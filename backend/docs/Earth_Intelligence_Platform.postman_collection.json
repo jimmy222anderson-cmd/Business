@@ -1,0 +1,624 @@
+{
+  "info": {
+    "name": "Earth Intelligence Platform API",
+    "description": "Complete API collection for Earth Intelligence Platform backend",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json",
+    "version": "1.0.0"
+  },
+  "auth": {
+    "type": "bearer",
+    "bearer": [
+      {
+        "key": "token",
+        "value": "{{jwt_token}}",
+        "type": "string"
+      }
+    ]
+  },
+  "variable": [
+    {
+      "key": "base_url",
+      "value": "http://localhost:3000/api",
+      "type": "string"
+    },
+    {
+      "key": "jwt_token",
+      "value": "",
+      "type": "string"
+    }
+  ],
+  "item": [
+    {
+      "name": "Authentication",
+      "item": [
+        {
+          "name": "Sign Up",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"fullName\": \"John Doe\",\n  \"email\": \"john.doe@example.com\",\n  \"companyName\": \"Acme Corp\",\n  \"password\": \"SecurePass123!\"\n}"
+            },
+            "url": {
+              "raw": "{{base_url}}/auth/signup",
+              "host": ["{{base_url}}"],
+              "path": ["auth", "signup"]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Sign In",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "if (pm.response.code === 200) {",
+                  "    var jsonData = pm.response.json();",
+                  "    pm.collectionVariables.set(\"jwt_token\", jsonData.token);",
+                  "}"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"email\": \"john.doe@example.com\",\n  \"password\": \"SecurePass123!\"\n}"
+            },
+            "url": {
+              "raw": "{{base_url}}/auth/signin",
+              "host": ["{{base_url}}"],
+              "path": ["auth", "signin"]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Get Current User",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{base_url}}/auth/me",
+              "host": ["{{base_url}}"],
+              "path": ["auth", "me"]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Forgot Password",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"email\": \"john.doe@example.com\"\n}"
+            },
+            "url": {
+              "raw": "{{base_url}}/auth/forgot-password",
+              "host": ["{{base_url}}"],
+              "path": ["auth", "forgot-password"]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Reset Password",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"token\": \"reset_token_here\",\n  \"newPassword\": \"NewSecurePass123!\"\n}"
+            },
+            "url": {
+              "raw": "{{base_url}}/auth/reset-password",
+              "host": ["{{base_url}}"],
+              "path": ["auth", "reset-password"]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Verify Email",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{base_url}}/auth/verify-email/:token",
+              "host": ["{{base_url}}"],
+              "path": ["auth", "verify-email", ":token"],
+              "variable": [
+                {
+                  "key": "token",
+                  "value": "verification_token_here"
+                }
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Sign Out",
+          "request": {
+            "method": "POST",
+            "header": [],
+            "url": {
+              "raw": "{{base_url}}/auth/signout",
+              "host": ["{{base_url}}"],
+              "path": ["auth", "signout"]
+            }
+          },
+          "response": []
+        }
+      ]
+    },
+    {
+      "name": "Demo Booking",
+      "item": [
+        {
+          "name": "Create Demo Booking",
+          "request": {
+            "auth": {
+              "type": "noauth"
+            },
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"fullName\": \"John Doe\",\n  \"email\": \"john.doe@example.com\",\n  \"companyName\": \"Acme Corp\",\n  \"phoneNumber\": \"+1-555-123-4567\",\n  \"jobTitle\": \"CTO\",\n  \"message\": \"Interested in satellite imagery for agriculture monitoring\"\n}"
+            },
+            "url": {
+              "raw": "{{base_url}}/demo/book",
+              "host": ["{{base_url}}"],
+              "path": ["demo", "book"]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Get User's Demo Bookings",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{base_url}}/demo/bookings/user/:userId",
+              "host": ["{{base_url}}"],
+              "path": ["demo", "bookings", "user", ":userId"],
+              "variable": [
+                {
+                  "key": "userId",
+                  "value": "user_id_here"
+                }
+              ]
+            }
+          },
+          "response": []
+        }
+      ]
+    },
+    {
+      "name": "Contact",
+      "item": [
+        {
+          "name": "Submit Contact Inquiry",
+          "request": {
+            "auth": {
+              "type": "noauth"
+            },
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"fullName\": \"Jane Smith\",\n  \"email\": \"jane.smith@example.com\",\n  \"subject\": \"Partnership Inquiry\",\n  \"message\": \"We are interested in partnering with your platform for our agriculture clients.\"\n}"
+            },
+            "url": {
+              "raw": "{{base_url}}/contact",
+              "host": ["{{base_url}}"],
+              "path": ["contact"]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Get User's Contact Inquiries",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{base_url}}/contact/inquiries/user/:userId",
+              "host": ["{{base_url}}"],
+              "path": ["contact", "inquiries", "user", ":userId"],
+              "variable": [
+                {
+                  "key": "userId",
+                  "value": "user_id_here"
+                }
+              ]
+            }
+          },
+          "response": []
+        }
+      ]
+    },
+    {
+      "name": "Quote Request",
+      "item": [
+        {
+          "name": "Submit Quote Request",
+          "request": {
+            "auth": {
+              "type": "noauth"
+            },
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"fullName\": \"Bob Johnson\",\n  \"email\": \"bob.johnson@example.com\",\n  \"companyName\": \"Mining Corp\",\n  \"phoneNumber\": \"+1-555-987-6543\",\n  \"industry\": \"Mining\",\n  \"estimatedDataVolume\": \"10-50 TB/month\",\n  \"requirements\": \"Need high-resolution imagery for mining site monitoring across 5 locations\"\n}"
+            },
+            "url": {
+              "raw": "{{base_url}}/quote/request",
+              "host": ["{{base_url}}"],
+              "path": ["quote", "request"]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Get User's Quote Requests",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{base_url}}/quote/requests/user/:userId",
+              "host": ["{{base_url}}"],
+              "path": ["quote", "requests", "user", ":userId"],
+              "variable": [
+                {
+                  "key": "userId",
+                  "value": "user_id_here"
+                }
+              ]
+            }
+          },
+          "response": []
+        }
+      ]
+    },
+    {
+      "name": "Content",
+      "item": [
+        {
+          "name": "Get Privacy Policy",
+          "request": {
+            "auth": {
+              "type": "noauth"
+            },
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{base_url}}/content/privacy",
+              "host": ["{{base_url}}"],
+              "path": ["content", "privacy"]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Get Terms of Service",
+          "request": {
+            "auth": {
+              "type": "noauth"
+            },
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{base_url}}/content/terms",
+              "host": ["{{base_url}}"],
+              "path": ["content", "terms"]
+            }
+          },
+          "response": []
+        }
+      ]
+    },
+    {
+      "name": "Admin - Demo Bookings",
+      "item": [
+        {
+          "name": "Get All Demo Bookings",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{base_url}}/admin/demo/bookings?status=pending&page=1&limit=20",
+              "host": ["{{base_url}}"],
+              "path": ["admin", "demo", "bookings"],
+              "query": [
+                {
+                  "key": "status",
+                  "value": "pending"
+                },
+                {
+                  "key": "page",
+                  "value": "1"
+                },
+                {
+                  "key": "limit",
+                  "value": "20"
+                }
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Update Demo Booking Status",
+          "request": {
+            "method": "PUT",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"status\": \"confirmed\"\n}"
+            },
+            "url": {
+              "raw": "{{base_url}}/admin/demo/bookings/:id/status",
+              "host": ["{{base_url}}"],
+              "path": ["admin", "demo", "bookings", ":id", "status"],
+              "variable": [
+                {
+                  "key": "id",
+                  "value": "booking_id_here"
+                }
+              ]
+            }
+          },
+          "response": []
+        }
+      ]
+    },
+    {
+      "name": "Admin - Contact Inquiries",
+      "item": [
+        {
+          "name": "Get All Contact Inquiries",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{base_url}}/admin/contact/inquiries?status=new&page=1&limit=20",
+              "host": ["{{base_url}}"],
+              "path": ["admin", "contact", "inquiries"],
+              "query": [
+                {
+                  "key": "status",
+                  "value": "new"
+                },
+                {
+                  "key": "page",
+                  "value": "1"
+                },
+                {
+                  "key": "limit",
+                  "value": "20"
+                }
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Update Contact Inquiry Status",
+          "request": {
+            "method": "PUT",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"status\": \"in-progress\"\n}"
+            },
+            "url": {
+              "raw": "{{base_url}}/admin/contact/inquiries/:id/status",
+              "host": ["{{base_url}}"],
+              "path": ["admin", "contact", "inquiries", ":id", "status"],
+              "variable": [
+                {
+                  "key": "id",
+                  "value": "inquiry_id_here"
+                }
+              ]
+            }
+          },
+          "response": []
+        }
+      ]
+    },
+    {
+      "name": "Admin - Quote Requests",
+      "item": [
+        {
+          "name": "Get All Quote Requests",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{base_url}}/admin/quote/requests?status=pending&page=1&limit=20",
+              "host": ["{{base_url}}"],
+              "path": ["admin", "quote", "requests"],
+              "query": [
+                {
+                  "key": "status",
+                  "value": "pending"
+                },
+                {
+                  "key": "page",
+                  "value": "1"
+                },
+                {
+                  "key": "limit",
+                  "value": "20"
+                }
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Update Quote Request Status",
+          "request": {
+            "method": "PUT",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"status\": \"quoted\"\n}"
+            },
+            "url": {
+              "raw": "{{base_url}}/admin/quote/requests/:id/status",
+              "host": ["{{base_url}}"],
+              "path": ["admin", "quote", "requests", ":id", "status"],
+              "variable": [
+                {
+                  "key": "id",
+                  "value": "request_id_here"
+                }
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Add Quote Details",
+          "request": {
+            "method": "PUT",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"quoteDetails\": {\n    \"pricing\": \"$5,000/month\",\n    \"terms\": \"12-month contract, monthly billing\",\n    \"validUntil\": \"2024-02-15T00:00:00.000Z\",\n    \"notes\": \"Includes 50 TB/month of high-resolution imagery\"\n  }\n}"
+            },
+            "url": {
+              "raw": "{{base_url}}/admin/quote/requests/:id/quote",
+              "host": ["{{base_url}}"],
+              "path": ["admin", "quote", "requests", ":id", "quote"],
+              "variable": [
+                {
+                  "key": "id",
+                  "value": "request_id_here"
+                }
+              ]
+            }
+          },
+          "response": []
+        }
+      ]
+    },
+    {
+      "name": "Admin - Content Management",
+      "item": [
+        {
+          "name": "Update Privacy Policy",
+          "request": {
+            "method": "PUT",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"sections\": [\n    {\n      \"id\": \"introduction\",\n      \"title\": \"Introduction\",\n      \"content\": \"Updated privacy policy content...\"\n    }\n  ],\n  \"version\": \"1.1\"\n}"
+            },
+            "url": {
+              "raw": "{{base_url}}/admin/content/privacy-policy",
+              "host": ["{{base_url}}"],
+              "path": ["admin", "content", "privacy-policy"]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Update Terms of Service",
+          "request": {
+            "method": "PUT",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"sections\": [\n    {\n      \"id\": \"acceptance\",\n      \"title\": \"Acceptance of Terms\",\n      \"content\": \"Updated terms content...\"\n    }\n  ],\n  \"version\": \"1.1\"\n}"
+            },
+            "url": {
+              "raw": "{{base_url}}/admin/content/terms-of-service",
+              "host": ["{{base_url}}"],
+              "path": ["admin", "content", "terms-of-service"]
+            }
+          },
+          "response": []
+        }
+      ]
+    }
+  ]
+}

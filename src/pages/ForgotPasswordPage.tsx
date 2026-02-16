@@ -5,7 +5,7 @@ import { useState } from "react";
 import { Link } from "react-router-dom";
 import { z } from "zod";
 import { ArrowLeft } from "lucide-react";
-import { handleFormSubmission } from "@/lib/form-utils";
+import { useToast } from "@/hooks/use-toast";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -27,6 +27,7 @@ const fadeInUp = {
 const ForgotPasswordPage = () => {
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [isSuccess, setIsSuccess] = useState(false);
+  const { toast } = useToast();
 
   const {
     register,
@@ -40,16 +41,35 @@ const ForgotPasswordPage = () => {
   const onSubmit = async (data: ForgotPasswordFormData) => {
     setIsSubmitting(true);
     try {
-      await handleFormSubmission(data, {
-        successTitle: "Reset Link Sent!",
-        successDescription: "If an account exists with this email, you will receive password reset instructions shortly.",
-        onSuccess: () => {
-          reset();
-          setIsSuccess(true);
+      const response = await fetch(`${import.meta.env.VITE_API_BASE_URL}/api/auth/forgot-password`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
         },
+        body: JSON.stringify(data),
       });
+
+      const result = await response.json();
+
+      if (!response.ok) {
+        throw new Error(result.message || 'Failed to send reset link');
+      }
+
+      // Show success message
+      toast({
+        title: "Reset Link Sent!",
+        description: result.message || "If an account exists with this email, you will receive password reset instructions shortly.",
+      });
+
+      reset();
+      setIsSuccess(true);
     } catch (error) {
-      // Error handling is done in handleFormSubmission
+      console.error('Forgot password error:', error);
+      toast({
+        title: "Error",
+        description: error instanceof Error ? error.message : "Failed to send reset link. Please try again.",
+        variant: "destructive",
+      });
     } finally {
       setIsSubmitting(false);
     }

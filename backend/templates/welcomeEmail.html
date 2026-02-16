@@ -1,0 +1,192 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Welcome to Earth Intelligence Platform</title>
+  <style>
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
+      line-height: 1.6;
+      color: #333;
+      background-color: #f4f4f4;
+      margin: 0;
+      padding: 0;
+    }
+    .container {
+      max-width: 600px;
+      margin: 40px auto;
+      background-color: #ffffff;
+      border-radius: 8px;
+      overflow: hidden;
+      box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+    }
+    .header {
+      background: linear-gradient(135deg, #1a1a2e 0%, #16213e 100%);
+      color: #ffffff;
+      padding: 40px 30px;
+      text-align: center;
+    }
+    .header h1 {
+      margin: 0;
+      font-size: 28px;
+      font-weight: 600;
+    }
+    .header p {
+      margin: 10px 0 0;
+      font-size: 16px;
+      opacity: 0.9;
+    }
+    .content {
+      padding: 40px 30px;
+    }
+    .content p {
+      margin: 0 0 20px;
+      font-size: 16px;
+    }
+    .cta-button {
+      display: inline-block;
+      padding: 14px 32px;
+      background: linear-gradient(135deg, #f59e0b 0%, #d97706 100%);
+      color: #ffffff;
+      text-decoration: none;
+      border-radius: 6px;
+      font-weight: 600;
+      font-size: 16px;
+      margin: 20px 0;
+      transition: transform 0.2s;
+    }
+    .cta-button:hover {
+      transform: translateY(-2px);
+    }
+    .features {
+      margin: 30px 0;
+    }
+    .feature-item {
+      display: flex;
+      align-items: flex-start;
+      margin-bottom: 20px;
+    }
+    .feature-icon {
+      font-size: 24px;
+      margin-right: 15px;
+      flex-shrink: 0;
+    }
+    .feature-text h3 {
+      margin: 0 0 5px;
+      font-size: 18px;
+      color: #1a1a2e;
+    }
+    .feature-text p {
+      margin: 0;
+      font-size: 14px;
+      color: #6b7280;
+    }
+    .info-box {
+      background-color: #f0fdf4;
+      border-left: 4px solid #10b981;
+      padding: 16px;
+      margin: 20px 0;
+      border-radius: 4px;
+    }
+    .info-box p {
+      margin: 0;
+      font-size: 14px;
+      color: #065f46;
+    }
+    .footer {
+      background-color: #f9fafb;
+      padding: 30px;
+      text-align: center;
+      font-size: 14px;
+      color: #6b7280;
+    }
+    .footer a {
+      color: #f59e0b;
+      text-decoration: none;
+    }
+    .social-links {
+      margin-top: 20px;
+    }
+    .social-links a {
+      display: inline-block;
+      margin: 0 10px;
+      color: #6b7280;
+      text-decoration: none;
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <div class="header">
+      <h1>🌍 Welcome to Earth Intelligence Platform!</h1>
+      <p>Your journey to powerful satellite insights begins here</p>
+    </div>
+    <div class="content">
+      <p>Hello {{fullName}},</p>
+      <p>Welcome aboard! We're thrilled to have you join Earth Intelligence Platform. You now have access to cutting-edge satellite data and analytics that will transform how you understand our planet.</p>
+      
+      <div class="info-box">
+        <p><strong>✅ Your account is ready!</strong></p>
+        <p>Start exploring our products and services right away.</p>
+      </div>
+
+      <center>
+        <a href="{{dashboardLink}}" class="cta-button">Go to Dashboard</a>
+      </center>
+
+      <div class="features">
+        <h2 style="font-size: 22px; margin-bottom: 20px;">What you can do now:</h2>
+        
+        <div class="feature-item">
+          <div class="feature-icon">🛰️</div>
+          <div class="feature-text">
+            <h3>Explore Products</h3>
+            <p>Browse our comprehensive satellite data products and analytics solutions</p>
+          </div>
+        </div>
+
+        <div class="feature-item">
+          <div class="feature-icon">📊</div>
+          <div class="feature-text">
+            <h3>View Pricing</h3>
+            <p>Check out our flexible pricing plans tailored to your needs</p>
+          </div>
+        </div>
+
+        <div class="feature-item">
+          <div class="feature-icon">🤝</div>
+          <div class="feature-text">
+            <h3>Book a Demo</h3>
+            <p>Schedule a personalized demo with our team to see the platform in action</p>
+          </div>
+        </div>
+
+        <div class="feature-item">
+          <div class="feature-icon">💬</div>
+          <div class="feature-text">
+            <h3>Get Support</h3>
+            <p>Our team is here to help you every step of the way</p>
+          </div>
+        </div>
+      </div>
+
+      <p style="margin-top: 30px;">If you have any questions or need assistance, don't hesitate to reach out to our support team.</p>
+    </div>
+    <div class="footer">
+      <p><strong>Earth Intelligence Platform</strong></p>
+      <p>Transforming satellite data into actionable insights</p>
+      <p style="margin-top: 15px;">
+        <a href="{{productsLink}}">Products</a> | 
+        <a href="{{pricingLink}}">Pricing</a> | 
+        <a href="{{supportLink}}">Support</a>
+      </p>
+      <div class="social-links">
+        <a href="{{twitterLink}}">Twitter</a>
+        <a href="{{linkedinLink}}">LinkedIn</a>
+        <a href="{{githubLink}}">GitHub</a>
+      </div>
+    </div>
+  </div>
+</body>
+</html>

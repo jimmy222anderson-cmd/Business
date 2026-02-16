@@ -2,10 +2,11 @@ import { motion } from "framer-motion";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useState } from "react";
-import { Link } from "react-router-dom";
+import { Link, useNavigate, useLocation } from "react-router-dom";
 import { Eye, EyeOff } from "lucide-react";
 import { signInSchema, type SignInFormData } from "@/lib/form-schemas";
-import { handleFormSubmission } from "@/lib/form-utils";
+import { useAuth } from "@/contexts/AuthContext";
+import { useToast } from "@/hooks/use-toast";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -19,6 +20,13 @@ const fadeInUp = {
 const SignInPage = () => {
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [showPassword, setShowPassword] = useState(false);
+  const { signIn } = useAuth();
+  const { toast } = useToast();
+  const navigate = useNavigate();
+  const location = useLocation();
+
+  // Get the redirect path from location state, or default to dashboard
+  const from = (location.state as any)?.from?.pathname || '/dashboard';
 
   const {
     register,
@@ -32,13 +40,56 @@ const SignInPage = () => {
   const onSubmit = async (data: SignInFormData) => {
     setIsSubmitting(true);
     try {
-      await handleFormSubmission(data, {
-        successTitle: "Sign In Successful!",
-        successDescription: "Welcome back to Earth Intelligence Platform.",
-        onSuccess: () => reset(),
+      // Sign in with backend
+      const user = await signIn({
+        email: data.email,
+        password: data.password,
       });
-    } catch (error) {
-      // Error handling is done in handleFormSubmission
+
+      // Show success message
+      toast({
+        title: "Sign In Successful!",
+        description: "Welcome back to Earth Intelligence Platform.",
+      });
+
+      // Reset form
+      reset();
+
+      // Determine redirect path based on user role
+      let redirectPath = from;
+      
+      // If coming from a protected route, use that path
+      // Otherwise, redirect based on role
+      if (from === '/dashboard') {
+        redirectPath = user.role === 'admin' ? '/admin/dashboard' : '/dashboard';
+      }
+
+      // Redirect to appropriate dashboard after a short delay
+      setTimeout(() => {
+        navigate(redirectPath, { replace: true });
+      }, 1500);
+    } catch (error: any) {
+      // Handle specific error cases
+      let errorTitle = "Sign In Failed";
+      let errorDescription = "Invalid email or password. Please try again.";
+
+      if (error.message) {
+        if (error.message.includes("verify your email") || error.message.includes("Email not verified")) {
+          errorTitle = "Email Not Verified";
+          errorDescription = "Please verify your email address before signing in. Check your inbox for the verification link.";
+        } else if (error.message.includes("Invalid email or password")) {
+          errorDescription = "Invalid email or password. Please try again.";
+        } else {
+          errorDescription = error.message;
+        }
+      }
+
+      // Show error message
+      toast({
+        title: errorTitle,
+        description: errorDescription,
+        variant: "destructive",
+      });
     } finally {
       setIsSubmitting(false);
     }

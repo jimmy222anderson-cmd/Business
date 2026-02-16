@@ -1,14 +1,17 @@
 import { useState, useEffect } from 'react';
-import { Link } from 'react-router-dom';
-import { Menu, X, ChevronDown } from 'lucide-react';
+import { Link, useNavigate } from 'react-router-dom';
+import { Menu, X, ChevronDown, User, LogOut, LayoutDashboard } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import {
   DropdownMenu,
   DropdownMenuContent,
   DropdownMenuItem,
   DropdownMenuTrigger,
+  DropdownMenuSeparator,
 } from '@/components/ui/dropdown-menu';
 import { Sheet, SheetContent, SheetTrigger } from '@/components/ui/sheet';
+import { useAuth } from '@/contexts/AuthContext';
+import { Avatar, AvatarFallback } from '@/components/ui/avatar';
 
 const industries = [
   { name: 'Financial Services', href: '/industries/financial-services' },
@@ -24,6 +27,8 @@ const industries = [
 export const Navbar = () => {
   const [isScrolled, setIsScrolled] = useState(false);
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
+  const { user, isAuthenticated, signOut } = useAuth();
+  const navigate = useNavigate();
 
   useEffect(() => {
     const handleScroll = () => {
@@ -33,6 +38,24 @@ export const Navbar = () => {
     window.addEventListener('scroll', handleScroll);
     return () => window.removeEventListener('scroll', handleScroll);
   }, []);
+
+  const handleSignOut = async () => {
+    try {
+      await signOut();
+      navigate('/');
+    } catch (error) {
+      console.error('Sign out error:', error);
+    }
+  };
+
+  const getUserInitials = () => {
+    if (!user?.full_name) return 'U';
+    const names = user.full_name.split(' ');
+    if (names.length >= 2) {
+      return `${names[0][0]}${names[1][0]}`.toUpperCase();
+    }
+    return user.full_name[0].toUpperCase();
+  };
 
   return (
     <nav
@@ -104,12 +127,56 @@ export const Navbar = () => {
 
           {/* CTA Buttons - Desktop */}
           <div className="hidden md:flex items-center space-x-4">
-            <Button variant="ghost" asChild>
-              <Link to="/auth/signin">Sign In</Link>
-            </Button>
-            <Button asChild>
-              <Link to="/demo">Book Demo</Link>
-            </Button>
+            {isAuthenticated && user ? (
+              <DropdownMenu>
+                <DropdownMenuTrigger asChild>
+                  <Button variant="ghost" className="flex items-center space-x-2">
+                    <Avatar className="h-8 w-8">
+                      <AvatarFallback className="bg-primary text-primary-foreground">
+                        {getUserInitials()}
+                      </AvatarFallback>
+                    </Avatar>
+                    <span className="font-medium">{user.full_name || user.email}</span>
+                    <ChevronDown className="w-4 h-4" />
+                  </Button>
+                </DropdownMenuTrigger>
+                <DropdownMenuContent align="end" className="w-56">
+                  <div className="px-2 py-1.5 text-sm">
+                    <p className="font-medium">{user.full_name || 'User'}</p>
+                    <p className="text-xs text-muted-foreground">{user.email}</p>
+                  </div>
+                  <DropdownMenuSeparator />
+                  <DropdownMenuItem asChild>
+                    <Link to="/dashboard" className="cursor-pointer">
+                      <LayoutDashboard className="w-4 h-4 mr-2" />
+                      Dashboard
+                    </Link>
+                  </DropdownMenuItem>
+                  {user.role === 'admin' && (
+                    <DropdownMenuItem asChild>
+                      <Link to="/admin/dashboard" className="cursor-pointer">
+                        <User className="w-4 h-4 mr-2" />
+                        Admin Panel
+                      </Link>
+                    </DropdownMenuItem>
+                  )}
+                  <DropdownMenuSeparator />
+                  <DropdownMenuItem onClick={handleSignOut} className="cursor-pointer text-destructive">
+                    <LogOut className="w-4 h-4 mr-2" />
+                    Sign Out
+                  </DropdownMenuItem>
+                </DropdownMenuContent>
+              </DropdownMenu>
+            ) : (
+              <>
+                <Button variant="ghost" asChild>
+                  <Link to="/auth/signin">Sign In</Link>
+                </Button>
+                <Button asChild>
+                  <Link to="/demo">Book Demo</Link>
+                </Button>
+              </>
+            )}
           </div>
 
           {/* Mobile Menu Button */}
@@ -176,16 +243,52 @@ export const Navbar = () => {
 
                 {/* CTA Buttons - Mobile */}
                 <div className="flex flex-col space-y-3 pt-6 border-t border-border">
-                  <Button variant="ghost" asChild className="w-full">
-                    <Link to="/auth/signin" onClick={() => setIsMobileMenuOpen(false)}>
-                      Sign In
-                    </Link>
-                  </Button>
-                  <Button asChild className="w-full">
-                    <Link to="/demo" onClick={() => setIsMobileMenuOpen(false)}>
-                      Book Demo
-                    </Link>
-                  </Button>
+                  {isAuthenticated && user ? (
+                    <>
+                      <div className="px-2 py-2 bg-muted rounded-lg">
+                        <p className="font-medium text-sm">{user.full_name || 'User'}</p>
+                        <p className="text-xs text-muted-foreground">{user.email}</p>
+                      </div>
+                      <Button variant="ghost" asChild className="w-full justify-start">
+                        <Link to="/dashboard" onClick={() => setIsMobileMenuOpen(false)}>
+                          <LayoutDashboard className="w-4 h-4 mr-2" />
+                          Dashboard
+                        </Link>
+                      </Button>
+                      {user.role === 'admin' && (
+                        <Button variant="ghost" asChild className="w-full justify-start">
+                          <Link to="/admin/dashboard" onClick={() => setIsMobileMenuOpen(false)}>
+                            <User className="w-4 h-4 mr-2" />
+                            Admin Panel
+                          </Link>
+                        </Button>
+                      )}
+                      <Button 
+                        variant="ghost" 
+                        className="w-full justify-start text-destructive"
+                        onClick={() => {
+                          setIsMobileMenuOpen(false);
+                          handleSignOut();
+                        }}
+                      >
+                        <LogOut className="w-4 h-4 mr-2" />
+                        Sign Out
+                      </Button>
+                    </>
+                  ) : (
+                    <>
+                      <Button variant="ghost" asChild className="w-full">
+                        <Link to="/auth/signin" onClick={() => setIsMobileMenuOpen(false)}>
+                          Sign In
+                        </Link>
+                      </Button>
+                      <Button asChild className="w-full">
+                        <Link to="/demo" onClick={() => setIsMobileMenuOpen(false)}>
+                          Book Demo
+                        </Link>
+                      </Button>
+                    </>
+                  )}
                 </div>
               </nav>
             </SheetContent>

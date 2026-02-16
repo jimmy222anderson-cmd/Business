@@ -1,4 +1,5 @@
 import { toast } from "@/hooks/use-toast";
+import { handleApiError } from "./api/errorHandler";
 
 /**
  * Shared form submission handler utility
@@ -48,10 +49,12 @@ export async function handleFormSubmission<T>(
       onSuccess();
     }
   } catch (error) {
+    const { message } = handleApiError(error);
+    
     // Show error message
     toast({
       title: errorTitle,
-      description: errorDescription,
+      description: message || errorDescription,
       variant: "destructive",
     });
     

@@ -1,9 +1,10 @@
 import { motion } from "framer-motion";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
-import { useState } from "react";
+import { useState, useEffect } from "react";
+import { useLocation } from "react-router-dom";
 import { quoteSchema, type QuoteFormData } from "@/lib/form-schemas";
-import { handleFormSubmission } from "@/lib/form-utils";
+import { toast } from "sonner";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -45,6 +46,13 @@ const dataVolumes = [
 
 const RequestQuotePage = () => {
   const [isSubmitting, setIsSubmitting] = useState(false);
+  const location = useLocation();
+  const calculatorData = location.state as {
+    estimatedPrice?: number;
+    dataType?: string;
+    coverageArea?: number;
+    frequency?: string;
+  } | null;
 
   const {
     register,
@@ -61,19 +69,61 @@ const RequestQuotePage = () => {
     },
   });
 
+  // Pre-fill requirements if coming from calculator
+  useEffect(() => {
+    if (calculatorData) {
+      const requirements = `Data Type: ${calculatorData.dataType || 'N/A'}
+Coverage Area: ${calculatorData.coverageArea || 'N/A'} sq km
+Frequency: ${calculatorData.frequency || 'N/A'}
+Estimated Price: $${calculatorData.estimatedPrice?.toFixed(2) || 'N/A'}
+
+Additional Requirements:
+`;
+      setValue('requirements', requirements);
+    }
+  }, [calculatorData, setValue]);
+
   const industry = watch("industry");
   const estimatedDataVolume = watch("estimatedDataVolume");
 
   const onSubmit = async (data: QuoteFormData) => {
     setIsSubmitting(true);
     try {
-      await handleFormSubmission(data, {
-        successTitle: "Quote Request Received!",
-        successDescription: "Our sales team will review your requirements and contact you within 24 hours with a custom quote.",
-        onSuccess: () => reset(),
+      const API_BASE_URL = import.meta.env.VITE_API_BASE_URL || 'http://localhost:3000/api';
+      
+      const response = await fetch(`${API_BASE_URL}/quote/request`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': `Bearer ${localStorage.getItem('auth_token') || ''}`
+        },
+        body: JSON.stringify(data),
       });
+
+      const result = await response.json();
+
+      if (!response.ok) {
+        // Handle validation errors
+        if (response.status === 400 && result.details) {
+          const errorMessages = Array.isArray(result.details) 
+            ? result.details.join(', ')
+            : Object.values(result.details).join(', ');
+          throw new Error(errorMessages);
+        }
+        throw new Error(result.error || 'Failed to submit quote request');
+      }
+
+      // Success
+      toast.success("Quote Request Received!", {
+        description: "Our sales team will review your requirements and contact you within 1-2 business days with a custom quote.",
+      });
+      
+      reset();
     } catch (error) {
-      // Error handling is done in handleFormSubmission
+      console.error('Quote request error:', error);
+      toast.error("Failed to Submit Request", {
+        description: error instanceof Error ? error.message : "Please try again later or contact support.",
+      });
     } finally {
       setIsSubmitting(false);
     }

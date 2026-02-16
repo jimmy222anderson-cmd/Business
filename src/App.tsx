@@ -3,6 +3,8 @@ import { Toaster as Sonner } from "@/components/ui/sonner";
 import { TooltipProvider } from "@/components/ui/tooltip";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { BrowserRouter, Routes, Route } from "react-router-dom";
+import { AuthProvider } from "@/contexts/AuthContext";
+import { ProtectedRoute } from "@/components/ProtectedRoute";
 import { Layout } from "./components/Layout";
 import Index from "./pages/Index";
 import NotFound from "./pages/NotFound";
@@ -20,11 +22,21 @@ import BookDemoPage from "./pages/BookDemoPage";
 import SignInPage from "./pages/SignInPage";
 import SignUpPage from "./pages/SignUpPage";
 import ForgotPasswordPage from "./pages/ForgotPasswordPage";
+import ResetPasswordPage from "./pages/ResetPasswordPage";
 import ContactPage from "./pages/ContactPage";
 import PrivacyPolicyPage from "./pages/PrivacyPolicyPage";
 import TermsOfServicePage from "./pages/TermsOfServicePage";
 import RequestQuotePage from "./pages/RequestQuotePage";
 import GetStartedPage from "./pages/GetStartedPage";
+import DashboardPage from "./pages/DashboardPage";
+import PartnershipPage from "./pages/PartnershipPage";
+import VerifyEmailPage from "./pages/VerifyEmailPage";
+import AdminDashboardPage from "./pages/admin/AdminDashboardPage";
+import DemoBookingsPage from "./pages/admin/DemoBookingsPage";
+import ContactInquiriesPage from "./pages/admin/ContactInquiriesPage";
+import ProductInquiriesPage from "./pages/admin/ProductInquiriesPage";
+import QuoteRequestsPage from "./pages/admin/QuoteRequestsPage";
+import UsersPage from "./pages/admin/UsersPage";
 
 const queryClient = new QueryClient();
 
@@ -40,41 +52,106 @@ const PlaceholderPage = ({ title }: { title: string }) => (
 
 const App = () => (
   <QueryClientProvider client={queryClient}>
-    <TooltipProvider>
-      <Toaster />
-      <Sonner />
-      <BrowserRouter>
-        <Routes>
-          <Route element={<Layout />}>
-            <Route path="/" element={<Index />} />
-            
-            {/* Phase 2 placeholder routes */}
-            <Route path="/products" element={<ProductsPage />} />
-            <Route path="/products/:productId" element={<ProductDetailPage />} />
-            <Route path="/industries" element={<IndustriesPage />} />
-            <Route path="/industries/:industryId" element={<IndustryDetailPage />} />
-            <Route path="/pricing" element={<PricingPage />} />
-            <Route path="/partners" element={<PartnersPage />} />
-            <Route path="/about" element={<AboutPage />} />
-            <Route path="/blog" element={<BlogPage />} />
-            <Route path="/blog/:postId" element={<BlogPostPage />} />
-            <Route path="/specs" element={<SpecsPage />} />
-            <Route path="/demo" element={<BookDemoPage />} />
-            <Route path="/get-started" element={<GetStartedPage />} />
-            <Route path="/auth/signin" element={<SignInPage />} />
-            <Route path="/auth/signup" element={<SignUpPage />} />
-            <Route path="/auth/forgot-password" element={<ForgotPasswordPage />} />
-            <Route path="/contact" element={<ContactPage />} />
-            <Route path="/privacy" element={<PrivacyPolicyPage />} />
-            <Route path="/terms" element={<TermsOfServicePage />} />
-            <Route path="/quote" element={<RequestQuotePage />} />
-            
-            {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
-            <Route path="*" element={<NotFound />} />
-          </Route>
-        </Routes>
-      </BrowserRouter>
-    </TooltipProvider>
+    <AuthProvider>
+      <TooltipProvider>
+        <Toaster />
+        <Sonner />
+        <BrowserRouter>
+          <Routes>
+            <Route element={<Layout />}>
+              <Route path="/" element={<Index />} />
+              
+              {/* Phase 2 placeholder routes */}
+              <Route path="/products" element={<ProductsPage />} />
+              <Route path="/products/:productId" element={<ProductDetailPage />} />
+              <Route path="/industries" element={<IndustriesPage />} />
+              <Route path="/industries/:industryId" element={<IndustryDetailPage />} />
+              <Route path="/pricing" element={<PricingPage />} />
+              <Route path="/partners" element={<PartnersPage />} />
+              <Route path="/about" element={<AboutPage />} />
+              <Route path="/blog" element={<BlogPage />} />
+              <Route path="/blog/:postId" element={<BlogPostPage />} />
+              <Route path="/specs" element={<SpecsPage />} />
+              <Route path="/demo" element={<BookDemoPage />} />
+              <Route path="/get-started" element={<GetStartedPage />} />
+              <Route path="/auth/signin" element={<SignInPage />} />
+              <Route path="/auth/signup" element={<SignUpPage />} />
+              <Route path="/auth/forgot-password" element={<ForgotPasswordPage />} />
+              <Route path="/auth/reset-password" element={<ResetPasswordPage />} />
+              <Route path="/auth/verify-email" element={<VerifyEmailPage />} />
+              <Route path="/contact" element={<ContactPage />} />
+              <Route path="/privacy" element={<PrivacyPolicyPage />} />
+              <Route path="/terms" element={<TermsOfServicePage />} />
+              <Route path="/quote" element={<RequestQuotePage />} />
+              <Route path="/partnership" element={<PartnershipPage />} />
+              
+              {/* Protected Routes */}
+              <Route 
+                path="/dashboard" 
+                element={
+                  <ProtectedRoute>
+                    <DashboardPage />
+                  </ProtectedRoute>
+                } 
+              />
+              
+              {/* Admin Routes */}
+              <Route 
+                path="/admin/dashboard" 
+                element={
+                  <ProtectedRoute requireAdmin>
+                    <AdminDashboardPage />
+                  </ProtectedRoute>
+                } 
+              />
+              <Route 
+                path="/admin/demo-bookings" 
+                element={
+                  <ProtectedRoute requireAdmin>
+                    <DemoBookingsPage />
+                  </ProtectedRoute>
+                } 
+              />
+              <Route 
+                path="/admin/contact-inquiries" 
+                element={
+                  <ProtectedRoute requireAdmin>
+                    <ContactInquiriesPage />
+                  </ProtectedRoute>
+                } 
+              />
+              <Route 
+                path="/admin/product-inquiries" 
+                element={
+                  <ProtectedRoute requireAdmin>
+                    <ProductInquiriesPage />
+                  </ProtectedRoute>
+                } 
+              />
+              <Route 
+                path="/admin/quote-requests" 
+                element={
+                  <ProtectedRoute requireAdmin>
+                    <QuoteRequestsPage />
+                  </ProtectedRoute>
+                } 
+              />
+              <Route 
+                path="/admin/users" 
+                element={
+                  <ProtectedRoute requireAdmin>
+                    <UsersPage />
+                  </ProtectedRoute>
+                } 
+              />
+              
+              {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
+              <Route path="*" element={<NotFound />} />
+            </Route>
+          </Routes>
+        </BrowserRouter>
+      </TooltipProvider>
+    </AuthProvider>
   </QueryClientProvider>
 );
 

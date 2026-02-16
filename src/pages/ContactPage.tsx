@@ -1,15 +1,10 @@
 import { motion } from "framer-motion";
-import { useForm } from "react-hook-form";
-import { zodResolver } from "@hookform/resolvers/zod";
 import { useState } from "react";
 import { Mail, Phone, MapPin } from "lucide-react";
-import { contactSchema, type ContactFormData } from "@/lib/form-schemas";
-import { handleFormSubmission } from "@/lib/form-utils";
+import { ContactForm, type ContactFormData } from "@/components/forms";
+import { createContactInquiry } from "@/lib/api";
+import { toast } from "sonner";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
-import { Button } from "@/components/ui/button";
-import { Input } from "@/components/ui/input";
-import { Textarea } from "@/components/ui/textarea";
-import { Label } from "@/components/ui/label";
 
 const fadeInUp = {
   hidden: { opacity: 0, y: 20 },
@@ -19,25 +14,47 @@ const fadeInUp = {
 const ContactPage = () => {
   const [isSubmitting, setIsSubmitting] = useState(false);
 
-  const {
-    register,
-    handleSubmit,
-    formState: { errors },
-    reset,
-  } = useForm<ContactFormData>({
-    resolver: zodResolver(contactSchema),
-  });
-
-  const onSubmit = async (data: ContactFormData) => {
+  const handleSubmit = async (data: ContactFormData) => {
     setIsSubmitting(true);
     try {
-      await handleFormSubmission(data, {
-        successTitle: "Message Sent!",
-        successDescription: "Thank you for contacting us. We'll get back to you within 24 hours.",
-        onSuccess: () => reset(),
+      await createContactInquiry({
+        inquiry_type: 'general',
+        full_name: data.full_name,
+        email: data.email,
+        company: data.company,
+        subject: data.subject,
+        message: data.message,
       });
-    } catch (error) {
-      // Error handling is done in handleFormSubmission
+
+      toast.success("Message Sent!", {
+        description: "Thank you for contacting us. We'll get back to you within 24-48 hours.",
+      });
+    } catch (error: any) {
+      console.error('Error submitting contact form:', error);
+      
+      // Handle specific error types
+      if (error.response?.status === 400) {
+        const errorDetails = error.response?.data?.details;
+        if (errorDetails) {
+          // Show validation errors
+          const errorMessages = Object.values(errorDetails).filter(Boolean).join(', ');
+          toast.error("Validation Error", {
+            description: errorMessages || "Please check your input and try again.",
+          });
+        } else {
+          toast.error("Invalid Input", {
+            description: error.response?.data?.error || "Please check your input and try again.",
+          });
+        }
+      } else if (error.response?.status === 500) {
+        toast.error("Server Error", {
+          description: "We're experiencing technical difficulties. Please try again later or contact us directly at contact@earthintelligence.com",
+        });
+      } else {
+        toast.error("Submission Failed", {
+          description: "There was an error sending your message. Please try again or contact us directly at contact@earthintelligence.com",
+        });
+      }
     } finally {
       setIsSubmitting(false);
     }
@@ -155,87 +172,11 @@ const ContactPage = () => {
                   </CardDescription>
                 </CardHeader>
                 <CardContent>
-                  <form onSubmit={handleSubmit(onSubmit)} className="space-y-6">
-                    {/* Full Name */}
-                    <div className="space-y-2">
-                      <Label htmlFor="fullName">Full Name *</Label>
-                      <Input
-                        id="fullName"
-                        placeholder="John Doe"
-                        {...register("fullName")}
-                        aria-invalid={errors.fullName ? "true" : "false"}
-                        aria-describedby={errors.fullName ? "fullName-error" : undefined}
-                      />
-                      {errors.fullName && (
-                        <p id="fullName-error" className="text-sm text-destructive">
-                          {errors.fullName.message}
-                        </p>
-                      )}
-                    </div>
-
-                    {/* Email */}
-                    <div className="space-y-2">
-                      <Label htmlFor="email">Email Address *</Label>
-                      <Input
-                        id="email"
-                        type="email"
-                        placeholder="john.doe@company.com"
-                        {...register("email")}
-                        aria-invalid={errors.email ? "true" : "false"}
-                        aria-describedby={errors.email ? "email-error" : undefined}
-                      />
-                      {errors.email && (
-                        <p id="email-error" className="text-sm text-destructive">
-                          {errors.email.message}
-                        </p>
-                      )}
-                    </div>
-
-                    {/* Subject */}
-                    <div className="space-y-2">
-                      <Label htmlFor="subject">Subject *</Label>
-                      <Input
-                        id="subject"
-                        placeholder="How can we help you?"
-                        {...register("subject")}
-                        aria-invalid={errors.subject ? "true" : "false"}
-                        aria-describedby={errors.subject ? "subject-error" : undefined}
-                      />
-                      {errors.subject && (
-                        <p id="subject-error" className="text-sm text-destructive">
-                          {errors.subject.message}
-                        </p>
-                      )}
-                    </div>
-
-                    {/* Message */}
-                    <div className="space-y-2">
-                      <Label htmlFor="message">Message *</Label>
-                      <Textarea
-                        id="message"
-                        placeholder="Tell us more about your inquiry..."
-                        rows={5}
-                        {...register("message")}
-                        aria-invalid={errors.message ? "true" : "false"}
-                        aria-describedby={errors.message ? "message-error" : undefined}
-                      />
-                      {errors.message && (
-                        <p id="message-error" className="text-sm text-destructive">
-                          {errors.message.message}
-                        </p>
-                      )}
-                    </div>
-
-                    {/* Submit Button */}
-                    <Button
-                      type="submit"
-                      className="w-full"
-                      disabled={isSubmitting}
-                    >
-                      {isSubmitting ? "Sending..." : "Send Message"}
-                    </Button>
-                  </form>
-                </CardContent>
+                <ContactForm
+                  onSubmit={handleSubmit}
+                  isSubmitting={isSubmitting}
+                />
+              </CardContent>
               </Card>
             </motion.div>
           </div>

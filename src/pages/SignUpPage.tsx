@@ -2,10 +2,11 @@ import { motion } from "framer-motion";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useState } from "react";
-import { Link } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 import { z } from "zod";
 import { Eye, EyeOff } from "lucide-react";
-import { handleFormSubmission } from "@/lib/form-utils";
+import { useAuth } from "@/contexts/AuthContext";
+import { useToast } from "@/hooks/use-toast";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -47,6 +48,11 @@ const SignUpPage = () => {
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [showPassword, setShowPassword] = useState(false);
   const [showConfirmPassword, setShowConfirmPassword] = useState(false);
+  const [showVerificationMessage, setShowVerificationMessage] = useState(false);
+  const [userEmail, setUserEmail] = useState('');
+  const { signUp } = useAuth();
+  const { toast } = useToast();
+  const navigate = useNavigate();
 
   const {
     register,
@@ -67,20 +73,110 @@ const SignUpPage = () => {
   const onSubmit = async (data: SignUpFormData) => {
     setIsSubmitting(true);
     try {
-      // Remove confirmPassword from submission data
-      const { confirmPassword, ...submitData } = data;
-      
-      await handleFormSubmission(submitData, {
-        successTitle: "Account Created Successfully!",
-        successDescription: "Welcome to Earth Intelligence Platform. You can now sign in with your credentials.",
-        onSuccess: () => reset(),
+      // Sign up with backend
+      const user = await signUp({
+        email: data.email,
+        password: data.password,
+        fullName: data.fullName,
+        companyName: data.companyName,
       });
-    } catch (error) {
-      // Error handling is done in handleFormSubmission
+
+      // Store email for verification message
+      setUserEmail(data.email);
+
+      // Show success message
+      toast({
+        title: "Account Created Successfully!",
+        description: "Please check your email to verify your account.",
+      });
+
+      // Reset form
+      reset();
+
+      // Show verification message instead of redirecting
+      setShowVerificationMessage(true);
+    } catch (error: any) {
+      // Show error message
+      toast({
+        title: "Sign Up Failed",
+        description: error.message || "Failed to create account. Please try again.",
+        variant: "destructive",
+      });
     } finally {
       setIsSubmitting(false);
     }
   };
+
+  // If verification message should be shown
+  if (showVerificationMessage) {
+    return (
+      <div className="min-h-screen bg-background flex items-center justify-center py-12 px-4 sm:px-6 lg:px-8">
+        <motion.div
+          initial="hidden"
+          animate="visible"
+          variants={fadeInUp}
+          transition={{ duration: 0.6 }}
+          className="w-full max-w-md"
+        >
+          <Card>
+            <CardHeader className="space-y-1">
+              <div className="flex justify-center mb-4">
+                <div className="w-16 h-16 bg-primary/10 rounded-full flex items-center justify-center">
+                  <svg
+                    className="w-8 h-8 text-primary"
+                    fill="none"
+                    stroke="currentColor"
+                    viewBox="0 0 24 24"
+                  >
+                    <path
+                      strokeLinecap="round"
+                      strokeLinejoin="round"
+                      strokeWidth={2}
+                      d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z"
+                    />
+                  </svg>
+                </div>
+              </div>
+              <CardTitle className="text-2xl font-bold text-center">Check Your Email</CardTitle>
+              <CardDescription className="text-center">
+                We've sent a verification link to <strong>{userEmail}</strong>
+              </CardDescription>
+            </CardHeader>
+            <CardContent className="space-y-4">
+              <div className="bg-muted p-4 rounded-lg">
+                <p className="text-sm text-muted-foreground">
+                  Please check your email and click the verification link to activate your account.
+                  The link will expire in 24 hours.
+                </p>
+              </div>
+              
+              <div className="space-y-2">
+                <p className="text-sm text-muted-foreground">
+                  Didn't receive the email? Check your spam folder or contact support.
+                </p>
+              </div>
+
+              <div className="flex flex-col gap-2">
+                <Button
+                  onClick={() => navigate('/auth/signin')}
+                  className="w-full"
+                >
+                  Go to Sign In
+                </Button>
+                <Button
+                  onClick={() => setShowVerificationMessage(false)}
+                  variant="outline"
+                  className="w-full"
+                >
+                  Back to Sign Up
+                </Button>
+              </div>
+            </CardContent>
+          </Card>
+        </motion.div>
+      </div>
+    );
+  }
 
   return (
     <div className="min-h-screen bg-background flex items-center justify-center py-12 px-4 sm:px-6 lg:px-8">

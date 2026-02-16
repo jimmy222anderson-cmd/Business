@@ -1,4 +1,5 @@
 import { useState } from "react";
+import { useNavigate } from "react-router-dom";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Label } from "@/components/ui/label";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
@@ -26,6 +27,7 @@ const frequencyMultipliers = {
 };
 
 const PricingCalculator = () => {
+  const navigate = useNavigate();
   const [inputs, setInputs] = useState<PricingInputs>({
     dataType: "commercial-imagery",
     coverageArea: 100,
@@ -42,6 +44,18 @@ const PricingCalculator = () => {
     const finalPrice = basePrice * frequency.multiplier;
     
     return Math.max(0, finalPrice);
+  };
+
+  const handleRequestQuote = () => {
+    // Navigate to quote request page with calculator data
+    navigate('/quote', {
+      state: {
+        estimatedPrice: calculatePrice(),
+        dataType: dataTypePricing[inputs.dataType as keyof typeof dataTypePricing].name,
+        coverageArea: inputs.coverageArea,
+        frequency: frequencyMultipliers[inputs.frequency as keyof typeof frequencyMultipliers].name,
+      }
+    });
   };
 
   const price = calculatePrice();
@@ -122,7 +136,7 @@ const PricingCalculator = () => {
           <p className="text-sm text-muted-foreground mb-4">
             {inputs.frequency !== "one-time" && "per " + frequencyMultipliers[inputs.frequency as keyof typeof frequencyMultipliers].name.toLowerCase()}
           </p>
-          <Button className="w-full" size="lg">
+          <Button className="w-full" size="lg" onClick={handleRequestQuote}>
             Request Quote
           </Button>
         </div>

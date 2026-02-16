@@ -3,10 +3,16 @@ import { motion } from 'framer-motion';
 import { ArrowLeft, Check } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { products } from '@/data/products';
+import { ProductInquiryForm, type ProductInquiryFormData } from '@/components/forms';
+import { createProductInquiry } from '@/lib/api';
+import { toast } from 'sonner';
+import { useState } from 'react';
 
 export function ProductDetailPage() {
   const { productId } = useParams<{ productId: string }>();
+  const [isSubmitting, setIsSubmitting] = useState(false);
   
   // Find the product by slug
   const product = products.find(p => p.slug === productId);
@@ -15,6 +21,24 @@ export function ProductDetailPage() {
   if (!product) {
     return <Navigate to="/products" replace />;
   }
+
+  const handleInquirySubmit = async (data: ProductInquiryFormData) => {
+    setIsSubmitting(true);
+    try {
+      await createProductInquiry(data);
+
+      toast.success("Inquiry Submitted!", {
+        description: "Thank you for your interest. Our sales team will contact you within 1 business day.",
+      });
+    } catch (error) {
+      console.error('Error submitting product inquiry:', error);
+      toast.error("Submission Failed", {
+        description: "There was an error submitting your inquiry. Please try again or contact us directly.",
+      });
+    } finally {
+      setIsSubmitting(false);
+    }
+  };
 
   return (
     <div className="min-h-screen bg-background">
@@ -232,6 +256,37 @@ export function ProductDetailPage() {
           </div>
         </section>
       )}
+
+      {/* Product Inquiry Section */}
+      <section className="py-20 bg-background">
+        <div className="container mx-auto px-6">
+          <div className="max-w-3xl mx-auto">
+            <motion.div
+              initial={{ opacity: 0, y: 20 }}
+              whileInView={{ opacity: 1, y: 0 }}
+              viewport={{ once: true }}
+              transition={{ duration: 0.6 }}
+            >
+              <Card>
+                <CardHeader>
+                  <CardTitle>Inquire About This Product</CardTitle>
+                  <CardDescription>
+                    Have questions or want to learn more? Send us your inquiry and our team will get back to you.
+                  </CardDescription>
+                </CardHeader>
+                <CardContent>
+                  <ProductInquiryForm
+                    productId={product.id}
+                    productName={product.name}
+                    onSubmit={handleInquirySubmit}
+                    isSubmitting={isSubmitting}
+                  />
+                </CardContent>
+              </Card>
+            </motion.div>
+          </div>
+        </div>
+      </section>
 
       {/* CTA Section */}
       <section className="py-20 bg-gradient-to-t from-background to-background/50">

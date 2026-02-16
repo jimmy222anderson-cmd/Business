@@ -30,13 +30,37 @@ const BookDemoPage = () => {
   const onSubmit = async (data: BookDemoFormData) => {
     setIsSubmitting(true);
     try {
+      // Import the API function dynamically to avoid circular dependencies
+      const { createDemoBooking } = await import("@/lib/api/demo");
+      
+      // Transform form data to API request format
+      const bookingData = {
+        fullName: data.fullName,
+        email: data.email,
+        companyName: data.companyName,
+        phoneNumber: data.phoneNumber,
+        jobTitle: data.jobTitle,
+        message: data.message,
+      };
+
+      // Call the API
+      const response = await createDemoBooking(bookingData);
+
+      // Show success message
       await handleFormSubmission(data, {
         successTitle: "Demo Request Received!",
-        successDescription: "Our team will contact you within 24 hours to schedule your personalized demo.",
+        successDescription: `Your booking ID is ${response.bookingId}. Our team will contact you within 24 hours to schedule your personalized demo.`,
         onSuccess: () => reset(),
+        simulateDelay: 0, // No delay since we already made the API call
       });
     } catch (error) {
-      // Error handling is done in handleFormSubmission
+      console.error('Demo booking error:', error);
+      // Show error message
+      await handleFormSubmission(data, {
+        errorTitle: "Submission Failed",
+        errorDescription: error instanceof Error ? error.message : "Unable to submit your demo request. Please try again or contact support.",
+        simulateDelay: 0,
+      });
     } finally {
       setIsSubmitting(false);
     }
