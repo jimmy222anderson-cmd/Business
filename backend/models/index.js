@@ -4,6 +4,11 @@ const ContactInquiry = require('./ContactInquiry');
 const ProductInquiry = require('./ProductInquiry');
 const NewsletterSubscription = require('./NewsletterSubscription');
 const BlogPost = require('./BlogPost');
+const Product = require('./Product');
+const Industry = require('./Industry');
+const Partner = require('./Partner');
+const Content = require('./Content');
+const QuoteRequest = require('./QuoteRequest');
 
 module.exports = {
   UserProfile,
@@ -11,5 +16,10 @@ module.exports = {
   ContactInquiry,
   ProductInquiry,
   NewsletterSubscription,
-  BlogPost
+  BlogPost,
+  Product,
+  Industry,
+  Partner,
+  Content,
+  QuoteRequest
 };

@@ -34,11 +34,11 @@ const formLimiter = rateLimit({
 });
 
 // General API rate limiter
-// Development: 500 requests per 15 minutes
+// Development: 10000 requests per 15 minutes (very lenient for local testing)
 // Production: 100 requests per 15 minutes
 const apiLimiter = rateLimit({
   windowMs: 15 * 60 * 1000, // 15 minutes
-  max: isDevelopment ? 500 : 100, // More lenient in development
+  max: isDevelopment ? 10000 : 100, // Very lenient in development
   message: {
     error: 'Too many requests from this IP, please try again later'
   },

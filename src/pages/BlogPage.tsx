@@ -1,12 +1,35 @@
 import { motion } from "framer-motion";
 import { Calendar, ArrowRight, Search } from "lucide-react";
 import { Link } from "react-router-dom";
-import { useState, useMemo } from "react";
-import { blogPosts } from "@/data/blog";
+import { useState, useMemo, useEffect } from "react";
 import { Input } from "@/components/ui/input";
+import { toast } from "sonner";
 
 const BlogPage = () => {
   const [searchQuery, setSearchQuery] = useState("");
+  const [blogPosts, setBlogPosts] = useState([]);
+  const [loading, setLoading] = useState(true);
+
+  useEffect(() => {
+    fetchBlogPosts();
+  }, []);
+
+  const fetchBlogPosts = async () => {
+    try {
+      const API_BASE_URL = import.meta.env.VITE_API_BASE_URL || 'http://localhost:3000/api';
+      const response = await fetch(`${API_BASE_URL}/public/blog`);
+      
+      if (!response.ok) throw new Error('Failed to fetch blog posts');
+      
+      const data = await response.json();
+      setBlogPosts(data);
+    } catch (error) {
+      console.error('Error fetching blog posts:', error);
+      toast.error('Failed to load blog posts');
+    } finally {
+      setLoading(false);
+    }
+  };
 
   // Filter posts based on search query
   const filteredPosts = useMemo(() => {
@@ -18,11 +41,21 @@ const BlogPage = () => {
     return blogPosts.filter((post) => {
       const titleMatch = post.title.toLowerCase().includes(query);
       const excerptMatch = post.excerpt.toLowerCase().includes(query);
-      const tagsMatch = post.tags.some((tag) => tag.toLowerCase().includes(query));
+      const tagsMatch = post.tags?.some((tag) => tag.toLowerCase().includes(query));
       
       return titleMatch || excerptMatch || tagsMatch;
     });
-  }, [searchQuery]);
+  }, [searchQuery, blogPosts]);
+
+  if (loading) {
+    return (
+      <div className="min-h-screen bg-background pt-24 pb-16">
+        <div className="container mx-auto px-6">
+          <div className="text-center">Loading blog posts...</div>
+        </div>
+      </div>
+    );
+  }
 
   return (
     <div className="min-h-screen bg-background pt-24 pb-16">
@@ -70,7 +103,7 @@ const BlogPage = () => {
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
           {filteredPosts.map((post, index) => (
             <motion.article
-              key={post.id}
+              key={post._id || post.id}
               initial={{ opacity: 0, y: 30 }}
               animate={{ opacity: 1, y: 0 }}
               transition={{ delay: index * 0.1 }}
@@ -80,7 +113,7 @@ const BlogPage = () => {
                   {/* Featured Image */}
                   <div className="h-56 bg-gradient-to-br from-primary/20 to-secondary overflow-hidden">
                     <img
-                      src={post.featuredImage}
+                      src={post.featured_image_url || post.featuredImage}
                       alt={post.title}
                       className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300"
                       loading="lazy"
@@ -91,7 +124,7 @@ const BlogPage = () => {
                   <div className="p-6 flex-1 flex flex-col">
                     {/* Meta */}
                     <div className="flex items-center gap-3 mb-4">
-                      {post.tags.slice(0, 1).map((tag) => (
+                      {post.tags?.slice(0, 1).map((tag) => (
                         <span
                           key={tag}
                           className="text-[10px] uppercase tracking-wider font-semibold text-primary bg-primary/10 px-2 py-0.5 rounded-full"
@@ -101,7 +134,7 @@ const BlogPage = () => {
                       ))}
                       <span className="flex items-center gap-1 text-xs text-muted-foreground">
                         <Calendar className="w-3 h-3" />
-                        {new Date(post.publishedAt).toLocaleDateString("en-US", {
+                        {new Date(post.published_at || post.publishedAt).toLocaleDateString("en-US", {
                           month: "short",
                           day: "numeric",
                           year: "numeric",

@@ -1,9 +1,78 @@
 import { motion } from 'framer-motion';
 import { Carousel } from './Carousel';
 import { ProductCard } from './ProductCard';
-import { products } from '@/data/products';
+import { useState, useEffect } from 'react';
+
+interface Feature {
+  title: string;
+  description: string;
+  icon: string;
+}
+
+interface UseCase {
+  title: string;
+  description: string;
+  industry?: string;
+}
+
+interface Specification {
+  key: string;
+  value: string;
+  unit?: string;
+}
+
+interface Product {
+  _id: string;
+  name: string;
+  slug: string;
+  description: string;
+  longDescription: string;
+  image: string;
+  pricingBadge?: string;
+  features: Feature[];
+  useCases: UseCase[];
+  specifications: Specification[];
+  category: string;
+  status: string;
+  order: number;
+}
 
 export function ProductsSection() {
+  const [products, setProducts] = useState<Product[]>([]);
+  const [loading, setLoading] = useState(true);
+
+  useEffect(() => {
+    const fetchProducts = async () => {
+      try {
+        const response = await fetch('http://localhost:5000/api/public/products');
+        if (!response.ok) throw new Error('Failed to fetch products');
+        const data = await response.json();
+        setProducts(data);
+      } catch (error) {
+        console.error('Error fetching products:', error);
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    fetchProducts();
+  }, []);
+
+  if (loading) {
+    return (
+      <section className="py-20 bg-background">
+        <div className="container mx-auto px-6 text-center">
+          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-yellow-500 mx-auto mb-4"></div>
+          <p className="text-muted-foreground">Loading products...</p>
+        </div>
+      </section>
+    );
+  }
+
+  if (products.length === 0) {
+    return null;
+  }
+
   return (
     <section className="py-20 bg-background">
       <div className="container mx-auto px-6">
@@ -38,7 +107,7 @@ export function ProductsSection() {
             className="h-[400px]"
           >
             {products.map((product) => (
-              <div key={product.id} className="flex justify-center items-center px-4">
+              <div key={product._id} className="flex justify-center items-center px-4">
                 <ProductCard product={product} variant="carousel" />
               </div>
             ))}

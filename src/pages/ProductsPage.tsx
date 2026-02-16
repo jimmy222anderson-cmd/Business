@@ -1,8 +1,43 @@
 import { motion } from 'framer-motion';
 import { ProductCard } from '@/components/ProductCard';
-import { products } from '@/data/products';
+import { useEffect, useState } from 'react';
+import { toast } from 'sonner';
 
 export function ProductsPage() {
+  const [products, setProducts] = useState([]);
+  const [loading, setLoading] = useState(true);
+
+  useEffect(() => {
+    fetchProducts();
+  }, []);
+
+  const fetchProducts = async () => {
+    try {
+      const API_BASE_URL = import.meta.env.VITE_API_BASE_URL || 'http://localhost:5000/api';
+      const response = await fetch(`${API_BASE_URL}/public/products`);
+      
+      if (!response.ok) throw new Error('Failed to fetch products');
+      
+      const data = await response.json();
+      setProducts(data);
+    } catch (error) {
+      console.error('Error fetching products:', error);
+      toast.error('Failed to load products');
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  if (loading) {
+    return (
+      <div className="min-h-screen bg-background py-20">
+        <div className="container mx-auto px-6">
+          <div className="text-center">Loading products...</div>
+        </div>
+      </div>
+    );
+  }
+
   return (
     <div className="min-h-screen bg-background py-20">
       <div className="container mx-auto px-6">
@@ -32,7 +67,7 @@ export function ProductsPage() {
         >
           {products.map((product, index) => (
             <motion.div
-              key={product.id}
+              key={product._id || product.id}
               initial={{ opacity: 0, y: 20 }}
               animate={{ opacity: 1, y: 0 }}
               transition={{ duration: 0.6, delay: 0.1 * index }}

@@ -9,7 +9,7 @@ export function IndustryContent({ industry }: IndustryContentProps) {
   return (
     <AnimatePresence mode="wait">
       <motion.div
-        key={industry.id}
+        key={industry._id}
         initial={{ opacity: 0, y: 20 }}
         animate={{ opacity: 1, y: 0 }}
         exit={{ opacity: 0, y: -20 }}
@@ -54,7 +54,7 @@ export function IndustryContent({ industry }: IndustryContentProps) {
               <ul className="space-y-2">
                 {industry.useCases.slice(0, 3).map((useCase) => (
                   <li
-                    key={useCase.id}
+                    key={useCase._id}
                     className="flex items-start text-sm text-muted-foreground"
                   >
                     <span className="mr-2 text-yellow-500">•</span>

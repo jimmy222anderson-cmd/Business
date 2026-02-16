@@ -102,7 +102,7 @@ export function Carousel({
   return (
     <div className={`relative w-full ${className}`}>
       {/* Carousel container */}
-      <div className="relative overflow-hidden">
+      <div className="relative overflow-hidden h-full">
         <AnimatePresence initial={false} custom={direction}>
           <motion.div
             key={currentIndex}
@@ -119,7 +119,7 @@ export function Carousel({
             dragConstraints={{ left: 0, right: 0 }}
             dragElastic={1}
             onDragEnd={handleDragEnd}
-            className="absolute w-full"
+            className="absolute w-full h-full"
           >
             {children[currentIndex]}
           </motion.div>

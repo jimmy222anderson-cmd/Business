@@ -1,14 +1,67 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { motion } from 'framer-motion';
 import { IndustryTabs } from './IndustryTabs';
 import { IndustryContent } from './IndustryContent';
-import { industries } from '@/data/industries';
+
+interface UseCase {
+  _id: string;
+  title: string;
+  description: string;
+}
+
+interface Industry {
+  _id: string;
+  name: string;
+  slug: string;
+  description: string;
+  longDescription: string;
+  image: string;
+  icon: string;
+  useCases: UseCase[];
+}
 
 export function IndustriesSection() {
-  const [activeTab, setActiveTab] = useState(industries[0].id);
+  const [industries, setIndustries] = useState<Industry[]>([]);
+  const [loading, setLoading] = useState(true);
+  const [activeTab, setActiveTab] = useState<string>('');
+
+  useEffect(() => {
+    const fetchIndustries = async () => {
+      try {
+        const response = await fetch('http://localhost:5000/api/public/industries');
+        if (!response.ok) throw new Error('Failed to fetch industries');
+        const data = await response.json();
+        setIndustries(data);
+        if (data.length > 0) {
+          setActiveTab(data[0]._id);
+        }
+      } catch (error) {
+        console.error('Error fetching industries:', error);
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    fetchIndustries();
+  }, []);
+
+  if (loading) {
+    return (
+      <section className="py-20 bg-muted/30">
+        <div className="container mx-auto px-6 text-center">
+          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-yellow-500 mx-auto mb-4"></div>
+          <p className="text-muted-foreground">Loading industries...</p>
+        </div>
+      </section>
+    );
+  }
+
+  if (industries.length === 0) {
+    return null;
+  }
 
   const activeIndustry = industries.find(
-    (industry) => industry.id === activeTab
+    (industry) => industry._id === activeTab
   ) || industries[0];
 
   return (

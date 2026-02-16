@@ -240,6 +240,44 @@ export default function AdminDashboardPage() {
           </CardContent>
         </Card>
 
+        {/* Content Management */}
+        <Card className="bg-gray-800 border-gray-700 mb-8">
+          <CardHeader>
+            <CardTitle className="text-white">Content Management</CardTitle>
+            <CardDescription className="text-gray-400">
+              Manage website content and data
+            </CardDescription>
+          </CardHeader>
+          <CardContent>
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
+              <Link to="/admin/products">
+                <Button variant="outline" className="w-full border-gray-600 text-gray-200 hover:bg-gray-700">
+                  <Package className="mr-2 h-4 w-4" />
+                  Products
+                </Button>
+              </Link>
+              <Link to="/admin/industries">
+                <Button variant="outline" className="w-full border-gray-600 text-gray-200 hover:bg-gray-700">
+                  <TrendingUp className="mr-2 h-4 w-4" />
+                  Industries
+                </Button>
+              </Link>
+              <Link to="/admin/partners">
+                <Button variant="outline" className="w-full border-gray-600 text-gray-200 hover:bg-gray-700">
+                  <Users className="mr-2 h-4 w-4" />
+                  Partners
+                </Button>
+              </Link>
+              <Link to="/admin/blog">
+                <Button variant="outline" className="w-full border-gray-600 text-gray-200 hover:bg-gray-700">
+                  <FileText className="mr-2 h-4 w-4" />
+                  Blog Posts
+                </Button>
+              </Link>
+            </div>
+          </CardContent>
+        </Card>
+
         {/* Recent Activity */}
         <Card className="bg-gray-800 border-gray-700">
           <CardHeader>

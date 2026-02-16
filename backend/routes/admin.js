@@ -7,6 +7,17 @@ const ContactInquiry = require('../models/ContactInquiry');
 const QuoteRequest = require('../models/QuoteRequest');
 const ProductInquiry = require('../models/ProductInquiry');
 
+// Content management routes
+const productsRouter = require('./admin/products');
+const industriesRouter = require('./admin/industries');
+const partnersRouter = require('./admin/partners');
+const blogsRouter = require('./admin/blogs');
+
+router.use('/products', productsRouter);
+router.use('/industries', industriesRouter);
+router.use('/partners', partnersRouter);
+router.use('/blogs', blogsRouter);
+
 /**
  * GET /api/admin/dashboard/stats
  * Get dashboard statistics

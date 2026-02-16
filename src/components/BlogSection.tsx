@@ -2,14 +2,62 @@ import { motion } from "framer-motion";
 import { ArrowRight, Calendar } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Link } from "react-router-dom";
-import { blogPosts } from "@/data/blog";
+import { useState, useEffect } from "react";
+
+interface BlogPost {
+  _id: string;
+  title: string;
+  slug: string;
+  excerpt: string;
+  author: string;
+  published_at: string;
+  featured_image_url: string;
+  tags: string[];
+  status: string;
+}
 
 const BlogSection = () => {
-  // Get the latest 3 published posts
-  const latestPosts = blogPosts
-    .filter((post) => post.status === "published")
-    .sort((a, b) => new Date(b.publishedAt).getTime() - new Date(a.publishedAt).getTime())
-    .slice(0, 3);
+  const [latestPosts, setLatestPosts] = useState<BlogPost[]>([]);
+  const [loading, setLoading] = useState(true);
+
+  useEffect(() => {
+    const fetchBlogPosts = async () => {
+      try {
+        const response = await fetch('http://localhost:5000/api/public/blog');
+        if (!response.ok) throw new Error('Failed to fetch blog posts');
+        const data = await response.json();
+        // Get the latest 3 published posts
+        const published = data
+          .filter((post: BlogPost) => post.status === "published")
+          .sort((a: BlogPost, b: BlogPost) => 
+            new Date(b.published_at).getTime() - new Date(a.published_at).getTime()
+          )
+          .slice(0, 3);
+        setLatestPosts(published);
+      } catch (error) {
+        console.error('Error fetching blog posts:', error);
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    fetchBlogPosts();
+  }, []);
+
+  if (loading) {
+    return (
+      <section className="py-24 bg-secondary/30">
+        <div className="container mx-auto px-6 text-center">
+          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-yellow-500 mx-auto mb-4"></div>
+          <p className="text-muted-foreground">Loading blog posts...</p>
+        </div>
+      </section>
+    );
+  }
+
+  if (latestPosts.length === 0) {
+    return null;
+  }
 
   return (
     <section className="py-24 bg-secondary/30">
@@ -35,7 +83,7 @@ const BlogSection = () => {
 
         <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
           {latestPosts.map((article, i) => (
-            <Link key={article.id} to={`/blog/${article.slug}`}>
+            <Link key={article._id} to={`/blog/${article.slug}`}>
               <motion.article
                 initial={{ opacity: 0, y: 30 }}
                 whileInView={{ opacity: 1, y: 0 }}
@@ -43,7 +91,17 @@ const BlogSection = () => {
                 transition={{ delay: i * 0.1 }}
                 className="glass rounded-xl overflow-hidden group cursor-pointer hover-glow h-full"
               >
-                <div className="h-48 bg-gradient-to-br from-primary/10 to-secondary" />
+                <div className="h-48 bg-muted overflow-hidden">
+                  <img
+                    src={article.featured_image_url}
+                    alt={article.title}
+                    className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300"
+                    loading="lazy"
+                    onError={(e) => {
+                      e.currentTarget.src = '/placeholder.svg';
+                    }}
+                  />
+                </div>
                 <div className="p-6">
                   <div className="flex items-center gap-3 mb-3">
                     <span className="text-[10px] uppercase tracking-wider font-semibold text-primary bg-primary/10 px-2 py-0.5 rounded-full">
@@ -51,7 +109,7 @@ const BlogSection = () => {
                     </span>
                     <span className="flex items-center gap-1 text-xs text-muted-foreground">
                       <Calendar className="w-3 h-3" />
-                      {new Date(article.publishedAt).toLocaleDateString("en-US", {
+                      {new Date(article.published_at).toLocaleDateString("en-US", {
                         month: "short",
                         day: "numeric",
                         year: "numeric",

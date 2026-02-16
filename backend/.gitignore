@@ -27,3 +27,8 @@ coverage/
 # Build
 dist/
 build/
+
+# Uploads (keep structure, ignore files)
+uploads/**/*
+!uploads/.gitkeep
+!uploads/*/.gitkeep

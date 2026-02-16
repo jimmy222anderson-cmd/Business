@@ -2,6 +2,7 @@ const express = require('express');
 const cors = require('cors');
 const helmet = require('helmet');
 const dns = require('dns');
+const path = require('path');
 const connectDB = require('./config/database');
 const { apiLimiter } = require('./middleware/rateLimiter');
 require('dotenv').config();
@@ -85,6 +86,9 @@ app.use(cors(corsOptions));
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 
+// Serve static files from uploads directory
+app.use('/uploads', express.static(path.join(__dirname, 'uploads')));
+
 // Apply general rate limiting to all API routes
 app.use('/api/', apiLimiter);
 
@@ -128,6 +132,7 @@ const demoRoutes = require('./routes/demo');
 const contactRoutes = require('./routes/contact');
 const quoteRoutes = require('./routes/quote');
 const contentRoutes = require('./routes/content');
+const publicContentRoutes = require('./routes/public/content');
 const adminRoutes = require('./routes/admin');
 
 app.use('/api/auth', authRoutes);
@@ -139,6 +144,7 @@ app.use('/api/demo', demoRoutes);
 app.use('/api/contact', contactRoutes);
 app.use('/api/quote', quoteRoutes);
 app.use('/api/content', contentRoutes);
+app.use('/api/public', publicContentRoutes);
 app.use('/api/admin', adminRoutes);
 
 // Error handling middleware

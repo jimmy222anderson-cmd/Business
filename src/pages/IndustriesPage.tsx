@@ -1,11 +1,11 @@
 import { motion } from 'framer-motion';
 import { Link } from 'react-router-dom';
-import { industries } from '@/data/industries';
-import { Industry } from '@/types';
 import { ArrowRight } from 'lucide-react';
+import { useEffect, useState } from 'react';
+import { toast } from 'sonner';
 
 // Industry card component
-function IndustryCard({ industry }: { industry: Industry }) {
+function IndustryCard({ industry }: { industry: any }) {
   return (
     <Link to={`/industries/${industry.slug}`}>
       <motion.div
@@ -48,6 +48,40 @@ function IndustryCard({ industry }: { industry: Industry }) {
 }
 
 export default function IndustriesPage() {
+  const [industries, setIndustries] = useState([]);
+  const [loading, setLoading] = useState(true);
+
+  useEffect(() => {
+    fetchIndustries();
+  }, []);
+
+  const fetchIndustries = async () => {
+    try {
+      const API_BASE_URL = import.meta.env.VITE_API_BASE_URL || 'http://localhost:3000/api';
+      const response = await fetch(`${API_BASE_URL}/public/industries`);
+      
+      if (!response.ok) throw new Error('Failed to fetch industries');
+      
+      const data = await response.json();
+      setIndustries(data);
+    } catch (error) {
+      console.error('Error fetching industries:', error);
+      toast.error('Failed to load industries');
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  if (loading) {
+    return (
+      <div className="min-h-screen bg-background">
+        <div className="container mx-auto px-6 py-20">
+          <div className="text-center">Loading industries...</div>
+        </div>
+      </div>
+    );
+  }
+
   return (
     <div className="min-h-screen bg-background">
       {/* Hero Section */}
@@ -75,7 +109,7 @@ export default function IndustriesPage() {
         <div className="container mx-auto px-6">
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
             {industries.map((industry) => (
-              <IndustryCard key={industry.id} industry={industry} />
+              <IndustryCard key={industry._id || industry.id} industry={industry} />
             ))}
           </div>
         </div>

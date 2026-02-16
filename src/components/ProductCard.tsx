@@ -20,12 +20,16 @@ export function ProductCard({ product, variant = 'carousel' }: ProductCardProps)
       }`}
     >
       {/* Product Image */}
-      <div className="relative h-48 overflow-hidden">
+      <div className="relative h-48 overflow-hidden bg-muted">
         <img
           src={product.image}
           alt={product.name}
           loading="lazy"
           className="w-full h-full object-cover"
+          onError={(e) => {
+            // Fallback to placeholder if image fails to load
+            e.currentTarget.src = '/placeholder.svg';
+          }}
         />
         {/* Pricing Badge */}
         {product.pricingBadge && (

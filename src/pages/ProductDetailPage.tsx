@@ -4,20 +4,57 @@ import { ArrowLeft, Check } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
-import { products } from '@/data/products';
 import { ProductInquiryForm, type ProductInquiryFormData } from '@/components/forms';
 import { createProductInquiry } from '@/lib/api';
 import { toast } from 'sonner';
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 
 export function ProductDetailPage() {
   const { productId } = useParams<{ productId: string }>();
   const [isSubmitting, setIsSubmitting] = useState(false);
-  
-  // Find the product by slug
-  const product = products.find(p => p.slug === productId);
+  const [product, setProduct] = useState<any>(null);
+  const [loading, setLoading] = useState(true);
+  const [notFound, setNotFound] = useState(false);
+
+  useEffect(() => {
+    fetchProduct();
+  }, [productId]);
+
+  const fetchProduct = async () => {
+    try {
+      const API_BASE_URL = import.meta.env.VITE_API_BASE_URL || 'http://localhost:3000/api';
+      const response = await fetch(`${API_BASE_URL}/public/products/${productId}`);
+      
+      if (!response.ok) {
+        if (response.status === 404) {
+          setNotFound(true);
+        }
+        throw new Error('Failed to fetch product');
+      }
+      
+      const data = await response.json();
+      setProduct(data);
+    } catch (error) {
+      console.error('Error fetching product:', error);
+      setNotFound(true);
+    } finally {
+      setLoading(false);
+    }
+  };
 
   // If product not found, redirect to products page
+  if (notFound) {
+    return <Navigate to="/products" replace />;
+  }
+
+  if (loading) {
+    return (
+      <div className="min-h-screen bg-background flex items-center justify-center">
+        <div className="text-center">Loading product...</div>
+      </div>
+    );
+  }
+
   if (!product) {
     return <Navigate to="/products" replace />;
   }
@@ -119,7 +156,7 @@ export function ProductDetailPage() {
       </section>
 
       {/* Features Section */}
-      {product.features.length > 0 && (
+      {product.features && product.features.length > 0 && (
         <section className="py-20 bg-background/50">
           <div className="container mx-auto px-6">
             <motion.div
@@ -138,9 +175,9 @@ export function ProductDetailPage() {
             </motion.div>
 
             <div className="grid md:grid-cols-3 gap-8">
-              {product.features.map((feature, index) => (
+              {product.features && product.features.map((feature, index) => (
                 <motion.div
-                  key={feature.id}
+                  key={feature._id || index}
                   initial={{ opacity: 0, y: 20 }}
                   whileInView={{ opacity: 1, y: 0 }}
                   viewport={{ once: true }}
@@ -164,7 +201,7 @@ export function ProductDetailPage() {
       )}
 
       {/* Use Cases Section */}
-      {product.useCases.length > 0 && (
+      {product.useCases && product.useCases.length > 0 && (
         <section className="py-20 bg-background">
           <div className="container mx-auto px-6">
             <motion.div
@@ -183,9 +220,9 @@ export function ProductDetailPage() {
             </motion.div>
 
             <div className="grid md:grid-cols-2 gap-8 max-w-4xl mx-auto">
-              {product.useCases.map((useCase, index) => (
+              {product.useCases && product.useCases.map((useCase, index) => (
                 <motion.div
-                  key={useCase.id}
+                  key={useCase._id || index}
                   initial={{ opacity: 0, x: index % 2 === 0 ? -20 : 20 }}
                   whileInView={{ opacity: 1, x: 0 }}
                   viewport={{ once: true }}
@@ -213,7 +250,7 @@ export function ProductDetailPage() {
       )}
 
       {/* Specifications Section */}
-      {product.specifications.length > 0 && (
+      {product.specifications && product.specifications.length > 0 && (
         <section className="py-20 bg-background/50">
           <div className="container mx-auto px-6">
             <motion.div
@@ -276,7 +313,7 @@ export function ProductDetailPage() {
                 </CardHeader>
                 <CardContent>
                   <ProductInquiryForm
-                    productId={product.id}
+                    productId={product._id || product.id}
                     productName={product.name}
                     onSubmit={handleInquirySubmit}
                     isSubmitting={isSubmitting}

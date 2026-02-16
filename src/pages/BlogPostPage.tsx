@@ -1,17 +1,61 @@
 import { motion } from "framer-motion";
 import { Calendar, User, ArrowLeft, Tag } from "lucide-react";
 import { Link, useParams, Navigate } from "react-router-dom";
-import { blogPosts } from "@/data/blog";
 import { Button } from "@/components/ui/button";
+import { useState, useEffect } from "react";
+
+interface BlogPost {
+  _id: string;
+  title: string;
+  slug: string;
+  excerpt: string;
+  content: string;
+  author: string;
+  published_at: string;
+  featured_image_url: string;
+  tags: string[];
+  status: string;
+}
 
 const BlogPostPage = () => {
   const { postId } = useParams<{ postId: string }>();
-  
-  // Find the post by slug
-  const post = blogPosts.find((p) => p.slug === postId);
+  const [post, setPost] = useState<BlogPost | null>(null);
+  const [loading, setLoading] = useState(true);
+  const [notFound, setNotFound] = useState(false);
 
-  // If post not found, redirect to blog page
-  if (!post) {
+  useEffect(() => {
+    const fetchPost = async () => {
+      try {
+        const response = await fetch(`http://localhost:5000/api/public/blog/${postId}`);
+        if (!response.ok) {
+          setNotFound(true);
+          return;
+        }
+        const data = await response.json();
+        setPost(data);
+      } catch (error) {
+        console.error('Error fetching blog post:', error);
+        setNotFound(true);
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    fetchPost();
+  }, [postId]);
+
+  if (loading) {
+    return (
+      <div className="min-h-screen bg-background flex items-center justify-center pt-24">
+        <div className="text-center">
+          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-yellow-500 mx-auto mb-4"></div>
+          <p className="text-muted-foreground">Loading blog post...</p>
+        </div>
+      </div>
+    );
+  }
+
+  if (notFound || !post) {
     return <Navigate to="/blog" replace />;
   }
 
@@ -109,11 +153,14 @@ const BlogPostPage = () => {
             className="mb-12"
           >
             {/* Featured Image */}
-            <div className="h-96 rounded-2xl overflow-hidden mb-8 bg-gradient-to-br from-primary/20 to-secondary">
+            <div className="h-96 rounded-2xl overflow-hidden mb-8 bg-muted">
               <img
-                src={post.featuredImage}
+                src={post.featured_image_url}
                 alt={post.title}
                 className="w-full h-full object-cover"
+                onError={(e) => {
+                  e.currentTarget.src = '/placeholder.svg';
+                }}
               />
             </div>
 
@@ -131,7 +178,7 @@ const BlogPostPage = () => {
               <div className="flex items-center gap-2">
                 <Calendar className="w-4 h-4" />
                 <span className="text-sm">
-                  {new Date(post.publishedAt).toLocaleDateString("en-US", {
+                  {new Date(post.published_at).toLocaleDateString("en-US", {
                     month: "long",
                     day: "numeric",
                     year: "numeric",

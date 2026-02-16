@@ -5,6 +5,7 @@ import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { BrowserRouter, Routes, Route } from "react-router-dom";
 import { AuthProvider } from "@/contexts/AuthContext";
 import { ProtectedRoute } from "@/components/ProtectedRoute";
+import { ScrollToTop } from "@/components/ScrollToTop";
 import { Layout } from "./components/Layout";
 import Index from "./pages/Index";
 import NotFound from "./pages/NotFound";
@@ -37,6 +38,14 @@ import ContactInquiriesPage from "./pages/admin/ContactInquiriesPage";
 import ProductInquiriesPage from "./pages/admin/ProductInquiriesPage";
 import QuoteRequestsPage from "./pages/admin/QuoteRequestsPage";
 import UsersPage from "./pages/admin/UsersPage";
+import ProductsManagementPage from "./pages/admin/ProductsManagementPage";
+import IndustriesManagementPage from "./pages/admin/IndustriesManagementPage";
+import PartnersManagementPage from "./pages/admin/PartnersManagementPage";
+import BlogManagementPage from "./pages/admin/BlogManagementPage";
+import ProductFormPage from "./pages/admin/ProductFormPage";
+import IndustryFormPage from "./pages/admin/IndustryFormPage";
+import PartnerFormPage from "./pages/admin/PartnerFormPage";
+import BlogFormPage from "./pages/admin/BlogFormPage";
 
 const queryClient = new QueryClient();
 
@@ -57,6 +66,7 @@ const App = () => (
         <Toaster />
         <Sonner />
         <BrowserRouter>
+          <ScrollToTop />
           <Routes>
             <Route element={<Layout />}>
               <Route path="/" element={<Index />} />
@@ -141,6 +151,102 @@ const App = () => (
                 element={
                   <ProtectedRoute requireAdmin>
                     <UsersPage />
+                  </ProtectedRoute>
+                } 
+              />
+              <Route 
+                path="/admin/products" 
+                element={
+                  <ProtectedRoute requireAdmin>
+                    <ProductsManagementPage />
+                  </ProtectedRoute>
+                } 
+              />
+              <Route 
+                path="/admin/products/new" 
+                element={
+                  <ProtectedRoute requireAdmin>
+                    <ProductFormPage />
+                  </ProtectedRoute>
+                } 
+              />
+              <Route 
+                path="/admin/products/edit/:id" 
+                element={
+                  <ProtectedRoute requireAdmin>
+                    <ProductFormPage />
+                  </ProtectedRoute>
+                } 
+              />
+              <Route 
+                path="/admin/industries" 
+                element={
+                  <ProtectedRoute requireAdmin>
+                    <IndustriesManagementPage />
+                  </ProtectedRoute>
+                } 
+              />
+              <Route 
+                path="/admin/industries/new" 
+                element={
+                  <ProtectedRoute requireAdmin>
+                    <IndustryFormPage />
+                  </ProtectedRoute>
+                } 
+              />
+              <Route 
+                path="/admin/industries/edit/:id" 
+                element={
+                  <ProtectedRoute requireAdmin>
+                    <IndustryFormPage />
+                  </ProtectedRoute>
+                } 
+              />
+              <Route 
+                path="/admin/partners" 
+                element={
+                  <ProtectedRoute requireAdmin>
+                    <PartnersManagementPage />
+                  </ProtectedRoute>
+                } 
+              />
+              <Route 
+                path="/admin/partners/new" 
+                element={
+                  <ProtectedRoute requireAdmin>
+                    <PartnerFormPage />
+                  </ProtectedRoute>
+                } 
+              />
+              <Route 
+                path="/admin/partners/edit/:id" 
+                element={
+                  <ProtectedRoute requireAdmin>
+                    <PartnerFormPage />
+                  </ProtectedRoute>
+                } 
+              />
+              <Route 
+                path="/admin/blog" 
+                element={
+                  <ProtectedRoute requireAdmin>
+                    <BlogManagementPage />
+                  </ProtectedRoute>
+                } 
+              />
+              <Route 
+                path="/admin/blog/new" 
+                element={
+                  <ProtectedRoute requireAdmin>
+                    <BlogFormPage />
+                  </ProtectedRoute>
+                } 
+              />
+              <Route 
+                path="/admin/blog/edit/:id" 
+                element={
+                  <ProtectedRoute requireAdmin>
+                    <BlogFormPage />
                   </ProtectedRoute>
                 } 
               />

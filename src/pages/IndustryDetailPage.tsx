@@ -1,17 +1,64 @@
 import { useParams, Link, Navigate } from 'react-router-dom';
 import { motion } from 'framer-motion';
-import { industries } from '@/data/industries';
 import { Button } from '@/components/ui/button';
 import { ArrowRight, CheckCircle2 } from 'lucide-react';
+import { useState, useEffect } from 'react';
+
+interface UseCase {
+  _id: string;
+  title: string;
+  description: string;
+}
+
+interface Industry {
+  _id: string;
+  name: string;
+  slug: string;
+  description: string;
+  longDescription: string;
+  image: string;
+  useCases: UseCase[];
+}
 
 export default function IndustryDetailPage() {
   const { industryId } = useParams<{ industryId: string }>();
-  
-  // Find the industry by slug
-  const industry = industries.find((ind) => ind.slug === industryId);
+  const [industry, setIndustry] = useState<Industry | null>(null);
+  const [loading, setLoading] = useState(true);
+  const [notFound, setNotFound] = useState(false);
 
-  // If industry not found, redirect to industries page
-  if (!industry) {
+  useEffect(() => {
+    const fetchIndustry = async () => {
+      try {
+        const response = await fetch(`http://localhost:5000/api/public/industries/${industryId}`);
+        if (!response.ok) {
+          setNotFound(true);
+          return;
+        }
+        const data = await response.json();
+        setIndustry(data);
+      } catch (error) {
+        console.error('Error fetching industry:', error);
+        setNotFound(true);
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    fetchIndustry();
+  }, [industryId]);
+
+  if (loading) {
+    return (
+      <div className="min-h-screen bg-background flex items-center justify-center">
+        <div className="text-center">
+          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-yellow-500 mx-auto mb-4"></div>
+          <p className="text-muted-foreground">Loading industry details...</p>
+        </div>
+      </div>
+    );
+  }
+
+  if (notFound || !industry) {
     return <Navigate to="/industries" replace />;
   }
 
@@ -84,7 +131,7 @@ export default function IndustryDetailPage() {
           <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-8 max-w-6xl mx-auto">
             {industry.useCases.map((useCase, index) => (
               <motion.div
-                key={useCase.id}
+                key={useCase._id}
                 initial={{ opacity: 0, y: 20 }}
                 whileInView={{ opacity: 1, y: 0 }}
                 viewport={{ once: true }}

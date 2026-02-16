@@ -1,10 +1,27 @@
 import { motion } from 'framer-motion';
-import { partners, categoryLabels } from '@/data/partners';
-import { Partner } from '@/types';
 import { ExternalLink } from 'lucide-react';
+import { useState, useEffect } from 'react';
+
+interface Partner {
+  _id: string;
+  name: string;
+  logo: string;
+  website?: string;
+  description?: string;
+  category: 'satellite' | 'data' | 'technology' | 'client';
+}
+
+const categoryLabels: Record<Partner['category'], string> = {
+  satellite: 'Satellite Providers',
+  data: 'Data Providers',
+  technology: 'Technology Partners',
+  client: 'Client Partners',
+};
 
 // Partner card component
 function PartnerCard({ partner }: { partner: Partner }) {
+  const [imageError, setImageError] = useState(false);
+
   const CardContent = (
     <motion.div
       initial={{ opacity: 0, y: 20 }}
@@ -15,13 +32,20 @@ function PartnerCard({ partner }: { partner: Partner }) {
       className="group relative overflow-hidden rounded-lg bg-card border border-border hover:border-yellow-500/50 transition-all duration-300 p-6 h-full flex flex-col"
     >
       {/* Partner Logo */}
-      <div className="flex items-center justify-center h-24 mb-4">
-        <img
-          src={partner.logo}
-          alt={`${partner.name} logo`}
-          className="max-h-full max-w-full object-contain transition-transform duration-300 group-hover:scale-110"
-          loading="lazy"
-        />
+      <div className="flex items-center justify-center h-24 mb-4 bg-muted rounded-lg">
+        {!imageError ? (
+          <img
+            src={partner.logo}
+            alt={`${partner.name} logo`}
+            className="max-h-full max-w-full object-contain transition-transform duration-300 group-hover:scale-110 p-2"
+            loading="lazy"
+            onError={() => setImageError(true)}
+          />
+        ) : (
+          <div className="text-2xl font-bold text-muted-foreground">
+            {partner.name.split(' ').map(word => word[0]).join('').slice(0, 3)}
+          </div>
+        )}
       </div>
 
       {/* Partner Name */}
@@ -83,7 +107,7 @@ function CategorySection({
 
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
         {categoryPartners.map((partner) => (
-          <PartnerCard key={partner.id} partner={partner} />
+          <PartnerCard key={partner._id} partner={partner} />
         ))}
       </div>
     </section>
@@ -91,6 +115,37 @@ function CategorySection({
 }
 
 export default function PartnersPage() {
+  const [partners, setPartners] = useState<Partner[]>([]);
+  const [loading, setLoading] = useState(true);
+
+  useEffect(() => {
+    const fetchPartners = async () => {
+      try {
+        const response = await fetch('http://localhost:5000/api/public/partners');
+        if (!response.ok) throw new Error('Failed to fetch partners');
+        const data = await response.json();
+        setPartners(data);
+      } catch (error) {
+        console.error('Error fetching partners:', error);
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    fetchPartners();
+  }, []);
+
+  if (loading) {
+    return (
+      <div className="min-h-screen bg-background flex items-center justify-center">
+        <div className="text-center">
+          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-yellow-500 mx-auto mb-4"></div>
+          <p className="text-muted-foreground">Loading partners...</p>
+        </div>
+      </div>
+    );
+  }
+
   // Group partners by category
   const satellitePartners = partners.filter((p) => p.category === 'satellite');
   const dataPartners = partners.filter((p) => p.category === 'data');
