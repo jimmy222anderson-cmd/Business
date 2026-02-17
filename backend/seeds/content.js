@@ -1,6 +1,11 @@
 const mongoose = require('mongoose');
 const Content = require('../models/Content');
-require('dotenv').config();
+const path = require('path');
+const dns = require('dns');
+require('dotenv').config({ path: path.join(__dirname, '../.env') });
+
+// Fix DNS resolution for MongoDB Atlas on Windows
+dns.setDefaultResultOrder('ipv4first');
 
 // Privacy Policy content
 const privacyPolicyContent = {

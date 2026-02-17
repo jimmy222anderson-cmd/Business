@@ -67,7 +67,7 @@ export function ProductsPage() {
         >
           {products.map((product, index) => (
             <motion.div
-              key={product._id || product.id}
+              key={product._id || product.id || `product-${index}`}
               initial={{ opacity: 0, y: 20 }}
               animate={{ opacity: 1, y: 0 }}
               transition={{ duration: 0.6, delay: 0.1 * index }}

@@ -53,11 +53,10 @@ blogPostSchema.index({ status: 1, published_at: -1 });
 blogPostSchema.index({ tags: 1 });
 
 // Auto-set published_at when status changes to published
-blogPostSchema.pre('save', function(next) {
+blogPostSchema.pre('save', async function() {
   if (this.isModified('status') && this.status === 'published' && !this.published_at) {
     this.published_at = new Date();
   }
-  next();
 });
 
 module.exports = mongoose.model('BlogPost', blogPostSchema);

@@ -106,8 +106,8 @@ function CategorySection({
       </motion.h2>
 
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
-        {categoryPartners.map((partner) => (
-          <PartnerCard key={partner._id} partner={partner} />
+        {categoryPartners.map((partner, index) => (
+          <PartnerCard key={partner._id || `partner-${index}`} partner={partner} />
         ))}
       </div>
     </section>

@@ -3,6 +3,7 @@ import { Link } from 'react-router-dom';
 import { ArrowRight } from 'lucide-react';
 import { useEffect, useState } from 'react';
 import { toast } from 'sonner';
+import { getImageUrl } from '@/lib/utils/image';
 
 // Industry card component
 function IndustryCard({ industry }: { industry: any }) {
@@ -19,7 +20,7 @@ function IndustryCard({ industry }: { industry: any }) {
         {/* Industry Image */}
         <div className="relative h-48 overflow-hidden">
           <img
-            src={industry.image}
+            src={getImageUrl(industry.image)}
             alt={industry.name}
             className="w-full h-full object-cover transition-transform duration-300 group-hover:scale-110"
             loading="lazy"
@@ -108,8 +109,8 @@ export default function IndustriesPage() {
       <section className="py-16">
         <div className="container mx-auto px-6">
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
-            {industries.map((industry) => (
-              <IndustryCard key={industry._id || industry.id} industry={industry} />
+            {industries.map((industry, index) => (
+              <IndustryCard key={industry._id || industry.id || `industry-${index}`} industry={industry} />
             ))}
           </div>
         </div>

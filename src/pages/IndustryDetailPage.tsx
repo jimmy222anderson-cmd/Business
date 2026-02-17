@@ -3,6 +3,7 @@ import { motion } from 'framer-motion';
 import { Button } from '@/components/ui/button';
 import { ArrowRight, CheckCircle2 } from 'lucide-react';
 import { useState, useEffect } from 'react';
+import { getImageUrl } from '@/lib/utils/image';
 
 interface UseCase {
   _id: string;
@@ -69,7 +70,7 @@ export default function IndustryDetailPage() {
         {/* Background Image */}
         <div className="absolute inset-0">
           <img
-            src={industry.image}
+            src={getImageUrl(industry.image)}
             alt={industry.name}
             className="w-full h-full object-cover"
           />
@@ -131,7 +132,7 @@ export default function IndustryDetailPage() {
           <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-8 max-w-6xl mx-auto">
             {industry.useCases.map((useCase, index) => (
               <motion.div
-                key={useCase._id}
+                key={useCase._id || `usecase-${index}`}
                 initial={{ opacity: 0, y: 20 }}
                 whileInView={{ opacity: 1, y: 0 }}
                 viewport={{ once: true }}

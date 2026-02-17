@@ -8,6 +8,7 @@ import { ProductInquiryForm, type ProductInquiryFormData } from '@/components/fo
 import { createProductInquiry } from '@/lib/api';
 import { toast } from 'sonner';
 import { useState, useEffect } from 'react';
+import { getImageUrl } from '@/lib/utils/image';
 
 export function ProductDetailPage() {
   const { productId } = useParams<{ productId: string }>();
@@ -110,7 +111,7 @@ export function ProductDetailPage() {
               className="relative"
             >
               <img
-                src={product.image}
+                src={getImageUrl(product.image)}
                 alt={product.name}
                 className="w-full h-[400px] object-cover rounded-lg shadow-2xl"
               />
@@ -177,7 +178,7 @@ export function ProductDetailPage() {
             <div className="grid md:grid-cols-3 gap-8">
               {product.features && product.features.map((feature, index) => (
                 <motion.div
-                  key={feature._id || index}
+                  key={feature._id || `feature-${index}`}
                   initial={{ opacity: 0, y: 20 }}
                   whileInView={{ opacity: 1, y: 0 }}
                   viewport={{ once: true }}
@@ -222,7 +223,7 @@ export function ProductDetailPage() {
             <div className="grid md:grid-cols-2 gap-8 max-w-4xl mx-auto">
               {product.useCases && product.useCases.map((useCase, index) => (
                 <motion.div
-                  key={useCase._id || index}
+                  key={useCase._id || `usecase-${index}`}
                   initial={{ opacity: 0, x: index % 2 === 0 ? -20 : 20 }}
                   whileInView={{ opacity: 1, x: 0 }}
                   viewport={{ once: true }}
@@ -276,7 +277,7 @@ export function ProductDetailPage() {
                 <tbody>
                   {product.specifications.map((spec, index) => (
                     <tr
-                      key={index}
+                      key={spec._id || `spec-${index}`}
                       className={index % 2 === 0 ? 'bg-background/50' : ''}
                     >
                       <td className="px-6 py-4 font-semibold text-foreground">

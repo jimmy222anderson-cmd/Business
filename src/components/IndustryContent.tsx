@@ -1,5 +1,6 @@
 import { motion, AnimatePresence } from 'framer-motion';
 import { Industry } from '@/types';
+import { getImageUrl } from '@/lib/utils/image';
 
 interface IndustryContentProps {
   industry: Industry;
@@ -24,7 +25,7 @@ export function IndustryContent({ industry }: IndustryContentProps) {
           className="relative overflow-hidden rounded-lg aspect-video"
         >
           <img
-            src={industry.image}
+            src={getImageUrl(industry.image)}
             alt={industry.name}
             className="w-full h-full object-cover"
             loading="lazy"
@@ -52,9 +53,9 @@ export function IndustryContent({ industry }: IndustryContentProps) {
                 Key Use Cases
               </h4>
               <ul className="space-y-2">
-                {industry.useCases.slice(0, 3).map((useCase) => (
+                {industry.useCases.slice(0, 3).map((useCase, index) => (
                   <li
-                    key={useCase._id}
+                    key={useCase._id || `usecase-${index}`}
                     className="flex items-start text-sm text-muted-foreground"
                   >
                     <span className="mr-2 text-yellow-500">•</span>

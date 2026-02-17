@@ -3,6 +3,7 @@ import { ArrowRight, Calendar } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Link } from "react-router-dom";
 import { useState, useEffect } from "react";
+import { getImageUrl } from "@/lib/utils/image";
 
 interface BlogPost {
   _id: string;
@@ -74,16 +75,16 @@ const BlogSection = () => {
             </h2>
             <p className="text-muted-foreground text-lg">Stay updated with the latest in satellite intelligence.</p>
           </div>
-          <Button asChild variant="ghost" className="hidden md:flex text-primary">
+          <Button asChild className="hidden md:flex bg-yellow-500/20 backdrop-blur-md border border-yellow-500/30 text-white hover:bg-yellow-500/30 hover:border-yellow-500/50 rounded-full px-6 shadow-lg shadow-yellow-500/20 group">
             <Link to="/blog">
-              View All <ArrowRight className="w-4 h-4 ml-1" />
+              View All <ArrowRight className="w-4 h-4 ml-1 group-hover:translate-x-1 transition-transform" />
             </Link>
           </Button>
         </motion.div>
 
         <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
           {latestPosts.map((article, i) => (
-            <Link key={article._id} to={`/blog/${article.slug}`}>
+            <Link key={article._id || `blog-${i}`} to={`/blog/${article.slug}`}>
               <motion.article
                 initial={{ opacity: 0, y: 30 }}
                 whileInView={{ opacity: 1, y: 0 }}
@@ -93,7 +94,7 @@ const BlogSection = () => {
               >
                 <div className="h-48 bg-muted overflow-hidden">
                   <img
-                    src={article.featured_image_url}
+                    src={getImageUrl(article.featured_image_url)}
                     alt={article.title}
                     className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300"
                     loading="lazy"
@@ -127,8 +128,8 @@ const BlogSection = () => {
         </div>
 
         <div className="text-center mt-8 md:hidden">
-          <Button asChild variant="ghost" className="text-primary">
-            <Link to="/blog">View All Articles <ArrowRight className="w-4 h-4 ml-1" /></Link>
+          <Button asChild className="bg-yellow-500/20 backdrop-blur-md border border-yellow-500/30 text-white hover:bg-yellow-500/30 hover:border-yellow-500/50 rounded-full px-6 shadow-lg shadow-yellow-500/20 group">
+            <Link to="/blog">View All Articles <ArrowRight className="w-4 h-4 ml-1 group-hover:translate-x-1 transition-transform" /></Link>
           </Button>
         </div>
       </div>

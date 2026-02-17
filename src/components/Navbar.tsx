@@ -13,20 +13,16 @@ import { Sheet, SheetContent, SheetTrigger } from '@/components/ui/sheet';
 import { useAuth } from '@/contexts/AuthContext';
 import { Avatar, AvatarFallback } from '@/components/ui/avatar';
 
-const industries = [
-  { name: 'Financial Services', href: '/industries/financial-services' },
-  { name: 'Agriculture', href: '/industries/agriculture' },
-  { name: 'Energy', href: '/industries/energy' },
-  { name: 'Mining', href: '/industries/mining' },
-  { name: 'Construction', href: '/industries/construction' },
-  { name: 'Government', href: '/industries/government' },
-  { name: 'Environment', href: '/industries/environment' },
-  { name: 'Insurance', href: '/industries/insurance' },
-];
+interface Industry {
+  _id: string;
+  name: string;
+  slug: string;
+}
 
 export const Navbar = () => {
   const [isScrolled, setIsScrolled] = useState(false);
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
+  const [industries, setIndustries] = useState<Industry[]>([]);
   const { user, isAuthenticated, signOut } = useAuth();
   const navigate = useNavigate();
 
@@ -37,6 +33,23 @@ export const Navbar = () => {
 
     window.addEventListener('scroll', handleScroll);
     return () => window.removeEventListener('scroll', handleScroll);
+  }, []);
+
+  useEffect(() => {
+    const fetchIndustries = async () => {
+      try {
+        const API_BASE_URL = import.meta.env.VITE_API_BASE_URL || 'http://localhost:5000/api';
+        const response = await fetch(`${API_BASE_URL}/public/industries`);
+        if (response.ok) {
+          const data = await response.json();
+          setIndustries(data);
+        }
+      } catch (error) {
+        console.error('Error fetching industries:', error);
+      }
+    };
+
+    fetchIndustries();
   }, []);
 
   const handleSignOut = async () => {
@@ -94,12 +107,18 @@ export const Navbar = () => {
               </DropdownMenuTrigger>
               <DropdownMenuContent className="w-56">
                 {industries.map((industry) => (
-                  <DropdownMenuItem key={industry.href} asChild>
-                    <Link to={industry.href} className="cursor-pointer">
+                  <DropdownMenuItem key={industry._id} asChild>
+                    <Link to={`/industries/${industry.slug}`} className="cursor-pointer">
                       {industry.name}
                     </Link>
                   </DropdownMenuItem>
                 ))}
+                {industries.length > 0 && <DropdownMenuSeparator />}
+                <DropdownMenuItem asChild>
+                  <Link to="/industries" className="cursor-pointer font-semibold text-primary">
+                    View All Industries
+                  </Link>
+                </DropdownMenuItem>
               </DropdownMenuContent>
             </DropdownMenu>
 
@@ -206,14 +225,23 @@ export const Navbar = () => {
                   <div className="pl-4 space-y-2">
                     {industries.map((industry) => (
                       <Link
-                        key={industry.href}
-                        to={industry.href}
+                        key={industry._id}
+                        to={`/industries/${industry.slug}`}
                         className="block text-foreground/80 hover:text-primary transition-colors"
                         onClick={() => setIsMobileMenuOpen(false)}
                       >
                         {industry.name}
                       </Link>
                     ))}
+                    {industries.length > 0 && (
+                      <Link
+                        to="/industries"
+                        className="block text-primary font-semibold hover:text-primary/80 transition-colors pt-2 border-t border-border"
+                        onClick={() => setIsMobileMenuOpen(false)}
+                      >
+                        View All Industries
+                      </Link>
+                    )}
                   </div>
                 </div>
 

@@ -72,7 +72,7 @@ export function IndustryTabs({ industries, activeTab, onTabChange }: IndustryTab
       <div className="flex overflow-x-auto scrollbar-hide gap-2 md:gap-4 pb-4">
         {industries.map((industry, index) => (
           <button
-            key={industry._id}
+            key={industry._id || `industry-tab-${index}`}
             ref={(el) => (tabsRef.current[index] = el)}
             onClick={() => onTabChange(industry._id)}
             className={`

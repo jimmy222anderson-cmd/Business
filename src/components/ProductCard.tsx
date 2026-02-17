@@ -4,6 +4,7 @@ import { Link } from 'react-router-dom';
 import { Product } from '@/types';
 import { Button } from './ui/button';
 import { Badge } from './ui/badge';
+import { getImageUrl } from '@/lib/utils/image';
 
 interface ProductCardProps {
   product: Product;
@@ -22,7 +23,7 @@ export function ProductCard({ product, variant = 'carousel' }: ProductCardProps)
       {/* Product Image */}
       <div className="relative h-48 overflow-hidden bg-muted">
         <img
-          src={product.image}
+          src={getImageUrl(product.image)}
           alt={product.name}
           loading="lazy"
           className="w-full h-full object-cover"

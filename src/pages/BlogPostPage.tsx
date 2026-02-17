@@ -3,6 +3,7 @@ import { Calendar, User, ArrowLeft, Tag } from "lucide-react";
 import { Link, useParams, Navigate } from "react-router-dom";
 import { Button } from "@/components/ui/button";
 import { useState, useEffect } from "react";
+import { getImageUrl } from "@/lib/utils/image";
 
 interface BlogPost {
   _id: string;
@@ -155,7 +156,7 @@ const BlogPostPage = () => {
             {/* Featured Image */}
             <div className="h-96 rounded-2xl overflow-hidden mb-8 bg-muted">
               <img
-                src={post.featured_image_url}
+                src={getImageUrl(post.featured_image_url)}
                 alt={post.title}
                 className="w-full h-full object-cover"
                 onError={(e) => {

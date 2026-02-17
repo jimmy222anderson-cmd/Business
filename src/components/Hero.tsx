@@ -3,7 +3,6 @@ import { Button } from "@/components/ui/button";
 import { ArrowRight } from "lucide-react";
 import { Link } from "react-router-dom";
 import CoordinatesOverlay from "./CoordinatesOverlay";
-import SatelliteDetectionBoxes from "./SatelliteDetectionBoxes";
 
 const coordinates = [
   "40.7128° N, 74.0060° W",
@@ -21,11 +20,22 @@ const Hero = () => {
 
   return (
     <section className="relative min-h-screen flex items-center justify-center overflow-hidden">
-      {/* Dark gradient background simulating satellite view with parallax */}
-      <motion.div 
-        className="absolute inset-0 bg-gradient-to-br from-background via-secondary to-background"
-        style={{ y: backgroundY }}
-      />
+      {/* Video Background */}
+      <div className="absolute inset-0 w-full h-full overflow-hidden">
+        <video
+          autoPlay
+          loop
+          muted
+          playsInline
+          className="absolute inset-0 w-full h-full object-cover"
+        >
+          <source src="/hero-background.mp4" type="video/mp4" />
+        </video>
+        {/* Dark overlay for better text readability */}
+        <div className="absolute inset-0 bg-black/60" />
+      </div>
+
+      {/* Gradient overlay for depth */}
       <motion.div 
         className="absolute inset-0 opacity-20" 
         style={{
@@ -42,9 +52,6 @@ const Hero = () => {
                           linear-gradient(90deg, hsl(var(--foreground)) 1px, transparent 1px)`,
         backgroundSize: "60px 60px",
       }} />
-
-      {/* Detection boxes */}
-      <SatelliteDetectionBoxes />
 
       {/* Content */}
       <motion.div 
@@ -83,7 +90,7 @@ const Hero = () => {
         >
           <Button
             size="lg"
-            className="bg-primary text-primary-foreground hover:bg-primary/90 rounded-full px-8 text-base font-semibold group"
+            className="bg-yellow-500/20 backdrop-blur-md border border-yellow-500/30 text-white hover:bg-yellow-500/30 hover:border-yellow-500/50 rounded-full px-8 text-base font-semibold group shadow-lg shadow-yellow-500/20"
             asChild
           >
             <Link to="/get-started">
@@ -94,7 +101,7 @@ const Hero = () => {
           <Button
             size="lg"
             variant="outline"
-            className="rounded-full px-8 text-base border-border/50 hover:bg-secondary/50"
+            className="bg-white/20 backdrop-blur-md border-2 border-white/40 text-white hover:bg-white/30 hover:border-white/60 rounded-full px-8 text-base font-semibold shadow-lg shadow-white/10"
             asChild
           >
             <Link to="/demo">

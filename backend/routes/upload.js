@@ -26,23 +26,15 @@ Object.values(categoriesDir).forEach(dir => {
 // Configure multer for disk storage with organized folders
 const storage = multer.diskStorage({
   destination: function (req, file, cb) {
-    // Get category from request body or default to 'general'
-    const category = req.body.category || 'general';
-    const uploadPath = categoriesDir[category] || categoriesDir.general;
-    cb(null, uploadPath);
+    // Default to general, will be moved to correct folder after upload if needed
+    // We can't reliably read req.body.category here because multer processes files before body fields
+    cb(null, uploadsDir);
   },
   filename: function (req, file, cb) {
-    // Get custom name from request or use original name
-    const customName = req.body.name || '';
     const ext = path.extname(file.originalname);
     const nameWithoutExt = path.basename(file.originalname, ext);
-    
-    // Create filename: customName or originalName + timestamp
-    const baseName = customName || nameWithoutExt;
-    const sanitizedName = baseName.replace(/[^a-zA-Z0-9-_]/g, '-').toLowerCase();
     const timestamp = Date.now();
-    const filename = `${sanitizedName}-${timestamp}${ext}`;
-    
+    const filename = `${nameWithoutExt}-${timestamp}${ext}`;
     cb(null, filename);
   }
 });
@@ -78,25 +70,46 @@ router.post('/', requireAuth, upload.single('file'), async (req, res) => {
       });
     }
 
-    // Get category from request
+    // Get category from request body (now available after multer processes the file)
     const category = req.body.category || 'general';
+    const customName = req.body.name || '';
+    
+    // Construct new filename with custom name if provided
+    const ext = path.extname(req.file.originalname);
+    const nameWithoutExt = customName || path.basename(req.file.originalname, ext);
+    const sanitizedName = nameWithoutExt.replace(/[^a-zA-Z0-9-_]/g, '-').toLowerCase();
+    const timestamp = Date.now();
+    const newFilename = `${sanitizedName}-${timestamp}${ext}`;
+    
+    // Determine target directory
+    const targetDir = categoriesDir[category] || categoriesDir.general;
+    const targetPath = path.join(targetDir, newFilename);
+    
+    // Move file from temp location to category folder with new name
+    fs.renameSync(req.file.path, targetPath);
     
     // Construct URL path
-    const url = `/uploads/${category}/${req.file.filename}`;
+    const url = `/uploads/${category}/${newFilename}`;
 
     res.status(201).json({
       success: true,
       url,
       fileUrl: url, // For backward compatibility
-      filename: req.file.filename,
+      filename: newFilename,
       originalName: req.file.originalname,
       size: req.file.size,
       mimetype: req.file.mimetype,
       category: category,
-      path: req.file.path
+      path: targetPath
     });
   } catch (error) {
     console.error('Upload error:', error);
+    
+    // Clean up file if it exists
+    if (req.file && req.file.path && fs.existsSync(req.file.path)) {
+      fs.unlinkSync(req.file.path);
+    }
+    
     res.status(500).json({ 
       error: 'Internal Server Error',
       message: error.message || 'Failed to upload file' 
@@ -116,19 +129,42 @@ router.post('/image', requireAuth, upload.single('file'), async (req, res) => {
       });
     }
 
+    // Get category from request body
     const category = req.body.category || 'general';
-    const url = `/uploads/${category}/${req.file.filename}`;
+    const customName = req.body.name || '';
+    
+    // Construct new filename
+    const ext = path.extname(req.file.originalname);
+    const nameWithoutExt = customName || path.basename(req.file.originalname, ext);
+    const sanitizedName = nameWithoutExt.replace(/[^a-zA-Z0-9-_]/g, '-').toLowerCase();
+    const timestamp = Date.now();
+    const newFilename = `${sanitizedName}-${timestamp}${ext}`;
+    
+    // Determine target directory
+    const targetDir = categoriesDir[category] || categoriesDir.general;
+    const targetPath = path.join(targetDir, newFilename);
+    
+    // Move file to category folder
+    fs.renameSync(req.file.path, targetPath);
+    
+    const url = `/uploads/${category}/${newFilename}`;
 
     res.status(201).json({
       success: true,
       url,
       fileUrl: url,
-      filename: req.file.filename,
+      filename: newFilename,
       size: req.file.size,
       mimetype: req.file.mimetype
     });
   } catch (error) {
     console.error('Upload error:', error);
+    
+    // Clean up file if it exists
+    if (req.file && req.file.path && fs.existsSync(req.file.path)) {
+      fs.unlinkSync(req.file.path);
+    }
+    
     res.status(500).json({ 
       error: 'Internal Server Error',
       message: error.message || 'Failed to upload file' 

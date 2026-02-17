@@ -1,6 +1,8 @@
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { z } from "zod";
+import { useEffect } from "react";
+import { useAuth } from "@/contexts/AuthContext";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
@@ -38,14 +40,31 @@ export const ContactForm = ({
   submitButtonText = "Send Message",
   showCompanyField = true,
 }: ContactFormProps) => {
+  const { user, isAuthenticated } = useAuth();
   const {
     register,
     handleSubmit,
     formState: { errors },
     reset,
+    setValue,
   } = useForm<ContactFormData>({
     resolver: zodResolver(contactFormSchema),
   });
+
+  // Auto-fill form with user data if logged in
+  useEffect(() => {
+    if (isAuthenticated && user) {
+      if (user.full_name) {
+        setValue("full_name", user.full_name);
+      }
+      if (user.email) {
+        setValue("email", user.email);
+      }
+      if (user.company) {
+        setValue("company", user.company);
+      }
+    }
+  }, [isAuthenticated, user, setValue]);
 
   const handleFormSubmit = async (data: ContactFormData) => {
     await onSubmit(data);

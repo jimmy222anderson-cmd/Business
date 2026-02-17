@@ -1,7 +1,8 @@
 import { motion } from "framer-motion";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
-import { useState } from "react";
+import { useState, useEffect } from "react";
+import { useAuth } from "@/contexts/AuthContext";
 import { bookDemoSchema, type BookDemoFormData } from "@/lib/form-schemas";
 import { handleFormSubmission } from "@/lib/form-utils";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
@@ -17,15 +18,32 @@ const fadeInUp = {
 
 const BookDemoPage = () => {
   const [isSubmitting, setIsSubmitting] = useState(false);
+  const { user, isAuthenticated } = useAuth();
 
   const {
     register,
     handleSubmit,
     formState: { errors },
     reset,
+    setValue,
   } = useForm<BookDemoFormData>({
     resolver: zodResolver(bookDemoSchema),
   });
+
+  // Auto-fill form with user data if logged in
+  useEffect(() => {
+    if (isAuthenticated && user) {
+      if (user.full_name) {
+        setValue("fullName", user.full_name);
+      }
+      if (user.email) {
+        setValue("email", user.email);
+      }
+      if (user.company) {
+        setValue("companyName", user.company);
+      }
+    }
+  }, [isAuthenticated, user, setValue]);
 
   const onSubmit = async (data: BookDemoFormData) => {
     setIsSubmitting(true);

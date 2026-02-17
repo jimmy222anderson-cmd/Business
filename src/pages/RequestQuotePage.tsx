@@ -3,6 +3,7 @@ import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useState, useEffect } from "react";
 import { useLocation } from "react-router-dom";
+import { useAuth } from "@/contexts/AuthContext";
 import { quoteSchema, type QuoteFormData } from "@/lib/form-schemas";
 import { toast } from "sonner";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
@@ -47,6 +48,7 @@ const dataVolumes = [
 const RequestQuotePage = () => {
   const [isSubmitting, setIsSubmitting] = useState(false);
   const location = useLocation();
+  const { user, isAuthenticated } = useAuth();
   const calculatorData = location.state as {
     estimatedPrice?: number;
     dataType?: string;
@@ -82,6 +84,21 @@ Additional Requirements:
       setValue('requirements', requirements);
     }
   }, [calculatorData, setValue]);
+
+  // Auto-fill form with user data if logged in
+  useEffect(() => {
+    if (isAuthenticated && user) {
+      if (user.full_name) {
+        setValue("fullName", user.full_name);
+      }
+      if (user.email) {
+        setValue("email", user.email);
+      }
+      if (user.company) {
+        setValue("companyName", user.company);
+      }
+    }
+  }, [isAuthenticated, user, setValue]);
 
   const industry = watch("industry");
   const estimatedDataVolume = watch("estimatedDataVolume");

@@ -48,9 +48,9 @@ const PricingHighlights = () => (
       </div>
 
       <div className="text-center">
-        <Button asChild size="lg" className="bg-primary text-primary-foreground rounded-full px-8">
+        <Button asChild size="lg" className="bg-yellow-500/20 backdrop-blur-md border border-yellow-500/30 text-white hover:bg-yellow-500/30 hover:border-yellow-500/50 rounded-full px-8 shadow-lg shadow-yellow-500/20 group">
           <Link to="/pricing">
-            View Pricing <ArrowRight className="w-4 h-4 ml-1" />
+            View Pricing <ArrowRight className="w-4 h-4 ml-1 group-hover:translate-x-1 transition-transform" />
           </Link>
         </Button>
       </div>
