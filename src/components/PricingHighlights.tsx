@@ -23,7 +23,7 @@ const PricingHighlights = () => (
         className="text-center mb-16"
       >
         <h2 className="font-display text-4xl md:text-5xl font-bold mb-4">
-          Why <span className="text-gradient">SkyFi</span>?
+          Why <span className="text-gradient">Us</span>?
         </h2>
         <p className="text-muted-foreground text-lg max-w-2xl mx-auto">
           The most accessible satellite data platform on the planet.

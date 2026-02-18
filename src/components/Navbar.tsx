@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
-import { Menu, X, ChevronDown, User, LogOut, LayoutDashboard } from 'lucide-react';
+import { Menu, X, ChevronDown, User, LogOut, LayoutDashboard, Map } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import {
   DropdownMenu,
@@ -142,6 +142,13 @@ export const Navbar = () => {
             >
               Partners
             </Link>
+
+            <Button variant="outline" size="sm" asChild className="ml-2">
+              <Link to="/explore" className="flex items-center space-x-2">
+                <Map className="w-4 h-4" />
+                <span>Explore Map</span>
+              </Link>
+            </Button>
           </div>
 
           {/* CTA Buttons - Desktop */}
@@ -268,6 +275,14 @@ export const Navbar = () => {
                 >
                   Partners
                 </Link>
+
+                {/* Explore Map Button - Mobile */}
+                <Button variant="outline" asChild className="w-full">
+                  <Link to="/explore" onClick={() => setIsMobileMenuOpen(false)}>
+                    <Map className="w-4 h-4 mr-2" />
+                    Explore Map
+                  </Link>
+                </Button>
 
                 {/* CTA Buttons - Mobile */}
                 <div className="flex flex-col space-y-3 pt-6 border-t border-border">

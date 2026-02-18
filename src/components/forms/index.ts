@@ -10,3 +10,6 @@ export type { PartnershipInquiryFormData } from './PartnershipInquiryForm';
 
 export { ProductInquiryForm } from './ProductInquiryForm';
 export type { ProductInquiryFormData } from './ProductInquiryForm';
+
+export { RequestForm } from './RequestForm';
+export type { RequestFormData } from './RequestForm';

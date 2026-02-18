@@ -169,6 +169,48 @@ async function sendQuoteEmail(email, name, quoteDetails) {
   return await emailService.sendQuoteEmail(email, name, quoteDetails);
 }
 
+/**
+ * Send imagery request confirmation to user
+ * @param {string} email - User email
+ * @param {string} name - User name
+ * @param {Object} request - Imagery request object
+ * @returns {Promise<Object>}
+ */
+async function sendImageryRequestConfirmation(email, name, request) {
+  if (USE_QUEUE) {
+    return await emailQueue.addEmailToQueue('imageryRequestConfirmation', { email, name, request });
+  }
+  return await emailService.sendImageryRequestConfirmation(email, name, request);
+}
+
+/**
+ * Send imagery request notification to admin
+ * @param {Object} request - Imagery request object
+ * @returns {Promise<Object>}
+ */
+async function sendImageryRequestNotification(request) {
+  if (USE_QUEUE) {
+    return await emailQueue.addEmailToQueue('imageryRequestNotification', { request });
+  }
+  return await emailService.sendImageryRequestNotification(request);
+}
+
+/**
+ * Send imagery request status update to user
+ * @param {string} email - User email
+ * @param {string} name - User name
+ * @param {Object} request - Imagery request object
+ * @param {string} oldStatus - Previous status
+ * @param {string} newStatus - New status
+ * @returns {Promise<Object>}
+ */
+async function sendImageryRequestStatusUpdate(email, name, request, oldStatus, newStatus) {
+  if (USE_QUEUE) {
+    return await emailQueue.addEmailToQueue('imageryRequestStatusUpdate', { email, name, request, oldStatus, newStatus });
+  }
+  return await emailService.sendImageryRequestStatusUpdate(email, name, request, oldStatus, newStatus);
+}
+
 module.exports = {
   sendWelcomeEmail,
   sendEmailVerification,
@@ -181,5 +223,8 @@ module.exports = {
   sendQuoteRequestConfirmation,
   sendQuoteRequestNotification,
   sendQuoteEmail,
+  sendImageryRequestConfirmation,
+  sendImageryRequestNotification,
+  sendImageryRequestStatusUpdate,
   USE_QUEUE
 };

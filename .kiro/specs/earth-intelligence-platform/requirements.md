@@ -89,7 +89,7 @@ As a content admin, I want to:
 - [ ] 3.7.2 Hover effects apply to each logo
 - [ ] 3.7.3 Grid is responsive across all screen sizes
 
-### 3.8 About SkyFi Preview
+### 3.8 About our Preview
 - [ ] 3.8.1 Three info cards display with images and descriptions
 - [ ] 3.8.2 Scroll-triggered fade-in animations activate when in viewport
 - [ ] 3.8.3 Cards stack properly on mobile

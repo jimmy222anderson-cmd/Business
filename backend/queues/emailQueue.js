@@ -92,6 +92,18 @@ emailQueue.process(async (job) => {
         await emailService.sendQuoteEmail(data.email, data.name, data.quoteDetails);
         break;
         
+      case 'imageryRequestConfirmation':
+        await emailService.sendImageryRequestConfirmation(data.email, data.name, data.request);
+        break;
+        
+      case 'imageryRequestNotification':
+        await emailService.sendImageryRequestNotification(data.request);
+        break;
+        
+      case 'imageryRequestStatusUpdate':
+        await emailService.sendImageryRequestStatusUpdate(data.email, data.name, data.request, data.oldStatus, data.newStatus);
+        break;
+        
       default:
         throw new Error(`Unknown email type: ${type}`);
     }

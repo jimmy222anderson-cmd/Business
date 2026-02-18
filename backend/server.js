@@ -137,6 +137,11 @@ const contactRoutes = require('./routes/contact');
 const quoteRoutes = require('./routes/quote');
 const contentRoutes = require('./routes/content');
 const publicContentRoutes = require('./routes/public/content');
+const publicSatelliteProductsRoutes = require('./routes/public/satelliteProducts');
+const publicImageryRequestsRoutes = require('./routes/public/imageryRequests');
+const publicGeocodingRoutes = require('./routes/public/geocoding');
+const userImageryRequestsRoutes = require('./routes/user/imageryRequests');
+const userSavedAOIsRoutes = require('./routes/user/savedAOIs');
 const adminRoutes = require('./routes/admin');
 
 app.use('/api/auth', authRoutes);
@@ -148,6 +153,11 @@ app.use('/api/demo', demoRoutes);
 app.use('/api/contact', contactRoutes);
 app.use('/api/quote', quoteRoutes);
 app.use('/api/content', contentRoutes);
+app.use('/api/public/satellite-products', publicSatelliteProductsRoutes);
+app.use('/api/public/imagery-requests', publicImageryRequestsRoutes);
+app.use('/api/public', publicGeocodingRoutes);
+app.use('/api/user/imagery-requests', userImageryRequestsRoutes);
+app.use('/api/user/saved-aois', userSavedAOIsRoutes);
 app.use('/api/public', publicContentRoutes);
 app.use('/api/admin', adminRoutes);
 

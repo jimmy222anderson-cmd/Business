@@ -3,6 +3,7 @@ import { Toaster as Sonner } from "@/components/ui/sonner";
 import { TooltipProvider } from "@/components/ui/tooltip";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { BrowserRouter, Routes, Route } from "react-router-dom";
+import { HelmetProvider } from "react-helmet-async";
 import { AuthProvider } from "@/contexts/AuthContext";
 import { ProtectedRoute } from "@/components/ProtectedRoute";
 import { ScrollToTop } from "@/components/ScrollToTop";
@@ -37,6 +38,7 @@ import DemoBookingsPage from "./pages/admin/DemoBookingsPage";
 import ContactInquiriesPage from "./pages/admin/ContactInquiriesPage";
 import ProductInquiriesPage from "./pages/admin/ProductInquiriesPage";
 import QuoteRequestsPage from "./pages/admin/QuoteRequestsPage";
+import ImageryRequestsPage from "./pages/admin/ImageryRequestsPage";
 import UsersPage from "./pages/admin/UsersPage";
 import ProductsManagementPage from "./pages/admin/ProductsManagementPage";
 import IndustriesManagementPage from "./pages/admin/IndustriesManagementPage";
@@ -46,6 +48,8 @@ import ProductFormPage from "./pages/admin/ProductFormPage";
 import IndustryFormPage from "./pages/admin/IndustryFormPage";
 import PartnerFormPage from "./pages/admin/PartnerFormPage";
 import BlogFormPage from "./pages/admin/BlogFormPage";
+import ExplorerPage from "./pages/ExplorerPage";
+import UserImageryDashboard from "./pages/UserImageryDashboard";
 
 const queryClient = new QueryClient();
 
@@ -61,13 +65,20 @@ const PlaceholderPage = ({ title }: { title: string }) => (
 
 const App = () => (
   <QueryClientProvider client={queryClient}>
-    <AuthProvider>
-      <TooltipProvider>
-        <Toaster />
-        <Sonner />
-        <BrowserRouter>
-          <ScrollToTop />
-          <Routes>
+    <HelmetProvider>
+      <AuthProvider>
+        <TooltipProvider>
+          <Toaster />
+          <Sonner />
+          <BrowserRouter>
+            <ScrollToTop />
+            <Routes>
+            {/* Explorer Page - Full screen without header/footer */}
+            <Route path="/explore" element={<ExplorerPage />} />
+            
+            {/* User Dashboard - Full screen without header/footer */}
+            <Route path="/dashboard/imagery" element={<UserImageryDashboard />} />
+            
             <Route element={<Layout />}>
               <Route path="/" element={<Index />} />
               
@@ -143,6 +154,14 @@ const App = () => (
                 element={
                   <ProtectedRoute requireAdmin>
                     <QuoteRequestsPage />
+                  </ProtectedRoute>
+                } 
+              />
+              <Route 
+                path="/admin/imagery-requests" 
+                element={
+                  <ProtectedRoute requireAdmin>
+                    <ImageryRequestsPage />
                   </ProtectedRoute>
                 } 
               />
@@ -258,6 +277,7 @@ const App = () => (
         </BrowserRouter>
       </TooltipProvider>
     </AuthProvider>
+    </HelmetProvider>
   </QueryClientProvider>
 );
 

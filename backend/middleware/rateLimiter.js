@@ -4,11 +4,11 @@ const rateLimit = require('express-rate-limit');
 const isDevelopment = process.env.NODE_ENV === 'development';
 
 // Rate limiter for authentication endpoints
-// Development: 50 requests per 15 minutes
+// Development: 1000 requests per 15 minutes (maximum for testing)
 // Production: 5 requests per 15 minutes
 const authLimiter = rateLimit({
   windowMs: 15 * 60 * 1000, // 15 minutes
-  max: isDevelopment ? 50 : 5, // More lenient in development
+  max: isDevelopment ? 1000 : 5, // Maximum in development for testing
   message: {
     error: 'Too many authentication attempts from this IP, please try again after 15 minutes'
   },
@@ -19,11 +19,11 @@ const authLimiter = rateLimit({
 });
 
 // Rate limiter for form submission endpoints
-// Development: 50 requests per hour
+// Development: 1000 requests per hour (maximum for testing)
 // Production: 10 requests per hour
 const formLimiter = rateLimit({
   windowMs: 60 * 60 * 1000, // 1 hour
-  max: isDevelopment ? 50 : 10, // More lenient in development
+  max: isDevelopment ? 1000 : 10, // Maximum in development for testing
   message: {
     error: 'Too many form submissions from this IP, please try again after an hour'
   },

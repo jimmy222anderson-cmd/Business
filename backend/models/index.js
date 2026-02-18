@@ -9,6 +9,9 @@ const Industry = require('./Industry');
 const Partner = require('./Partner');
 const Content = require('./Content');
 const QuoteRequest = require('./QuoteRequest');
+const SatelliteProduct = require('./SatelliteProduct');
+const ImageryRequest = require('./ImageryRequest');
+const SavedAOI = require('./SavedAOI');
 
 module.exports = {
   UserProfile,
@@ -21,5 +24,8 @@ module.exports = {
   Industry,
   Partner,
   Content,
-  QuoteRequest
+  QuoteRequest,
+  SatelliteProduct,
+  ImageryRequest,
+  SavedAOI
 };

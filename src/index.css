@@ -1,5 +1,8 @@
 @import url('https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@300;400;500;600;700&family=Inter:wght@300;400;500;600;700&display=swap');
 
+/* Leaflet CSS */
+@import 'leaflet/dist/leaflet.css';
+
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
@@ -97,4 +100,405 @@
 
 .animate-blink {
   animation: blink 1s step-end infinite;
+}
+
+/* Leaflet Drawing Controls Styling */
+/* Style the drawing toolbar buttons */
+.leaflet-draw-toolbar a {
+  @apply bg-card border-border transition-all duration-200;
+}
+
+.leaflet-draw-toolbar a:hover {
+  @apply bg-primary/20 border-primary;
+  box-shadow: 0 0 10px hsl(45 100% 55% / 0.3);
+}
+
+.leaflet-draw-toolbar a.leaflet-draw-draw-polygon,
+.leaflet-draw-toolbar a.leaflet-draw-draw-rectangle {
+  @apply transition-all duration-200;
+}
+
+.leaflet-draw-toolbar a.leaflet-draw-draw-polygon:hover,
+.leaflet-draw-toolbar a.leaflet-draw-draw-rectangle:hover {
+  @apply bg-primary/30;
+  transform: scale(1.05);
+}
+
+/* Active state for drawing tools */
+.leaflet-draw-toolbar a.leaflet-draw-toolbar-button-enabled {
+  @apply bg-primary border-primary;
+  box-shadow: 0 0 15px hsl(45 100% 55% / 0.5);
+}
+
+/* Style the edit toolbar buttons */
+.leaflet-draw-toolbar .leaflet-draw-edit-edit,
+.leaflet-draw-toolbar .leaflet-draw-edit-remove {
+  @apply bg-card border-border transition-all duration-200;
+}
+
+.leaflet-draw-toolbar .leaflet-draw-edit-edit:hover,
+.leaflet-draw-toolbar .leaflet-draw-edit-remove:hover {
+  @apply bg-primary/20 border-primary;
+  box-shadow: 0 0 10px hsl(45 100% 55% / 0.3);
+  transform: scale(1.05);
+}
+
+/* Active state for edit tools */
+.leaflet-draw-toolbar .leaflet-draw-edit-edit.leaflet-draw-toolbar-button-enabled,
+.leaflet-draw-toolbar .leaflet-draw-edit-remove.leaflet-draw-toolbar-button-enabled {
+  @apply bg-primary border-primary;
+  box-shadow: 0 0 15px hsl(45 100% 55% / 0.5);
+}
+
+/* Style the drawing actions (Save/Cancel buttons) */
+.leaflet-draw-actions a {
+  @apply bg-card text-foreground border-border transition-all duration-200;
+}
+
+.leaflet-draw-actions a:hover {
+  @apply bg-primary/20 border-primary text-primary;
+  box-shadow: 0 0 10px hsl(45 100% 55% / 0.3);
+}
+
+/* Style the drawing tooltip */
+.leaflet-draw-tooltip {
+  @apply bg-card/95 backdrop-blur-sm border border-border text-foreground;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
+  font-size: 13px;
+  padding: 6px 10px;
+}
+
+.leaflet-draw-tooltip-single {
+  @apply text-foreground font-medium;
+}
+
+.leaflet-draw-tooltip-subtext {
+  @apply text-muted-foreground text-xs;
+  margin-top: 2px;
+}
+
+/* Style drawn shapes - purple with transparency */
+.leaflet-interactive {
+  stroke: #9333EA !important;
+  stroke-width: 3 !important;
+  fill: #9333EA !important;
+  fill-opacity: 0.2 !important;
+  transition: all 0.2s ease;
+}
+
+/* Hover effect on drawn shapes */
+.leaflet-interactive:hover {
+  stroke-width: 4 !important;
+  fill-opacity: 0.3 !important;
+  filter: drop-shadow(0 0 8px rgba(234, 179, 8, 0.6));
+}
+
+/* Style for editing vertices - SMALLER SIZE */
+.leaflet-editing-icon {
+  width: 8px !important;
+  height: 8px !important;
+  margin-left: -4px !important;
+  margin-top: -4px !important;
+  border: 2px solid #9333EA !important;
+  background-color: #ffffff !important;
+  border-radius: 50%;
+  box-shadow: 0 0 4px rgba(234, 179, 8, 0.5);
+  transition: all 0.2s ease;
+}
+
+.leaflet-editing-icon:hover {
+  width: 10px !important;
+  height: 10px !important;
+  margin-left: -5px !important;
+  margin-top: -5px !important;
+  background-color: #9333EA !important;
+  border-color: #ffffff !important;
+  transform: scale(1.2);
+  box-shadow: 0 0 8px rgba(234, 179, 8, 0.8);
+}
+
+/* Style for middle markers (for adding vertices) - SMALLER */
+.leaflet-marker-icon.leaflet-div-icon.leaflet-editing-icon.leaflet-touch-icon {
+  width: 6px !important;
+  height: 6px !important;
+  margin-left: -3px !important;
+  margin-top: -3px !important;
+  border: 1px solid rgba(234, 179, 8, 0.6) !important;
+  background-color: rgba(255, 255, 255, 0.8) !important;
+  opacity: 0.7;
+}
+
+.leaflet-marker-icon.leaflet-div-icon.leaflet-editing-icon.leaflet-touch-icon:hover {
+  width: 8px !important;
+  height: 8px !important;
+  margin-left: -4px !important;
+  margin-top: -4px !important;
+  border-color: #9333EA !important;
+  background-color: rgba(147, 51, 234, 0.3) !important;
+  opacity: 1;
+}
+
+/* Style the area label popup */
+.aoi-area-label {
+  @apply bg-card/95 backdrop-blur-sm border border-primary;
+  box-shadow: 0 4px 12px rgba(234, 179, 8, 0.3);
+}
+
+.aoi-area-label .leaflet-popup-content-wrapper {
+  @apply bg-card/95 backdrop-blur-sm border border-primary rounded-lg;
+  box-shadow: 0 4px 12px rgba(234, 179, 8, 0.3);
+}
+
+.aoi-area-label .leaflet-popup-content {
+  @apply m-2;
+}
+
+.aoi-area-label .leaflet-popup-tip {
+  @apply bg-card border-primary;
+}
+
+/* Style for drawing guide lines */
+.leaflet-draw-guide-dash {
+  stroke: #9333EA !important;
+  stroke-opacity: 0.6 !important;
+  stroke-dasharray: 10, 10 !important;
+}
+
+/* Zoom control styling */
+.leaflet-control-zoom a {
+  @apply bg-card border-border text-foreground transition-all duration-200;
+}
+
+.leaflet-control-zoom a:hover {
+  @apply bg-primary/20 border-primary text-primary;
+  box-shadow: 0 0 10px hsl(45 100% 55% / 0.3);
+}
+
+/* Scale control styling */
+.leaflet-control-scale {
+  @apply bg-card/80 backdrop-blur-sm border-border;
+}
+
+.leaflet-control-scale-line {
+  @apply border-primary text-foreground;
+  border-width: 2px;
+  border-top: none;
+}
+
+/* Attribution styling */
+.leaflet-control-attribution {
+  @apply bg-card/80 backdrop-blur-sm text-muted-foreground;
+}
+
+/* Custom Scrollbar Styling - Dark Theme */
+/* For Webkit browsers (Chrome, Safari, Edge) */
+::-webkit-scrollbar {
+  width: 12px;
+  height: 12px;
+}
+
+::-webkit-scrollbar-track {
+  background-color: rgb(15 23 42); /* slate-900 */
+  border-radius: 6px;
+}
+
+::-webkit-scrollbar-thumb {
+  background-color: rgb(51 65 85); /* slate-700 */
+  border-radius: 6px;
+  border: 2px solid transparent;
+  background-clip: padding-box;
+  transition: background-color 0.2s ease;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background-color: rgb(147 51 234); /* purple-600 */
+}
+
+::-webkit-scrollbar-thumb:active {
+  background-color: rgb(126 34 206); /* purple-700 */
+}
+
+/* For Firefox */
+* {
+  scrollbar-width: thin;
+  scrollbar-color: rgb(51 65 85) rgb(15 23 42); /* slate-700 slate-900 */
+}
+
+/* Scrollbar for dialog/modal content */
+.dialog-scrollable::-webkit-scrollbar {
+  width: 8px;
+}
+
+.dialog-scrollable::-webkit-scrollbar-track {
+  background-color: rgb(30 41 59); /* slate-800 */
+  border-radius: 4px;
+}
+
+.dialog-scrollable::-webkit-scrollbar-thumb {
+  background-color: rgb(71 85 105); /* slate-600 */
+  border-radius: 4px;
+  transition: background-color 0.2s ease;
+}
+
+.dialog-scrollable::-webkit-scrollbar-thumb:hover {
+  background-color: rgb(147 51 234); /* purple-600 */
+}
+
+/* Scrollbar for sidebar */
+.sidebar-scrollable::-webkit-scrollbar {
+  width: 8px;
+}
+
+.sidebar-scrollable::-webkit-scrollbar-track {
+  background-color: rgb(15 23 42); /* slate-900 */
+  border-radius: 4px;
+}
+
+.sidebar-scrollable::-webkit-scrollbar-thumb {
+  background-color: rgb(51 65 85); /* slate-700 */
+  border-radius: 4px;
+  transition: background-color 0.2s ease;
+}
+
+.sidebar-scrollable::-webkit-scrollbar-thumb:hover {
+  background-color: rgb(147 51 234); /* purple-600 */
+}
+
+/* React DatePicker Dark Theme Styling */
+.react-datepicker {
+  font-family: inherit;
+  background-color: hsl(var(--popover)) !important;
+  border: 1px solid hsl(var(--border)) !important;
+  border-radius: 0.5rem;
+  box-shadow: 0 10px 15px -3px rgb(0 0 0 / 0.1);
+}
+
+.react-datepicker__header {
+  background-color: hsl(var(--muted)) !important;
+  border-bottom: 1px solid hsl(var(--border)) !important;
+  border-top-left-radius: 0.5rem;
+  border-top-right-radius: 0.5rem;
+}
+
+.react-datepicker__current-month,
+.react-datepicker__day-name {
+  color: hsl(var(--foreground)) !important;
+}
+
+.react-datepicker__day {
+  color: hsl(var(--foreground)) !important;
+}
+
+.react-datepicker__day:hover {
+  background-color: hsl(var(--accent)) !important;
+  color: hsl(var(--accent-foreground)) !important;
+}
+
+.react-datepicker__day--selected,
+.react-datepicker__day--keyboard-selected {
+  background-color: hsl(var(--primary)) !important;
+  color: hsl(var(--primary-foreground)) !important;
+}
+
+.react-datepicker__day--disabled {
+  color: hsl(var(--muted-foreground)) !important;
+  opacity: 0.5;
+}
+
+.react-datepicker__navigation-icon::before {
+  border-color: hsl(var(--foreground)) !important;
+}
+
+.react-datepicker__navigation:hover *::before {
+  border-color: hsl(var(--primary)) !important;
+}
+
+.react-datepicker__triangle {
+  display: none;
+}
+
+/* Responsive Leaflet Controls */
+@media (max-width: 768px) {
+  /* Adjust drawing toolbar for mobile */
+  .leaflet-draw-toolbar {
+    margin-top: 60px !important;
+  }
+  
+  /* Make drawing buttons slightly larger for touch */
+  .leaflet-draw-toolbar a {
+    width: 36px !important;
+    height: 36px !important;
+  }
+  
+  /* Adjust zoom controls for mobile */
+  .leaflet-control-zoom {
+    margin-top: 60px !important;
+  }
+  
+  .leaflet-control-zoom a {
+    width: 36px !important;
+    height: 36px !important;
+    line-height: 36px !important;
+    font-size: 20px !important;
+  }
+  
+  /* Make area label more compact on mobile */
+  .aoi-area-label .leaflet-popup-content-wrapper {
+    padding: 4px 8px;
+  }
+  
+  .aoi-area-label .leaflet-popup-content {
+    margin: 4px;
+    font-size: 12px;
+  }
+  
+  /* Adjust scale control for mobile */
+  .leaflet-control-scale {
+    font-size: 10px;
+  }
+  
+  /* Hide attribution on very small screens */
+  .leaflet-control-attribution {
+    font-size: 9px;
+    max-width: 200px;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+  }
+}
+
+@media (max-width: 640px) {
+  /* Further adjustments for small mobile screens */
+  .leaflet-draw-toolbar {
+    margin-top: 70px !important;
+  }
+  
+  .leaflet-control-zoom {
+    margin-top: 70px !important;
+  }
+}
+
+/* Touch-friendly improvements for mobile */
+@media (hover: none) and (pointer: coarse) {
+  /* Increase touch target sizes */
+  .leaflet-draw-toolbar a,
+  .leaflet-control-zoom a {
+    min-width: 40px !important;
+    min-height: 40px !important;
+  }
+  
+  /* Make editing vertices slightly larger for touch but still reasonable */
+  .leaflet-editing-icon {
+    width: 12px !important;
+    height: 12px !important;
+    margin-left: -6px !important;
+    margin-top: -6px !important;
+  }
+  
+  .leaflet-editing-icon:hover {
+    width: 14px !important;
+    height: 14px !important;
+    margin-left: -7px !important;
+    margin-top: -7px !important;
+  }
 }

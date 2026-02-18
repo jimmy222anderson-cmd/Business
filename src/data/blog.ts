@@ -90,12 +90,12 @@ Many applications benefit from combining both sensor types for comprehensive ana
     status: "published",
   },
   {
-    id: "skyfi-iceye-partnership",
-    slug: "skyfi-iceye-partnership",
-    title: "SkyFi Partners with ICEYE for Enhanced SAR Coverage",
+    id: "Our-iceye-partnership",
+    slug: "Our-iceye-partnership",
+    title: "Our Partners with ICEYE for Enhanced SAR Coverage",
     excerpt: "Expanding our SAR capabilities with ICEYE's constellation for all-weather, day-and-night imaging.",
     content: `
-# SkyFi Partners with ICEYE for Enhanced SAR Coverage
+# Our Partners with ICEYE for Enhanced SAR Coverage
 
 We're excited to announce our partnership with ICEYE, the global leader in SAR satellite operations. This collaboration significantly expands our all-weather imaging capabilities.
 

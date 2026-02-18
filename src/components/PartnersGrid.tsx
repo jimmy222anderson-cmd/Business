@@ -1,10 +1,40 @@
 import { motion } from "framer-motion";
 import { useState, useEffect } from "react";
+import { getImageUrl } from "@/lib/utils/image";
 
 interface Partner {
   _id: string;
   name: string;
   logo: string;
+}
+
+// Partner card component with image error handling
+function PartnerCard({ partner, index }: { partner: Partner; index: number }) {
+  const [imageError, setImageError] = useState(false);
+
+  return (
+    <motion.div
+      initial={{ opacity: 0, scale: 0.9 }}
+      whileInView={{ opacity: 1, scale: 1 }}
+      viewport={{ once: true }}
+      transition={{ delay: index * 0.05 }}
+      className="glass rounded-xl p-6 flex items-center justify-center hover-scale hover-glow cursor-pointer"
+    >
+      {!imageError ? (
+        <img
+          src={getImageUrl(partner.logo)}
+          alt={`${partner.name} logo`}
+          className="max-h-16 max-w-full object-contain"
+          loading="lazy"
+          onError={() => setImageError(true)}
+        />
+      ) : (
+        <span className="font-display font-semibold text-muted-foreground text-sm text-center">
+          {partner.name}
+        </span>
+      )}
+    </motion.div>
+  );
 }
 
 const PartnersGrid = () => {
@@ -48,16 +78,7 @@ const PartnersGrid = () => {
 
       <div className="grid grid-cols-1 md:grid-cols-3 lg:grid-cols-4 gap-4">
         {partners.map((partner, i) => (
-          <motion.div
-            key={partner._id}
-            initial={{ opacity: 0, scale: 0.9 }}
-            whileInView={{ opacity: 1, scale: 1 }}
-            viewport={{ once: true }}
-            transition={{ delay: i * 0.05 }}
-            className="glass rounded-xl p-6 flex items-center justify-center hover-scale hover-glow cursor-pointer"
-          >
-            <span className="font-display font-semibold text-muted-foreground text-sm text-center">{partner.name}</span>
-          </motion.div>
+          <PartnerCard key={partner._id} partner={partner} index={i} />
         ))}
       </div>
     </div>

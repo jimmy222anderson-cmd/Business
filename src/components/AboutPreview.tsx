@@ -10,7 +10,7 @@ const cards = [
   {
     icon: Database,
     title: "One Platform, All Sources",
-    description: "Instead of navigating dozens of providers, SkyFi aggregates 50+ satellite constellations into a single, unified marketplace.",
+    description: "Instead of navigating dozens of providers, We aggregates 50+ satellite constellations into a single, unified marketplace.",
   },
   {
     icon: Globe,
@@ -29,7 +29,7 @@ const AboutPreview = () => (
         className="text-center mb-16"
       >
         <h2 className="font-display text-4xl md:text-5xl font-bold mb-4">
-          About <span className="text-gradient">SkyFi</span>
+          About <span className="text-gradient">Us</span>
         </h2>
       </motion.div>
 

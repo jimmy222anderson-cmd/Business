@@ -9,6 +9,7 @@
     "dev": "nodemon server.js",
     "seed:content": "node seeds/content.js",
     "seed:admins": "node seeds/adminUsers.js",
+    "seed:satellites": "node seeds/satelliteProducts.js",
     "test:email": "node scripts/test-email.js",
     "test": "echo \"Error: no test specified\" && exit 1"
   },
@@ -21,6 +22,7 @@
   "license": "ISC",
   "dependencies": {
     "@aws-sdk/client-s3": "^3.989.0",
+    "axios": "^1.13.5",
     "bcrypt": "^6.0.0",
     "cors": "^2.8.6",
     "dotenv": "^17.3.1",
@@ -29,9 +31,16 @@
     "express-validator": "^7.3.1",
     "helmet": "^8.1.0",
     "jsonwebtoken": "^9.0.3",
+    "leaflet": "^1.9.4",
+    "leaflet-draw": "^1.0.4",
     "mongoose": "^9.2.1",
     "multer": "^2.0.2",
     "nodemailer": "^8.0.1",
+    "react-leaflet": "^5.0.0",
     "resend": "^6.9.2"
+  },
+  "devDependencies": {
+    "@types/leaflet": "^1.9.21",
+    "@types/leaflet-draw": "^1.0.13"
   }
 }

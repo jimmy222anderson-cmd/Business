@@ -6,17 +6,22 @@ const DemoBooking = require('../models/DemoBooking');
 const ContactInquiry = require('../models/ContactInquiry');
 const QuoteRequest = require('../models/QuoteRequest');
 const ProductInquiry = require('../models/ProductInquiry');
+const ImageryRequest = require('../models/ImageryRequest');
 
 // Content management routes
 const productsRouter = require('./admin/products');
 const industriesRouter = require('./admin/industries');
 const partnersRouter = require('./admin/partners');
 const blogsRouter = require('./admin/blogs');
+const satelliteProductsRouter = require('./admin/satelliteProducts');
+const imageryRequestsRouter = require('./admin/imageryRequests');
 
 router.use('/products', productsRouter);
 router.use('/industries', industriesRouter);
 router.use('/partners', partnersRouter);
 router.use('/blogs', blogsRouter);
+router.use('/satellite-products', satelliteProductsRouter);
+router.use('/imagery-requests', imageryRequestsRouter);
 
 /**
  * GET /api/admin/dashboard/stats
@@ -32,20 +37,24 @@ router.get('/dashboard/stats', requireAuth, requireAdmin, async (req, res) => {
       totalContactInquiries,
       totalProductInquiries,
       totalQuoteRequests,
+      totalImageryRequests,
       pendingDemoBookings,
       newContactInquiries,
       pendingProductInquiries,
-      pendingQuoteRequests
+      pendingQuoteRequests,
+      pendingImageryRequests
     ] = await Promise.all([
       UserProfile.countDocuments(),
       DemoBooking.countDocuments(),
       ContactInquiry.countDocuments(),
       ProductInquiry.countDocuments(),
       QuoteRequest.countDocuments(),
+      ImageryRequest.countDocuments(),
       DemoBooking.countDocuments({ status: 'pending' }),
       ContactInquiry.countDocuments({ status: 'new' }),
       ProductInquiry.countDocuments({ status: 'pending' }),
-      QuoteRequest.countDocuments({ status: 'pending' })
+      QuoteRequest.countDocuments({ status: 'pending' }),
+      ImageryRequest.countDocuments({ status: 'pending' })
     ]);
 
     res.json({
@@ -54,10 +63,12 @@ router.get('/dashboard/stats', requireAuth, requireAdmin, async (req, res) => {
       totalContactInquiries,
       totalProductInquiries,
       totalQuoteRequests,
+      totalImageryRequests,
       pendingDemoBookings,
       newContactInquiries,
       pendingProductInquiries,
-      pendingQuoteRequests
+      pendingQuoteRequests,
+      pendingImageryRequests
     });
   } catch (error) {
     console.error('Error fetching dashboard stats:', error);
@@ -71,82 +82,230 @@ router.get('/dashboard/stats', requireAuth, requireAdmin, async (req, res) => {
  * Admin only
  */
 router.get('/dashboard/activity', requireAuth, requireAdmin, async (req, res) => {
+  console.log('Dashboard activity endpoint called');
   try {
     const { limit = 10 } = req.query;
-    const limitNum = parseInt(limit);
-
-    // Fetch recent items from each collection
-    const [recentUsers, recentBookings, recentInquiries, recentProductInquiries, recentQuotes] = await Promise.all([
-      UserProfile.find().sort({ created_at: -1 }).limit(limitNum).select('full_name email created_at'),
-      DemoBooking.find().sort({ created_at: -1 }).limit(limitNum).select('fullName email status created_at'),
-      ContactInquiry.find().sort({ created_at: -1 }).limit(limitNum).select('full_name email subject status created_at'),
-      ProductInquiry.find().sort({ created_at: -1 }).limit(limitNum).select('full_name email product_id status created_at'),
-      QuoteRequest.find().sort({ created_at: -1 }).limit(limitNum).select('fullName email industry status created_at')
-    ]);
+    const limitNum = Math.min(parseInt(limit) || 10, 50); // Cap at 50
+    console.log('Fetching activity with limit:', limitNum);
 
     // Combine and format activities
     const activities = [];
 
-    recentUsers.forEach(user => {
-      activities.push({
-        id: `user-${user._id}`,
-        type: 'user',
-        title: 'New User Registration',
-        description: `${user.full_name || user.email} created an account`,
-        timestamp: user.created_at
-      });
-    });
+    // Fetch recent items from each collection with individual error handling
+    try {
+      const recentUsers = await UserProfile.find()
+        .sort({ created_at: -1 })
+        .limit(limitNum)
+        .select('full_name email created_at')
+        .lean()
+        .exec();
+      console.log('Fetched users:', recentUsers?.length || 0);
+      
+      if (Array.isArray(recentUsers)) {
+        recentUsers.forEach(user => {
+          try {
+            if (user && user._id && user.created_at) {
+              activities.push({
+                id: `user-${user._id}`,
+                type: 'user',
+                title: 'New User Registration',
+                description: `${user.full_name || user.email || 'Unknown'} created an account`,
+                timestamp: user.created_at.toISOString ? user.created_at.toISOString() : user.created_at
+              });
+            }
+          } catch (e) {
+            console.error('Error processing user:', e.message);
+          }
+        });
+      }
+    } catch (err) {
+      console.error('Error fetching recent users:', err.message);
+    }
 
-    recentBookings.forEach(booking => {
-      activities.push({
-        id: `demo-${booking._id}`,
-        type: 'demo',
-        title: 'New Demo Booking',
-        description: `${booking.fullName} (${booking.email}) requested a demo - Status: ${booking.status}`,
-        timestamp: booking.created_at
-      });
-    });
+    try {
+      const recentBookings = await DemoBooking.find()
+        .sort({ created_at: -1 })
+        .limit(limitNum)
+        .select('fullName email status created_at')
+        .lean()
+        .exec();
+      console.log('Fetched bookings:', recentBookings?.length || 0);
+      
+      if (Array.isArray(recentBookings)) {
+        recentBookings.forEach(booking => {
+          try {
+            if (booking && booking._id && booking.created_at) {
+              activities.push({
+                id: `demo-${booking._id}`,
+                type: 'demo',
+                title: 'New Demo Booking',
+                description: `${booking.fullName || 'Unknown'} (${booking.email || 'N/A'}) requested a demo - Status: ${booking.status || 'pending'}`,
+                timestamp: booking.created_at.toISOString ? booking.created_at.toISOString() : booking.created_at
+              });
+            }
+          } catch (e) {
+            console.error('Error processing booking:', e.message);
+          }
+        });
+      }
+    } catch (err) {
+      console.error('Error fetching recent bookings:', err.message);
+    }
 
-    recentInquiries.forEach(inquiry => {
-      activities.push({
-        id: `contact-${inquiry._id}`,
-        type: 'contact',
-        title: 'New Contact Inquiry',
-        description: `${inquiry.full_name} (${inquiry.email}) - ${inquiry.subject} - Status: ${inquiry.status}`,
-        timestamp: inquiry.created_at
-      });
-    });
+    try {
+      const recentInquiries = await ContactInquiry.find()
+        .sort({ created_at: -1 })
+        .limit(limitNum)
+        .select('full_name email subject status created_at')
+        .lean()
+        .exec();
+      console.log('Fetched inquiries:', recentInquiries?.length || 0);
+      
+      if (Array.isArray(recentInquiries)) {
+        recentInquiries.forEach(inquiry => {
+          try {
+            if (inquiry && inquiry._id && inquiry.created_at) {
+              activities.push({
+                id: `contact-${inquiry._id}`,
+                type: 'contact',
+                title: 'New Contact Inquiry',
+                description: `${inquiry.full_name || 'Unknown'} (${inquiry.email || 'N/A'}) - ${inquiry.subject || 'No subject'} - Status: ${inquiry.status || 'new'}`,
+                timestamp: inquiry.created_at.toISOString ? inquiry.created_at.toISOString() : inquiry.created_at
+              });
+            }
+          } catch (e) {
+            console.error('Error processing inquiry:', e.message);
+          }
+        });
+      }
+    } catch (err) {
+      console.error('Error fetching recent inquiries:', err.message);
+    }
 
-    recentProductInquiries.forEach(inquiry => {
-      activities.push({
-        id: `product-${inquiry._id}`,
-        type: 'product',
-        title: 'New Product Inquiry',
-        description: `${inquiry.full_name} (${inquiry.email}) - Product ${inquiry.product_id} - Status: ${inquiry.status}`,
-        timestamp: inquiry.created_at
-      });
-    });
+    try {
+      const recentProductInquiries = await ProductInquiry.find()
+        .sort({ created_at: -1 })
+        .limit(limitNum)
+        .select('full_name email product_id status created_at')
+        .lean()
+        .exec();
+      console.log('Fetched product inquiries:', recentProductInquiries?.length || 0);
+      
+      if (Array.isArray(recentProductInquiries)) {
+        recentProductInquiries.forEach(inquiry => {
+          try {
+            if (inquiry && inquiry._id && inquiry.created_at) {
+              activities.push({
+                id: `product-${inquiry._id}`,
+                type: 'product',
+                title: 'New Product Inquiry',
+                description: `${inquiry.full_name || 'Unknown'} (${inquiry.email || 'N/A'}) - Product ${inquiry.product_id || 'N/A'} - Status: ${inquiry.status || 'pending'}`,
+                timestamp: inquiry.created_at.toISOString ? inquiry.created_at.toISOString() : inquiry.created_at
+              });
+            }
+          } catch (e) {
+            console.error('Error processing product inquiry:', e.message);
+          }
+        });
+      }
+    } catch (err) {
+      console.error('Error fetching recent product inquiries:', err.message);
+    }
 
-    recentQuotes.forEach(quote => {
-      activities.push({
-        id: `quote-${quote._id}`,
-        type: 'quote',
-        title: 'New Quote Request',
-        description: `${quote.fullName} (${quote.email}) - ${quote.industry} - Status: ${quote.status}`,
-        timestamp: quote.created_at
-      });
-    });
+    try {
+      const recentQuotes = await QuoteRequest.find()
+        .sort({ created_at: -1 })
+        .limit(limitNum)
+        .select('fullName email industry status created_at')
+        .lean()
+        .exec();
+      console.log('Fetched quotes:', recentQuotes?.length || 0);
+      
+      if (Array.isArray(recentQuotes)) {
+        recentQuotes.forEach(quote => {
+          try {
+            if (quote && quote._id && quote.created_at) {
+              activities.push({
+                id: `quote-${quote._id}`,
+                type: 'quote',
+                title: 'New Quote Request',
+                description: `${quote.fullName || 'Unknown'} (${quote.email || 'N/A'}) - ${quote.industry || 'N/A'} - Status: ${quote.status || 'pending'}`,
+                timestamp: quote.created_at.toISOString ? quote.created_at.toISOString() : quote.created_at
+              });
+            }
+          } catch (e) {
+            console.error('Error processing quote:', e.message);
+          }
+        });
+      }
+    } catch (err) {
+      console.error('Error fetching recent quotes:', err.message);
+    }
+
+    try {
+      const recentImageryRequests = await ImageryRequest.find()
+        .sort({ createdAt: -1 })
+        .limit(limitNum)
+        .select('userId guestEmail aoi status createdAt')
+        .populate('userId', 'email')
+        .lean()
+        .exec();
+      console.log('Fetched imagery requests:', recentImageryRequests?.length || 0);
+      
+      if (Array.isArray(recentImageryRequests)) {
+        recentImageryRequests.forEach(request => {
+          try {
+            if (request && request._id && request.createdAt) {
+              const email = request.userId?.email || request.guestEmail || 'Unknown';
+              const aoiType = request.aoi?.type || 'Unknown';
+              const aoiArea = (request.aoi?.area && typeof request.aoi.area === 'number') ? request.aoi.area.toFixed(2) : 'N/A';
+              activities.push({
+                id: `imagery-${request._id}`,
+                type: 'imagery',
+                title: 'New Imagery Request',
+                description: `${email} - ${aoiType} (${aoiArea} km²) - Status: ${request.status || 'pending'}`,
+                timestamp: request.createdAt.toISOString ? request.createdAt.toISOString() : request.createdAt
+              });
+            }
+          } catch (e) {
+            console.error('Error processing imagery request:', e.message);
+          }
+        });
+      }
+    } catch (err) {
+      console.error('Error fetching recent imagery requests:', err.message);
+    }
+
+    console.log('Total activities collected:', activities.length);
 
     // Sort by timestamp descending and limit
-    activities.sort((a, b) => new Date(b.timestamp).getTime() - new Date(a.timestamp).getTime());
+    try {
+      activities.sort((a, b) => {
+        try {
+          const timeA = a.timestamp ? new Date(a.timestamp).getTime() : 0;
+          const timeB = b.timestamp ? new Date(b.timestamp).getTime() : 0;
+          return timeB - timeA;
+        } catch (e) {
+          return 0;
+        }
+      });
+    } catch (err) {
+      console.error('Error sorting activities:', err.message);
+    }
+    
     const limitedActivities = activities.slice(0, limitNum);
+    console.log('Returning activities:', limitedActivities.length);
 
     res.json({
       activities: limitedActivities
     });
   } catch (error) {
-    console.error('Error fetching dashboard activity:', error);
-    res.status(500).json({ error: 'Failed to fetch recent activity' });
+    console.error('FATAL Error fetching dashboard activity:', error);
+    console.error('Error stack:', error.stack);
+    res.status(500).json({ 
+      error: 'Failed to fetch recent activity',
+      message: process.env.NODE_ENV === 'development' ? error.message : 'Internal server error'
+    });
   }
 });
 

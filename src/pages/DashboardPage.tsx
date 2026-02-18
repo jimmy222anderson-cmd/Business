@@ -11,7 +11,7 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Badge } from "@/components/ui/badge";
-import { User, Mail, Building, LogOut, Calendar, Package, Edit2, Save, X, MessageSquare, FileText } from "lucide-react";
+import { User, Mail, Building, LogOut, Calendar, Package, Edit2, Save, X, MessageSquare, FileText, Satellite } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
 import { useState, useEffect } from "react";
 import { getUserBookings, getUserInquiries, getUserContactInquiries, getUserQuoteRequests, updateUserProfile, DemoBooking, ProductInquiry, ContactInquiry, QuoteRequest } from "@/lib/api/users";
@@ -359,6 +359,14 @@ const DashboardPage = () => {
               <CardDescription>Manage your account and access features</CardDescription>
             </CardHeader>
             <CardContent className="space-y-3">
+              <Button
+                variant="outline"
+                className="w-full justify-start"
+                onClick={() => navigate('/dashboard/imagery')}
+              >
+                <Satellite className="h-4 w-4 mr-2" />
+                Imagery Dashboard
+              </Button>
               <Button
                 variant="outline"
                 className="w-full justify-start"

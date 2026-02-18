@@ -40,7 +40,7 @@ Build the core layout and stunning homepage with smooth animations.
 - Logo grid of satellite/data partners
 - Hover effects on each logo
 
-### About SkyFi Preview
+### About Our Preview
 - Three stacked info cards with images and descriptions
 - Scroll-triggered fade-in animations
 

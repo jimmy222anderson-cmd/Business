@@ -1,6 +1,7 @@
 import { motion } from 'framer-motion';
 import { ExternalLink } from 'lucide-react';
 import { useState, useEffect } from 'react';
+import { getImageUrl } from '@/lib/utils/image';
 
 interface Partner {
   _id: string;
@@ -35,7 +36,7 @@ function PartnerCard({ partner }: { partner: Partner }) {
       <div className="flex items-center justify-center h-24 mb-4 bg-muted rounded-lg">
         {!imageError ? (
           <img
-            src={partner.logo}
+            src={getImageUrl(partner.logo)}
             alt={`${partner.name} logo`}
             className="max-h-full max-w-full object-contain transition-transform duration-300 group-hover:scale-110 p-2"
             loading="lazy"
