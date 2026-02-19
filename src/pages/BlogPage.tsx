@@ -4,6 +4,7 @@ import { Link } from "react-router-dom";
 import { useState, useMemo, useEffect } from "react";
 import { Input } from "@/components/ui/input";
 import { toast } from "sonner";
+import { getImageUrl } from "@/lib/utils/image";
 
 const BlogPage = () => {
   const [searchQuery, setSearchQuery] = useState("");
@@ -113,10 +114,13 @@ const BlogPage = () => {
                   {/* Featured Image */}
                   <div className="h-56 bg-gradient-to-br from-primary/20 to-secondary overflow-hidden">
                     <img
-                      src={post.featured_image_url || post.featuredImage}
+                      src={getImageUrl(post.featured_image_url || post.featuredImage)}
                       alt={post.title}
                       className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300"
                       loading="lazy"
+                      onError={(e) => {
+                        e.currentTarget.src = '/placeholder.svg';
+                      }}
                     />
                   </div>
 

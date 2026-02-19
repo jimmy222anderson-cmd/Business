@@ -137,7 +137,7 @@ const BlogPostPage = () => {
           animate={{ opacity: 1, x: 0 }}
           className="mb-8"
         >
-          <Button asChild variant="ghost" className="text-muted-foreground hover:text-primary">
+          <Button asChild variant="ghost" className="text-muted-foreground hover:bg-primary hover:text-black">
             <Link to="/blog">
               <ArrowLeft className="w-4 h-4 mr-2" />
               Back to Blog

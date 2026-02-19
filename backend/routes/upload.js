@@ -13,7 +13,8 @@ const categoriesDir = {
   industries: path.join(uploadsDir, 'industries'),
   partners: path.join(uploadsDir, 'partners'),
   blog: path.join(uploadsDir, 'blog'),
-  general: path.join(uploadsDir, 'general')
+  general: path.join(uploadsDir, 'general'),
+  satelliteproduct: path.join(uploadsDir, 'satelliteproduct')
 };
 
 // Ensure all directories exist
@@ -59,7 +60,7 @@ const upload = multer({
  * POST /api/upload
  * Upload an image file to organized folders
  * Requires authentication
- * Body params: category (products|industries|partners|blog|general), name (optional custom name)
+ * Body params: category (products|industries|partners|blog|general|satelliteproduct), name (optional custom name)
  */
 router.post('/', requireAuth, upload.single('file'), async (req, res) => {
   try {

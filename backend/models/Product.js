@@ -39,6 +39,29 @@ const specificationSchema = new mongoose.Schema({
   unit: String
 }, { _id: false });
 
+const subProductSchema = new mongoose.Schema({
+  name: {
+    type: String,
+    required: true,
+    trim: true
+  },
+  slug: {
+    type: String,
+    required: true,
+    lowercase: true,
+    trim: true
+  },
+  description: String,
+  longDescription: String,
+  image: String,  // Removed default value to allow explicit setting
+  features: [featureSchema],
+  specifications: [specificationSchema],
+  order: {
+    type: Number,
+    default: 0
+  }
+}, { _id: true });
+
 const productSchema = new mongoose.Schema({
   name: {
     type: String,
@@ -68,6 +91,7 @@ const productSchema = new mongoose.Schema({
   features: [featureSchema],
   useCases: [useCaseSchema],
   specifications: [specificationSchema],
+  subProducts: [subProductSchema],
   category: {
     type: String,
     enum: ['analytics', 'imagery', 'data', 'plugin'],

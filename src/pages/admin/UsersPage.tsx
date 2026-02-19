@@ -38,6 +38,7 @@ import {
 } from '@/components/ui/alert-dialog';
 import { Users, Eye, Filter, Shield, UserX, UserCheck } from 'lucide-react';
 import { toast } from 'sonner';
+import { BackButton } from '@/components/BackButton';
 
 interface User {
   _id: string;
@@ -201,6 +202,8 @@ export default function UsersPage() {
   return (
     <div className="min-h-screen bg-gradient-to-b from-gray-900 to-black text-white p-8 pt-24">
       <div className="max-w-7xl mx-auto">
+        <BackButton to="/admin/dashboard" label="Back to Admin Dashboard" />
+        
         {/* Header */}
         <div className="mb-8">
           <h1 className="text-3xl font-bold mb-2">User Management</h1>

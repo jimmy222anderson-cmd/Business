@@ -12,6 +12,7 @@ import Index from "./pages/Index";
 import NotFound from "./pages/NotFound";
 import ProductsPage from "./pages/ProductsPage";
 import ProductDetailPage from "./pages/ProductDetailPage";
+import SubProductDetailPage from "./pages/SubProductDetailPage";
 import IndustriesPage from "./pages/IndustriesPage";
 import IndustryDetailPage from "./pages/IndustryDetailPage";
 import PricingPage from "./pages/PricingPage";
@@ -48,6 +49,8 @@ import ProductFormPage from "./pages/admin/ProductFormPage";
 import IndustryFormPage from "./pages/admin/IndustryFormPage";
 import PartnerFormPage from "./pages/admin/PartnerFormPage";
 import BlogFormPage from "./pages/admin/BlogFormPage";
+import AdminSatelliteProductsPage from "./pages/admin/AdminSatelliteProductsPage";
+import SatelliteProductFormPage from "./pages/admin/SatelliteProductFormPage";
 import ExplorerPage from "./pages/ExplorerPage";
 import UserImageryDashboard from "./pages/UserImageryDashboard";
 
@@ -85,6 +88,7 @@ const App = () => (
               {/* Phase 2 placeholder routes */}
               <Route path="/products" element={<ProductsPage />} />
               <Route path="/products/:productId" element={<ProductDetailPage />} />
+              <Route path="/products/:productId/:subProductId" element={<SubProductDetailPage />} />
               <Route path="/industries" element={<IndustriesPage />} />
               <Route path="/industries/:industryId" element={<IndustryDetailPage />} />
               <Route path="/pricing" element={<PricingPage />} />
@@ -92,7 +96,7 @@ const App = () => (
               <Route path="/about" element={<AboutPage />} />
               <Route path="/blog" element={<BlogPage />} />
               <Route path="/blog/:postId" element={<BlogPostPage />} />
-              <Route path="/specs" element={<SpecsPage />} />
+              <Route path="/features" element={<SpecsPage />} />
               <Route path="/demo" element={<BookDemoPage />} />
               <Route path="/get-started" element={<GetStartedPage />} />
               <Route path="/auth/signin" element={<SignInPage />} />
@@ -266,6 +270,30 @@ const App = () => (
                 element={
                   <ProtectedRoute requireAdmin>
                     <BlogFormPage />
+                  </ProtectedRoute>
+                } 
+              />
+              <Route 
+                path="/admin/satellite-products" 
+                element={
+                  <ProtectedRoute requireAdmin>
+                    <AdminSatelliteProductsPage />
+                  </ProtectedRoute>
+                } 
+              />
+              <Route 
+                path="/admin/satellite-products/new" 
+                element={
+                  <ProtectedRoute requireAdmin>
+                    <SatelliteProductFormPage />
+                  </ProtectedRoute>
+                } 
+              />
+              <Route 
+                path="/admin/satellite-products/edit/:id" 
+                element={
+                  <ProtectedRoute requireAdmin>
+                    <SatelliteProductFormPage />
                   </ProtectedRoute>
                 } 
               />

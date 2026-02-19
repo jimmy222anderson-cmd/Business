@@ -7,7 +7,7 @@ interface ImageUploadProps {
   value?: string;
   onChange: (url: string) => void;
   label?: string;
-  category?: 'products' | 'industries' | 'partners' | 'blog' | 'general';
+  category?: 'products' | 'industries' | 'partners' | 'blog' | 'general' | 'satelliteproduct';
   customName?: string;
 }
 

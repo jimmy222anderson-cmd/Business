@@ -31,8 +31,10 @@ export function AuthProvider({ children }: AuthProviderProps) {
   useEffect(() => {
     const initAuth = async () => {
       try {
-        const currentUser = await checkAuth();
-        setUser(currentUser);
+        // Clear any existing token on app start to prevent auto-login
+        localStorage.removeItem('auth_token');
+        apiClient.setAuthToken(null);
+        setUser(null);
       } catch (error) {
         console.error('Auth initialization error:', error);
         setUser(null);

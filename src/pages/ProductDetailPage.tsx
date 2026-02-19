@@ -156,6 +156,65 @@ export function ProductDetailPage() {
         </div>
       </section>
 
+      {/* Sub-Products Section */}
+      {product.subProducts && product.subProducts.length > 0 && (
+        <section className="py-20 bg-background">
+          <div className="container mx-auto px-6">
+            <motion.div
+              initial={{ opacity: 0, y: 20 }}
+              whileInView={{ opacity: 1, y: 0 }}
+              viewport={{ once: true }}
+              transition={{ duration: 0.6 }}
+              className="text-center mb-12"
+            >
+              <h2 className="text-3xl md:text-4xl font-bold mb-4 text-foreground">
+                Available Options
+              </h2>
+              <p className="text-lg text-muted-foreground max-w-2xl mx-auto">
+                Choose from our range of {product.name} products
+              </p>
+            </motion.div>
+
+            <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-6 max-w-6xl mx-auto">
+              {product.subProducts
+                .sort((a, b) => (a.order || 0) - (b.order || 0))
+                .map((subProduct, index) => (
+                  <motion.div
+                    key={subProduct._id || `subproduct-${index}`}
+                    initial={{ opacity: 0, y: 20 }}
+                    whileInView={{ opacity: 1, y: 0 }}
+                    viewport={{ once: true }}
+                    transition={{ duration: 0.6, delay: 0.1 * index }}
+                  >
+                    <Link to={`/products/${product.slug}/${subProduct.slug}`}>
+                      <Card className="h-full hover:shadow-lg transition-shadow cursor-pointer border-2 hover:border-yellow-500/50 overflow-hidden">
+                        {subProduct.image && subProduct.image !== '/placeholder.svg' && (
+                          <img
+                            src={getImageUrl(subProduct.image)}
+                            alt={subProduct.name}
+                            className="w-full h-48 object-cover"
+                          />
+                        )}
+                        <CardHeader>
+                          <CardTitle className="text-xl">{subProduct.name}</CardTitle>
+                        </CardHeader>
+                        <CardContent>
+                          <p className="text-muted-foreground line-clamp-3">
+                            {subProduct.description || `Learn more about ${subProduct.name}`}
+                          </p>
+                          <Button variant="link" className="mt-4 p-0 text-yellow-500">
+                            Learn More →
+                          </Button>
+                        </CardContent>
+                      </Card>
+                    </Link>
+                  </motion.div>
+                ))}
+            </div>
+          </div>
+        </section>
+      )}
+
       {/* Features Section */}
       {product.features && product.features.length > 0 && (
         <section className="py-20 bg-background/50">

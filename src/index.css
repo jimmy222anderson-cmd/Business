@@ -290,7 +290,7 @@
   @apply bg-card/80 backdrop-blur-sm text-muted-foreground;
 }
 
-/* Custom Scrollbar Styling - Dark Theme */
+/* Custom Scrollbar Styling - Dark Theme with Yellow Accent */
 /* For Webkit browsers (Chrome, Safari, Edge) */
 ::-webkit-scrollbar {
   width: 12px;
@@ -303,7 +303,7 @@
 }
 
 ::-webkit-scrollbar-thumb {
-  background-color: rgb(51 65 85); /* slate-700 */
+  background-color: rgb(234 179 8); /* yellow-500 */
   border-radius: 6px;
   border: 2px solid transparent;
   background-clip: padding-box;
@@ -311,17 +311,17 @@
 }
 
 ::-webkit-scrollbar-thumb:hover {
-  background-color: rgb(147 51 234); /* purple-600 */
+  background-color: rgb(250 204 21); /* yellow-400 */
 }
 
 ::-webkit-scrollbar-thumb:active {
-  background-color: rgb(126 34 206); /* purple-700 */
+  background-color: rgb(202 138 4); /* yellow-600 */
 }
 
 /* For Firefox */
 * {
   scrollbar-width: thin;
-  scrollbar-color: rgb(51 65 85) rgb(15 23 42); /* slate-700 slate-900 */
+  scrollbar-color: rgb(234 179 8) rgb(15 23 42); /* yellow-500 slate-900 */
 }
 
 /* Scrollbar for dialog/modal content */
@@ -335,13 +335,13 @@
 }
 
 .dialog-scrollable::-webkit-scrollbar-thumb {
-  background-color: rgb(71 85 105); /* slate-600 */
+  background-color: rgb(234 179 8); /* yellow-500 */
   border-radius: 4px;
   transition: background-color 0.2s ease;
 }
 
 .dialog-scrollable::-webkit-scrollbar-thumb:hover {
-  background-color: rgb(147 51 234); /* purple-600 */
+  background-color: rgb(250 204 21); /* yellow-400 */
 }
 
 /* Scrollbar for sidebar */
@@ -355,13 +355,13 @@
 }
 
 .sidebar-scrollable::-webkit-scrollbar-thumb {
-  background-color: rgb(51 65 85); /* slate-700 */
+  background-color: rgb(234 179 8); /* yellow-500 */
   border-radius: 4px;
   transition: background-color 0.2s ease;
 }
 
 .sidebar-scrollable::-webkit-scrollbar-thumb:hover {
-  background-color: rgb(147 51 234); /* purple-600 */
+  background-color: rgb(250 204 21); /* yellow-400 */
 }
 
 /* React DatePicker Dark Theme Styling */

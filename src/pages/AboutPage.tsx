@@ -349,10 +349,10 @@ export default function AboutPage() {
               want to join our team, we'd love to hear from you.
             </p>
             <div className="flex flex-col sm:flex-row gap-4 justify-center">
-              <Link to="/demo" className="px-8 py-3 bg-yellow-500 text-black font-semibold rounded-lg hover:bg-yellow-400 transition-colors text-center">
+              <Link to="/demo" className="px-8 py-3 bg-yellow-500 text-black font-semibold rounded-lg hover:bg-yellow-400 hover:text-black transition-colors text-center">
                 Book a Demo
               </Link>
-              <Link to="/contact" className="px-8 py-3 bg-transparent border-2 border-yellow-500 text-yellow-500 font-semibold rounded-lg hover:bg-yellow-500/10 transition-colors text-center">
+              <Link to="/contact" className="px-8 py-3 bg-transparent border-2 border-yellow-500 text-yellow-500 font-semibold rounded-lg hover:bg-yellow-500/10 hover:text-yellow-400 transition-colors text-center">
                 Contact Us
               </Link>
             </div>

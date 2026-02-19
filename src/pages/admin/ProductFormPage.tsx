@@ -8,7 +8,8 @@ import { Textarea } from '@/components/ui/textarea';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { ImageUpload } from '@/components/ImageUpload';
 import { toast } from 'sonner';
-import { ArrowLeft, Plus, Trash2 } from 'lucide-react';
+import { Plus, Trash2 } from 'lucide-react';
+import { BackButton } from '@/components/BackButton';
 
 interface Feature {
   title: string;
@@ -28,6 +29,18 @@ interface Specification {
   unit: string;
 }
 
+interface SubProduct {
+  _id?: string;
+  name: string;
+  slug: string;
+  description: string;
+  longDescription?: string;
+  image?: string;
+  features?: Feature[];
+  specifications?: Specification[];
+  order: number;
+}
+
 interface ProductForm {
   name: string;
   slug: string;
@@ -41,6 +54,7 @@ interface ProductForm {
   features: Feature[];
   useCases: UseCase[];
   specifications: Specification[];
+  subProducts: SubProduct[];
 }
 
 export default function ProductFormPage() {
@@ -59,7 +73,8 @@ export default function ProductFormPage() {
     order: 0,
     features: [],
     useCases: [],
-    specifications: []
+    specifications: [],
+    subProducts: []
   });
 
   useEffect(() => {
@@ -184,17 +199,43 @@ export default function ProductFormPage() {
     setFormData({ ...formData, specifications: newSpecs });
   };
 
+  const addSubProduct = () => {
+    setFormData({
+      ...formData,
+      subProducts: [...formData.subProducts, { 
+        name: '', 
+        slug: '', 
+        description: '', 
+        longDescription: '',
+        image: '/placeholder.svg',
+        features: [],
+        specifications: [],
+        order: formData.subProducts.length + 1 
+      }]
+    });
+  };
+
+  const removeSubProduct = (index: number) => {
+    setFormData({
+      ...formData,
+      subProducts: formData.subProducts.filter((_, i) => i !== index)
+    });
+  };
+
+  const updateSubProduct = (index: number, field: keyof SubProduct, value: string | number) => {
+    const newSubProducts = [...formData.subProducts];
+    newSubProducts[index] = { ...newSubProducts[index], [field]: value };
+    setFormData({ ...formData, subProducts: newSubProducts });
+  };
+
+  const generateSubProductSlug = (name: string) => {
+    return name.toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/(^-|-$)/g, '');
+  };
+
   return (
     <div className="min-h-screen bg-gradient-to-b from-gray-900 to-black text-white p-8 pt-24">
       <div className="max-w-4xl mx-auto">
-        <Button
-          variant="ghost"
-          className="mb-4 text-gray-400 hover:text-white"
-          onClick={() => navigate('/admin/products')}
-        >
-          <ArrowLeft className="mr-2 h-4 w-4" />
-          Back to Products
-        </Button>
+        <BackButton to="/admin/dashboard" label="Back to Admin Dashboard" />
 
         <h1 className="text-3xl font-bold mb-8">
           {id ? 'Edit Product' : 'Add New Product'}
@@ -469,6 +510,110 @@ export default function ProductFormPage() {
                   </div>
                 </div>
               ))}
+            </CardContent>
+          </Card>
+
+          <Card className="bg-gray-800 border-gray-700">
+            <CardHeader>
+              <div className="flex justify-between items-center">
+                <div>
+                  <CardTitle className="text-white">Sub-Products</CardTitle>
+                  <p className="text-sm text-gray-400 mt-1">
+                    Add sub-products for hierarchical navigation (e.g., VHR, SAR, DOM under Commercial Imagery)
+                  </p>
+                </div>
+                <Button type="button" onClick={addSubProduct} size="sm">
+                  <Plus className="h-4 w-4 mr-2" />
+                  Add Sub-Product
+                </Button>
+              </div>
+            </CardHeader>
+            <CardContent className="space-y-6">
+              {formData.subProducts.length === 0 ? (
+                <div className="text-center py-8 text-gray-400">
+                  No sub-products added. Click "Add Sub-Product" to create nested products.
+                </div>
+              ) : (
+                formData.subProducts.map((subProduct, index) => (
+                  <Card key={index} className="bg-gray-700 border-gray-600">
+                    <CardHeader>
+                      <div className="flex justify-between items-center">
+                        <span className="text-lg font-semibold text-white">Sub-Product {index + 1}</span>
+                        <Button
+                          type="button"
+                          variant="ghost"
+                          size="sm"
+                          onClick={() => removeSubProduct(index)}
+                          className="text-red-400 hover:text-red-300"
+                        >
+                          <Trash2 className="h-4 w-4" />
+                        </Button>
+                      </div>
+                    </CardHeader>
+                    <CardContent className="space-y-4">
+                      <div className="grid grid-cols-2 gap-3">
+                        <div>
+                          <Label className="text-gray-300 text-sm">Name *</Label>
+                          <Input
+                            placeholder="e.g., VHR, SAR, DOM"
+                            value={subProduct.name}
+                            onChange={(e) => {
+                              updateSubProduct(index, 'name', e.target.value);
+                              updateSubProduct(index, 'slug', generateSubProductSlug(e.target.value));
+                            }}
+                            className="bg-gray-600 border-gray-500 text-white"
+                          />
+                        </div>
+                        <div>
+                          <Label className="text-gray-300 text-sm">Slug *</Label>
+                          <Input
+                            placeholder="e.g., vhr, sar, dom"
+                            value={subProduct.slug}
+                            onChange={(e) => updateSubProduct(index, 'slug', e.target.value)}
+                            className="bg-gray-600 border-gray-500 text-white"
+                          />
+                        </div>
+                      </div>
+                      <div>
+                        <Label className="text-gray-300 text-sm">Short Description</Label>
+                        <Textarea
+                          placeholder="Brief description for cards and listings"
+                          value={subProduct.description}
+                          onChange={(e) => updateSubProduct(index, 'description', e.target.value)}
+                          rows={2}
+                          className="bg-gray-600 border-gray-500 text-white"
+                        />
+                      </div>
+                      <div>
+                        <Label className="text-gray-300 text-sm">Long Description</Label>
+                        <Textarea
+                          placeholder="Detailed description for the sub-product page"
+                          value={subProduct.longDescription || ''}
+                          onChange={(e) => updateSubProduct(index, 'longDescription', e.target.value)}
+                          rows={4}
+                          className="bg-gray-600 border-gray-500 text-white"
+                        />
+                      </div>
+                      <div>
+                        <Label className="text-gray-300 text-sm">Display Order</Label>
+                        <Input
+                          type="number"
+                          value={subProduct.order}
+                          onChange={(e) => updateSubProduct(index, 'order', parseInt(e.target.value) || 0)}
+                          className="bg-gray-600 border-gray-500 text-white"
+                        />
+                      </div>
+                      <ImageUpload
+                        value={subProduct.image || '/placeholder.svg'}
+                        onChange={(url) => updateSubProduct(index, 'image', url)}
+                        label="Sub-Product Image"
+                        category="products"
+                        customName={`${formData.slug}-${subProduct.slug}`}
+                      />
+                    </CardContent>
+                  </Card>
+                ))
+              )}
             </CardContent>
           </Card>
 

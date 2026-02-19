@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
-import { Menu, X, ChevronDown, User, LogOut, LayoutDashboard, Map } from 'lucide-react';
+import { Menu, X, ChevronDown, User, LogOut, LayoutDashboard, Map, ChevronRight } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import {
   DropdownMenu,
@@ -8,6 +8,9 @@ import {
   DropdownMenuItem,
   DropdownMenuTrigger,
   DropdownMenuSeparator,
+  DropdownMenuSub,
+  DropdownMenuSubContent,
+  DropdownMenuSubTrigger,
 } from '@/components/ui/dropdown-menu';
 import { Sheet, SheetContent, SheetTrigger } from '@/components/ui/sheet';
 import { useAuth } from '@/contexts/AuthContext';
@@ -19,10 +22,24 @@ interface Industry {
   slug: string;
 }
 
+interface SubProduct {
+  _id: string;
+  name: string;
+  slug: string;
+}
+
+interface Product {
+  _id: string;
+  name: string;
+  slug: string;
+  subProducts?: SubProduct[];
+}
+
 export const Navbar = () => {
   const [isScrolled, setIsScrolled] = useState(false);
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
   const [industries, setIndustries] = useState<Industry[]>([]);
+  const [products, setProducts] = useState<Product[]>([]);
   const { user, isAuthenticated, signOut } = useAuth();
   const navigate = useNavigate();
 
@@ -49,7 +66,21 @@ export const Navbar = () => {
       }
     };
 
+    const fetchProducts = async () => {
+      try {
+        const API_BASE_URL = import.meta.env.VITE_API_BASE_URL || 'http://localhost:5000/api';
+        const response = await fetch(`${API_BASE_URL}/public/products`);
+        if (response.ok) {
+          const data = await response.json();
+          setProducts(data);
+        }
+      } catch (error) {
+        console.error('Error fetching products:', error);
+      }
+    };
+
     fetchIndustries();
+    fetchProducts();
   }, []);
 
   const handleSignOut = async () => {
@@ -92,12 +123,51 @@ export const Navbar = () => {
 
           {/* Desktop Navigation */}
           <div className="hidden md:flex items-center space-x-8">
-            <Link
-              to="/products"
-              className="text-foreground/80 hover:text-foreground transition-colors font-medium"
-            >
-              Products
-            </Link>
+            {/* Products Dropdown */}
+            <DropdownMenu>
+              <DropdownMenuTrigger className="flex items-center space-x-1 text-foreground/80 hover:text-foreground transition-colors font-medium outline-none">
+                <span>Products</span>
+                <ChevronDown className="w-4 h-4" />
+              </DropdownMenuTrigger>
+              <DropdownMenuContent className="w-56">
+                {products.map((product) => (
+                  product.subProducts && product.subProducts.length > 0 ? (
+                    <DropdownMenuSub key={product._id}>
+                      <DropdownMenuSubTrigger className="cursor-pointer">
+                        {product.name}
+                      </DropdownMenuSubTrigger>
+                      <DropdownMenuSubContent className="w-56">
+                        {product.subProducts.map((subProduct) => (
+                          <DropdownMenuItem key={subProduct._id} asChild>
+                            <Link to={`/products/${product.slug}/${subProduct.slug}`} className="cursor-pointer">
+                              {subProduct.name}
+                            </Link>
+                          </DropdownMenuItem>
+                        ))}
+                        <DropdownMenuSeparator />
+                        <DropdownMenuItem asChild>
+                          <Link to={`/products/${product.slug}`} className="cursor-pointer font-semibold text-primary">
+                            View All {product.name}
+                          </Link>
+                        </DropdownMenuItem>
+                      </DropdownMenuSubContent>
+                    </DropdownMenuSub>
+                  ) : (
+                    <DropdownMenuItem key={product._id} asChild>
+                      <Link to={`/products/${product.slug}`} className="cursor-pointer">
+                        {product.name}
+                      </Link>
+                    </DropdownMenuItem>
+                  )
+                ))}
+                {products.length > 0 && <DropdownMenuSeparator />}
+                <DropdownMenuItem asChild>
+                  <Link to="/products" className="cursor-pointer font-semibold text-primary">
+                    View All Products
+                  </Link>
+                </DropdownMenuItem>
+              </DropdownMenuContent>
+            </DropdownMenu>
 
             {/* Industries Dropdown */}
             <DropdownMenu>
@@ -123,10 +193,10 @@ export const Navbar = () => {
             </DropdownMenu>
 
             <Link
-              to="/specs"
+              to="/features"
               className="text-foreground/80 hover:text-foreground transition-colors font-medium"
             >
-              Specs
+              Features
             </Link>
 
             <Link
@@ -218,13 +288,57 @@ export const Navbar = () => {
             </SheetTrigger>
             <SheetContent side="right" className="w-[300px] sm:w-[400px]">
               <nav className="flex flex-col space-y-6 mt-8">
-                <Link
-                  to="/products"
-                  className="text-lg font-medium text-foreground hover:text-primary transition-colors"
-                  onClick={() => setIsMobileMenuOpen(false)}
-                >
-                  Products
-                </Link>
+                {/* Products - Mobile */}
+                <div className="space-y-3">
+                  <div className="text-lg font-medium text-foreground">Products</div>
+                  <div className="pl-4 space-y-2">
+                    {products.map((product) => (
+                      <div key={product._id}>
+                        {product.subProducts && product.subProducts.length > 0 ? (
+                          <div className="space-y-2">
+                            <div className="font-medium text-foreground/90">{product.name}</div>
+                            <div className="pl-4 space-y-1">
+                              {product.subProducts.map((subProduct) => (
+                                <Link
+                                  key={subProduct._id}
+                                  to={`/products/${product.slug}/${subProduct.slug}`}
+                                  className="block text-sm text-foreground/70 hover:text-primary transition-colors"
+                                  onClick={() => setIsMobileMenuOpen(false)}
+                                >
+                                  {subProduct.name}
+                                </Link>
+                              ))}
+                              <Link
+                                to={`/products/${product.slug}`}
+                                className="block text-sm text-primary font-semibold hover:text-primary/80 transition-colors pt-1"
+                                onClick={() => setIsMobileMenuOpen(false)}
+                              >
+                                View All {product.name}
+                              </Link>
+                            </div>
+                          </div>
+                        ) : (
+                          <Link
+                            to={`/products/${product.slug}`}
+                            className="block text-foreground/80 hover:text-primary transition-colors"
+                            onClick={() => setIsMobileMenuOpen(false)}
+                          >
+                            {product.name}
+                          </Link>
+                        )}
+                      </div>
+                    ))}
+                    {products.length > 0 && (
+                      <Link
+                        to="/products"
+                        className="block text-primary font-semibold hover:text-primary/80 transition-colors pt-2 border-t border-border"
+                        onClick={() => setIsMobileMenuOpen(false)}
+                      >
+                        View All Products
+                      </Link>
+                    )}
+                  </div>
+                </div>
 
                 {/* Industries - Mobile */}
                 <div className="space-y-3">
@@ -253,11 +367,11 @@ export const Navbar = () => {
                 </div>
 
                 <Link
-                  to="/specs"
+                  to="/features"
                   className="text-lg font-medium text-foreground hover:text-primary transition-colors"
                   onClick={() => setIsMobileMenuOpen(false)}
                 >
-                  Specs
+                  Features
                 </Link>
 
                 <Link

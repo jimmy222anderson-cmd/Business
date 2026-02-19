@@ -10,6 +10,7 @@ import { Alert, AlertDescription } from '@/components/ui/alert';
 import { Loader2, Save, Plus, Trash2, FileText, Shield } from 'lucide-react';
 import { getPrivacyPolicy, getTermsOfService, updateContent, type ContentSection } from '@/lib/api/content';
 import { toast } from 'sonner';
+import { BackButton } from '@/components/BackButton';
 
 interface EditableSection {
   id: string;
@@ -151,6 +152,8 @@ export default function ContentEditorPage() {
     <div className="min-h-screen bg-background">
       <div className="container mx-auto px-6 py-8">
         <div className="max-w-6xl mx-auto">
+          <BackButton to="/admin/dashboard" label="Back to Admin Dashboard" />
+          
           <div className="mb-8">
             <h1 className="text-3xl font-bold text-foreground mb-2">Content Editor</h1>
             <p className="text-muted-foreground">

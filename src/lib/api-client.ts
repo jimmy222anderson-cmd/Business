@@ -23,8 +23,8 @@ class ApiClient {
 
   constructor(baseUrl: string) {
     this.baseUrl = baseUrl;
-    // Load token from localStorage on initialization
-    this.authToken = localStorage.getItem('auth_token');
+    // Don't load token from localStorage on initialization to prevent auto-login
+    this.authToken = null;
   }
 
   /**

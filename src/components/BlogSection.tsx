@@ -75,7 +75,7 @@ const BlogSection = () => {
             </h2>
             <p className="text-muted-foreground text-lg">Stay updated with the latest in satellite intelligence.</p>
           </div>
-          <Button asChild className="hidden md:flex bg-yellow-500/20 backdrop-blur-md border border-yellow-500/30 text-white hover:bg-yellow-500/30 hover:border-yellow-500/50 rounded-full px-6 shadow-lg shadow-yellow-500/20 group">
+          <Button asChild className="hidden md:flex bg-yellow-500/20 backdrop-blur-md border border-yellow-500/30 text-white hover:bg-yellow-500/30 hover:border-yellow-500/50 hover:text-black rounded-full px-6 shadow-lg shadow-yellow-500/20 group">
             <Link to="/blog">
               View All <ArrowRight className="w-4 h-4 ml-1 group-hover:translate-x-1 transition-transform" />
             </Link>
@@ -128,7 +128,7 @@ const BlogSection = () => {
         </div>
 
         <div className="text-center mt-8 md:hidden">
-          <Button asChild className="bg-yellow-500/20 backdrop-blur-md border border-yellow-500/30 text-white hover:bg-yellow-500/30 hover:border-yellow-500/50 rounded-full px-6 shadow-lg shadow-yellow-500/20 group">
+          <Button asChild className="bg-yellow-500/20 backdrop-blur-md border border-yellow-500/30 text-white hover:bg-yellow-500/30 hover:border-yellow-500/50 hover:text-black rounded-full px-6 shadow-lg shadow-yellow-500/20 group">
             <Link to="/blog">View All Articles <ArrowRight className="w-4 h-4 ml-1 group-hover:translate-x-1 transition-transform" /></Link>
           </Button>
         </div>

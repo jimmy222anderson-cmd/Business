@@ -8,7 +8,8 @@ import { Textarea } from '@/components/ui/textarea';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { ImageUpload } from '@/components/ImageUpload';
 import { toast } from 'sonner';
-import { ArrowLeft, Plus, X } from 'lucide-react';
+import { Plus, X } from 'lucide-react';
+import { BackButton } from '@/components/BackButton';
 
 export default function BlogFormPage() {
   const { id } = useParams();
@@ -97,14 +98,7 @@ export default function BlogFormPage() {
   return (
     <div className="min-h-screen bg-gradient-to-b from-gray-900 to-black text-white p-8 pt-24">
       <div className="max-w-4xl mx-auto">
-        <Button
-          variant="ghost"
-          className="mb-4 text-gray-400 hover:text-white"
-          onClick={() => navigate('/admin/blog')}
-        >
-          <ArrowLeft className="mr-2 h-4 w-4" />
-          Back to Blog Posts
-        </Button>
+        <BackButton to="/admin/dashboard" label="Back to Admin Dashboard" />
 
         <h1 className="text-3xl font-bold mb-8">
           {id ? 'Edit Blog Post' : 'Add New Blog Post'}

@@ -90,7 +90,7 @@ const Hero = () => {
         >
           <Button
             size="lg"
-            className="bg-yellow-500/20 backdrop-blur-md border border-yellow-500/30 text-white hover:bg-yellow-500/30 hover:border-yellow-500/50 rounded-full px-8 text-base font-semibold group shadow-lg shadow-yellow-500/20"
+            className="bg-yellow-500/20 backdrop-blur-md border border-yellow-500/30 text-white hover:bg-yellow-500/30 hover:border-yellow-500/50 hover:text-black rounded-full px-8 text-base font-semibold group shadow-lg shadow-yellow-500/20"
             asChild
           >
             <Link to="/get-started">

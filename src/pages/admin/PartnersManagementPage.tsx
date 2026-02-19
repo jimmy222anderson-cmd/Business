@@ -4,6 +4,7 @@ import { Button } from '@/components/ui/button';
 import { Plus, Edit, Trash2 } from 'lucide-react';
 import { Link } from 'react-router-dom';
 import { toast } from 'sonner';
+import { BackButton } from '@/components/BackButton';
 
 interface Partner {
   _id: string;
@@ -85,6 +86,8 @@ export default function PartnersManagementPage() {
   return (
     <div className="min-h-screen bg-gradient-to-b from-gray-900 to-black text-white p-8 pt-24">
       <div className="max-w-7xl mx-auto">
+        <BackButton to="/admin/dashboard" label="Back to Admin Dashboard" />
+        
         <div className="flex justify-between items-center mb-8">
           <div>
             <h1 className="text-3xl font-bold mb-2">Partners Management</h1>

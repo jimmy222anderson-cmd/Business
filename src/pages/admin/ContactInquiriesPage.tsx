@@ -28,6 +28,7 @@ import {
 } from '@/components/ui/dialog';
 import { Mail, Eye, Filter, Send } from 'lucide-react';
 import { toast } from 'sonner';
+import { BackButton } from '@/components/BackButton';
 
 interface ContactInquiry {
   _id: string;
@@ -189,6 +190,8 @@ export default function ContactInquiriesPage() {
   return (
     <div className="min-h-screen bg-gradient-to-b from-gray-900 to-black text-white p-8 pt-24">
       <div className="max-w-7xl mx-auto">
+        <BackButton to="/admin/dashboard" label="Back to Admin Dashboard" />
+        
         {/* Header */}
         <div className="mb-8">
           <h1 className="text-3xl font-bold mb-2">Contact Inquiries Management</h1>

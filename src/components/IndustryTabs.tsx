@@ -92,20 +92,7 @@ export function IndustryTabs({ industries, activeTab, onTabChange }: IndustryTab
         ))}
       </div>
 
-      {/* Active Tab Indicator */}
-      <motion.div
-        className="absolute bottom-0 h-0.5 bg-yellow-500"
-        initial={false}
-        animate={{
-          left: indicatorStyle.left,
-          width: indicatorStyle.width,
-        }}
-        transition={{
-          type: 'spring',
-          stiffness: 300,
-          damping: 30,
-        }}
-      />
+      {/* Active Tab Indicator - Removed */}
     </div>
   );
 }

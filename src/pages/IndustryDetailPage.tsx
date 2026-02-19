@@ -190,7 +190,7 @@ export default function IndustryDetailPage() {
               <Button
                 size="lg"
                 variant="outline"
-                className="border-yellow-500 text-yellow-500 hover:bg-yellow-500/10"
+                className="border-yellow-500 text-yellow-500 hover:bg-yellow-500/10 hover:text-yellow-400"
                 asChild
               >
                 <Link to="/products">

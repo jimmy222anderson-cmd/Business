@@ -606,14 +606,13 @@ export function FilterPanel({ className, onFilterChange, isOpen, onOpenChange }:
           </div>
 
           {/* Provider Section */}
-          <div className="p-6 border-b border-slate-700">
+          {/* <div className="p-6 border-b border-slate-700">
             <h3 className="text-sm font-semibold text-slate-300 mb-3 flex items-center gap-2">
               <Building2 className="h-4 w-4" />
               PROVIDER
             </h3>
             
             <div className="space-y-3">
-              {/* Search Input */}
               <div className="relative">
                 <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-slate-400" />
                 <Input
@@ -625,7 +624,6 @@ export function FilterPanel({ className, onFilterChange, isOpen, onOpenChange }:
                 />
               </div>
 
-              {/* Provider List */}
               <div className="max-h-60 overflow-y-auto space-y-2">
                 {filteredProviders.length > 0 ? (
                   filteredProviders.map((provider) => (
@@ -667,7 +665,7 @@ export function FilterPanel({ className, onFilterChange, isOpen, onOpenChange }:
                 </div>
               )}
             </div>
-          </div>
+          </div> */}
 
           {/* Bands Section */}
           <div className="p-6 border-b border-slate-700">

@@ -73,7 +73,7 @@ export default function AdminDashboardPage() {
           setRecentActivity([]);
         } else {
           const activityData = await activityResponse.json();
-          console.log('Activity data received:', activityData);
+          // console.log('Activity data received:', activityData);
           setRecentActivity(activityData.activities || []);
         }
       } catch (activityError) {
@@ -307,6 +307,12 @@ export default function AdminDashboardPage() {
                 <Button variant="outline" className="w-full border-gray-600 text-gray-200 hover:bg-gray-700">
                   <FileText className="mr-2 h-4 w-4" />
                   Blog Posts
+                </Button>
+              </Link>
+              <Link to="/admin/satellite-products">
+                <Button variant="outline" className="w-full border-gray-600 text-gray-200 hover:bg-gray-700">
+                  <Satellite className="mr-2 h-4 w-4" />
+                  Satellite Products
                 </Button>
               </Link>
             </div>

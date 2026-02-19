@@ -197,7 +197,7 @@ export default function SpecsPage() {
             className="text-center max-w-3xl mx-auto"
           >
             <h1 className="text-4xl md:text-5xl font-bold mb-6 text-foreground">
-              Technical Specifications
+              Platform Features
             </h1>
             <p className="text-lg md:text-xl text-muted-foreground">
               Comprehensive technical details for all satellite data sources available
@@ -332,7 +332,7 @@ export default function SpecsPage() {
       </section>
 
       {/* Satellite Specifications Table */}
-      <section className="py-16 bg-muted/30">
+      {/* <section className="py-16 bg-muted/30">
         <div className="container mx-auto px-6">
           <motion.h2
             initial={{ opacity: 0, y: 20 }}
@@ -343,7 +343,6 @@ export default function SpecsPage() {
             Satellite Specifications
           </motion.h2>
 
-          {/* Optical Satellites */}
           <div className="mb-12">
             <h3 className="text-2xl font-bold text-foreground mb-4">
               Optical Satellites
@@ -387,7 +386,6 @@ export default function SpecsPage() {
             </div>
           </div>
 
-          {/* SAR Satellites */}
           <div className="mb-12">
             <h3 className="text-2xl font-bold text-foreground mb-4">SAR Satellites</h3>
             <div className="overflow-x-auto rounded-lg border border-border">
@@ -429,7 +427,6 @@ export default function SpecsPage() {
             </div>
           </div>
 
-          {/* Multispectral Satellites */}
           <div>
             <h3 className="text-2xl font-bold text-foreground mb-4">
               Multispectral Satellites
@@ -473,10 +470,10 @@ export default function SpecsPage() {
             </div>
           </div>
         </div>
-      </section>
+      </section> */}
 
       {/* Feature Comparison Table */}
-      <section className="py-16">
+      {/* <section className="py-16">
         <div className="container mx-auto px-6">
           <motion.h2
             initial={{ opacity: 0, y: 20 }}
@@ -533,7 +530,7 @@ export default function SpecsPage() {
             </table>
           </div>
         </div>
-      </section>
+      </section> */}
 
       {/* CTA Section */}
       <section className="py-16 bg-muted/30">
@@ -551,7 +548,7 @@ export default function SpecsPage() {
               Our team can help you select the right satellite data sources for your
               specific use case and requirements.
             </p>
-            <Link to="/contact" className="px-8 py-3 bg-yellow-500 text-black font-semibold rounded-lg hover:bg-yellow-400 transition-colors inline-block">
+            <Link to="/contact" className="px-8 py-3 bg-yellow-500 text-black font-semibold rounded-lg hover:bg-yellow-400 hover:text-black transition-colors inline-block">
               Contact Our Experts
             </Link>
           </motion.div>
