@@ -15,6 +15,7 @@ const partnersRouter = require('./admin/partners');
 const blogsRouter = require('./admin/blogs');
 const satelliteProductsRouter = require('./admin/satelliteProducts');
 const imageryRequestsRouter = require('./admin/imageryRequests');
+const analyticsRouter = require('./admin/analytics');
 
 router.use('/products', productsRouter);
 router.use('/industries', industriesRouter);
@@ -22,6 +23,7 @@ router.use('/partners', partnersRouter);
 router.use('/blogs', blogsRouter);
 router.use('/satellite-products', satelliteProductsRouter);
 router.use('/imagery-requests', imageryRequestsRouter);
+router.use('/analytics', analyticsRouter);
 
 /**
  * GET /api/admin/dashboard/stats

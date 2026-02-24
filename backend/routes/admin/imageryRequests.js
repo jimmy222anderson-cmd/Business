@@ -112,6 +112,171 @@ router.get('/', requireAuth, requireAdmin, async (req, res) => {
   }
 });
 
+// GET /api/admin/imagery-requests/export - Export imagery requests as CSV
+// NOTE: This route MUST come BEFORE /:id route to avoid "export" being treated as an ID
+// Using explicit path to ensure it's matched before the /:id route
+router.get('/export', requireAuth, requireAdmin, async (req, res) => {
+  try {
+    const {
+      status,
+      date_from,
+      date_to,
+      user_id,
+      urgency,
+      email
+    } = req.query;
+
+    // Build query (same as main GET route)
+    const query = {};
+
+    if (status) {
+      query.status = status;
+    }
+
+    if (urgency) {
+      query.urgency = urgency;
+    }
+
+    if (user_id) {
+      query.user_id = user_id;
+    }
+
+    if (email) {
+      query.email = { $regex: email, $options: 'i' };
+    }
+
+    // Add date range filter
+    if (date_from || date_to) {
+      query.created_at = {};
+      if (date_from) {
+        query.created_at.$gte = new Date(date_from);
+      }
+      if (date_to) {
+        const endDate = new Date(date_to);
+        endDate.setHours(23, 59, 59, 999);
+        query.created_at.$lte = endDate;
+      }
+    }
+
+    // Fetch all matching requests (no pagination for export)
+    const requests = await ImageryRequest.find(query)
+      .sort({ created_at: -1 })
+      .populate('user_id', 'full_name email company')
+      .populate('reviewed_by', 'full_name email')
+      .select('-__v')
+      .lean();
+
+    // Generate CSV content
+    const csvRows = [];
+    
+    // CSV Headers
+    const headers = [
+      'Request ID',
+      'Status',
+      'Urgency',
+      'Full Name',
+      'Email',
+      'Company',
+      'Phone',
+      'AOI Type',
+      'AOI Area (km²)',
+      'AOI Center Lat',
+      'AOI Center Lng',
+      'Date Range Start',
+      'Date Range End',
+      'Resolution Categories',
+      'Max Cloud Coverage (%)',
+      'Providers',
+      'Bands',
+      'Image Types',
+      'Additional Requirements',
+      'Quote Amount',
+      'Quote Currency',
+      'Admin Notes',
+      'Created At',
+      'Updated At',
+      'Reviewed At',
+      'Reviewed By'
+    ];
+    csvRows.push(headers.join(','));
+
+    // CSV Data Rows
+    requests.forEach(request => {
+      const row = [
+        request._id,
+        request.status,
+        request.urgency,
+        escapeCsvValue(request.full_name),
+        escapeCsvValue(request.email),
+        escapeCsvValue(request.company || ''),
+        escapeCsvValue(request.phone || ''),
+        request.aoi_type,
+        request.aoi_area_km2,
+        request.aoi_center.lat,
+        request.aoi_center.lng,
+        new Date(request.date_range.start_date).toISOString().split('T')[0],
+        new Date(request.date_range.end_date).toISOString().split('T')[0],
+        escapeCsvValue((request.filters?.resolution_category || []).join('; ')),
+        request.filters?.max_cloud_coverage || '',
+        escapeCsvValue((request.filters?.providers || []).join('; ')),
+        escapeCsvValue((request.filters?.bands || []).join('; ')),
+        escapeCsvValue((request.filters?.image_types || []).join('; ')),
+        escapeCsvValue(request.additional_requirements || ''),
+        request.quote_amount || '',
+        request.quote_currency || '',
+        escapeCsvValue(request.admin_notes || ''),
+        new Date(request.created_at).toISOString(),
+        new Date(request.updated_at).toISOString(),
+        request.reviewed_at ? new Date(request.reviewed_at).toISOString() : '',
+        request.reviewed_by ? escapeCsvValue(request.reviewed_by.full_name || request.reviewed_by.email) : ''
+      ];
+      csvRows.push(row.join(','));
+    });
+
+    const csvContent = csvRows.join('\n');
+
+    // Set headers for file download
+    const timestamp = new Date().toISOString().split('T')[0];
+    const filename = `imagery-requests-${timestamp}.csv`;
+    
+    res.setHeader('Content-Type', 'text/csv');
+    res.setHeader('Content-Disposition', `attachment; filename="${filename}"`);
+    res.send(csvContent);
+
+  } catch (error) {
+    console.error('Error exporting imagery requests:', error);
+
+    // Handle invalid date format
+    if (error.message && error.message.includes('Invalid Date')) {
+      return res.status(400).json({
+        error: 'Invalid date format',
+        message: 'Please provide dates in ISO format (YYYY-MM-DD)'
+      });
+    }
+
+    res.status(500).json({
+      error: 'Failed to export imagery requests',
+      message: process.env.NODE_ENV === 'development' ? error.message : undefined
+    });
+  }
+});
+
+// Helper function to escape CSV values
+function escapeCsvValue(value) {
+  if (value === null || value === undefined) {
+    return '';
+  }
+  
+  const stringValue = String(value);
+  
+  // If value contains comma, newline, or double quote, wrap in quotes and escape quotes
+  if (stringValue.includes(',') || stringValue.includes('\n') || stringValue.includes('"')) {
+    return `"${stringValue.replace(/"/g, '""')}"`;
+  }
+  
+  return stringValue;
+}
+
 // GET /api/admin/imagery-requests/:id - Get single imagery request
 router.get('/:id', requireAuth, requireAdmin, validateObjectId, async (req, res) => {
   try {
@@ -120,6 +285,7 @@ router.get('/:id', requireAuth, requireAdmin, validateObjectId, async (req, res)
     const request = await ImageryRequest.findById(id)
       .populate('user_id', 'full_name email company phone')
       .populate('reviewed_by', 'full_name email')
+      .populate('status_history.changed_by', 'full_name email')
       .select('-__v')
       .lean();
 

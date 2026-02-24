@@ -1,7 +1,7 @@
 import { useEffect, useState } from 'react';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
-import { Users, Calendar, Mail, FileText, TrendingUp, Clock, Package, Satellite } from 'lucide-react';
+import { Users, Calendar, Mail, FileText, TrendingUp, Clock, Package, Satellite, BarChart3 } from 'lucide-react';
 import { Link } from 'react-router-dom';
 import { toast } from 'sonner';
 
@@ -269,6 +269,12 @@ export default function AdminDashboardPage() {
                 <Button variant="outline" className="w-full border-gray-600 text-gray-200 hover:bg-gray-700">
                   <Users className="mr-2 h-4 w-4" />
                   Manage Users
+                </Button>
+              </Link>
+              <Link to="/admin/analytics">
+                <Button variant="outline" className="w-full border-gray-600 text-gray-200 hover:bg-gray-700">
+                  <BarChart3 className="mr-2 h-4 w-4" />
+                  Analytics
                 </Button>
               </Link>
             </div>

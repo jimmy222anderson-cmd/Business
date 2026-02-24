@@ -394,18 +394,18 @@
   - Implement bulk actions (activate/deactivate multiple)
 
 ### 18. Admin - Request Management
-- [ ] 18.1 Create AdminImageryRequestsPage
+- [x] 18.1 Create AdminImageryRequestsPage
   - Create page layout
   - Add route /admin/imagery-requests
   - Require admin authentication
-- [ ] 18.2 Create RequestsTable component
+- [x] 18.2 Create RequestsTable component
   - Display all imagery requests
   - Show request date, user, status, AOI area
   - Add status badges
   - Add "View Details" button
   - Add pagination
   - Add sorting
-- [ ] 18.3 Create RequestDetailPanel component
+- [x] 18.3 Create RequestDetailPanel component
   - Display full request details
   - Show AOI on interactive map
   - Show user contact information
@@ -413,32 +413,32 @@
   - Add status update form
   - Add admin notes textarea
   - Add quote input fields
-- [ ] 18.4 Add request filtering
+- [x] 18.4 Add request filtering
   - Filter by status
   - Filter by date range
   - Filter by user
   - Filter by urgency
   - Add search by request ID or user email
-- [ ] 18.5 Add status update functionality
+- [x] 18.5 Add status update functionality
   - Update request status
   - Add admin notes
   - Add quote amount and currency
   - Send email notification to user on status change
   - Track status change history
-- [ ] 18.6 Add export functionality
+- [x] 18.6 Add export functionality
   - Export requests as CSV
   - Include all request details
   - Filter exported data
   - Add date range for export
 
 ### 19. Admin - Analytics Dashboard
-- [ ] 19.1 Create analytics overview
+- [x] 19.1 Create analytics overview
   - Show total requests count
   - Show requests by status (pie chart)
   - Show requests over time (line chart)
   - Show popular products
   - Show average AOI size
-- [ ] 19.2 Add request metrics
+- [x] 19.2 Add request metrics
   - Calculate average response time
   - Calculate conversion rate (pending → approved)
   - Show requests by urgency

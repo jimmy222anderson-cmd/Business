@@ -1,15 +1,8 @@
 import { useEffect, useState } from 'react';
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
-import { Button } from '@/components/ui/button';
+import { Card, CardContent } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
-import {
-  Table,
-  TableBody,
-  TableCell,
-  TableHead,
-  TableHeader,
-  TableRow,
-} from '@/components/ui/table';
+import { Button } from '@/components/ui/button';
+import { Input } from '@/components/ui/input';
 import {
   Select,
   SelectContent,
@@ -24,9 +17,11 @@ import {
   DialogHeader,
   DialogTitle,
 } from '@/components/ui/dialog';
-import { Satellite, Eye, Filter, MapPin } from 'lucide-react';
+import { Satellite, Filter, MapPin, X, Search, Calendar, Download } from 'lucide-react';
 import { toast } from 'sonner';
 import { BackButton } from '@/components/BackButton';
+import { RequestsTable } from '@/components/admin/RequestsTable';
+import { RequestDetailPanel } from '@/components/admin/RequestDetailPanel';
 
 interface ImageryRequest {
   _id: string;
@@ -80,8 +75,15 @@ export default function ImageryRequestsPage() {
   const [filteredRequests, setFilteredRequests] = useState<ImageryRequest[]>([]);
   const [loading, setLoading] = useState(true);
   const [statusFilter, setStatusFilter] = useState<string>('all');
+  const [urgencyFilter, setUrgencyFilter] = useState<string>('all');
+  const [searchQuery, setSearchQuery] = useState<string>('');
+  const [dateFrom, setDateFrom] = useState<string>('');
+  const [dateTo, setDateTo] = useState<string>('');
   const [selectedRequest, setSelectedRequest] = useState<ImageryRequest | null>(null);
   const [detailsOpen, setDetailsOpen] = useState(false);
+  const [page, setPage] = useState(1);
+  const [limit] = useState(10);
+  const [totalPages, setTotalPages] = useState(1);
 
   useEffect(() => {
     fetchRequests();
@@ -89,13 +91,13 @@ export default function ImageryRequestsPage() {
 
   useEffect(() => {
     filterRequests();
-  }, [requests, statusFilter]);
+  }, [requests, statusFilter, urgencyFilter, searchQuery, dateFrom, dateTo]);
 
   const fetchRequests = async () => {
     try {
       setLoading(true);
       const API_BASE_URL = import.meta.env.VITE_API_BASE_URL || 'http://localhost:3000/api';
-      const response = await fetch(`${API_BASE_URL}/admin/imagery-requests`, {
+      const response = await fetch(`${API_BASE_URL}/admin/imagery-requests?page=${page}&limit=${limit}`, {
         headers: {
           'Authorization': `Bearer ${localStorage.getItem('auth_token')}`
         }
@@ -107,6 +109,13 @@ export default function ImageryRequestsPage() {
 
       const data = await response.json();
       setRequests(data.requests || []);
+      
+      // Calculate total pages from response
+      if (data.pagination) {
+        setTotalPages(data.pagination.totalPages || 1);
+      } else if (data.total) {
+        setTotalPages(Math.ceil(data.total / limit));
+      }
     } catch (error) {
       console.error('Error fetching imagery requests:', error);
       toast.error('Failed to load imagery requests');
@@ -116,14 +125,65 @@ export default function ImageryRequestsPage() {
   };
 
   const filterRequests = () => {
-    if (statusFilter === 'all') {
-      setFilteredRequests(requests);
-    } else {
-      setFilteredRequests(requests.filter(r => r.status === statusFilter));
+    let filtered = [...requests];
+
+    // Status filter
+    if (statusFilter !== 'all') {
+      filtered = filtered.filter(r => r.status === statusFilter);
     }
+
+    // Urgency filter
+    if (urgencyFilter !== 'all') {
+      filtered = filtered.filter(r => r.urgency === urgencyFilter);
+    }
+
+    // Date range filter
+    if (dateFrom) {
+      const fromDate = new Date(dateFrom);
+      filtered = filtered.filter(r => new Date(r.created_at) >= fromDate);
+    }
+    if (dateTo) {
+      const toDate = new Date(dateTo);
+      toDate.setHours(23, 59, 59, 999); // Include the entire day
+      filtered = filtered.filter(r => new Date(r.created_at) <= toDate);
+    }
+
+    // Search filter (request ID, user name, or email)
+    if (searchQuery.trim()) {
+      const query = searchQuery.toLowerCase().trim();
+      filtered = filtered.filter(r => {
+        const requestId = r._id.toLowerCase();
+        const userName = (r.user_id?.full_name || r.full_name || '').toLowerCase();
+        const userEmail = (r.user_id?.email || r.email || '').toLowerCase();
+        
+        return requestId.includes(query) || 
+               userName.includes(query) || 
+               userEmail.includes(query);
+      });
+    }
+
+    setFilteredRequests(filtered);
   };
 
-  const updateRequestStatus = async (requestId: string, newStatus: string) => {
+  const clearFilters = () => {
+    setStatusFilter('all');
+    setUrgencyFilter('all');
+    setSearchQuery('');
+    setDateFrom('');
+    setDateTo('');
+  };
+
+  const getActiveFilterCount = () => {
+    let count = 0;
+    if (statusFilter !== 'all') count++;
+    if (urgencyFilter !== 'all') count++;
+    if (searchQuery.trim()) count++;
+    if (dateFrom) count++;
+    if (dateTo) count++;
+    return count;
+  };
+
+  const updateRequestStatus = async (requestId: string, updates: Partial<ImageryRequest>) => {
     try {
       const API_BASE_URL = import.meta.env.VITE_API_BASE_URL || 'http://localhost:3000/api';
       const response = await fetch(`${API_BASE_URL}/admin/imagery-requests/${requestId}`, {
@@ -132,18 +192,19 @@ export default function ImageryRequestsPage() {
           'Content-Type': 'application/json',
           'Authorization': `Bearer ${localStorage.getItem('auth_token')}`
         },
-        body: JSON.stringify({ status: newStatus })
+        body: JSON.stringify(updates)
       });
 
       if (!response.ok) {
-        throw new Error('Failed to update request status');
+        throw new Error('Failed to update request');
       }
 
-      toast.success('Imagery request status updated successfully');
+      toast.success('Imagery request updated successfully');
+      setDetailsOpen(false);
       fetchRequests();
     } catch (error) {
-      console.error('Error updating request status:', error);
-      toast.error('Failed to update request status');
+      console.error('Error updating request:', error);
+      toast.error('Failed to update request');
     }
   };
 
@@ -164,6 +225,14 @@ export default function ImageryRequestsPage() {
     setDetailsOpen(true);
   };
 
+  const handlePageChange = (newPage: number) => {
+    setPage(newPage);
+  };
+
+  useEffect(() => {
+    fetchRequests();
+  }, [page]);
+
   const getUserName = (request: ImageryRequest) => {
     if (request.user_id?.full_name) {
       return request.user_id.full_name;
@@ -173,6 +242,57 @@ export default function ImageryRequestsPage() {
 
   const getUserEmail = (request: ImageryRequest) => {
     return request.user_id?.email || request.email || 'N/A';
+  };
+
+  const handleExport = async () => {
+    try {
+      const API_BASE_URL = import.meta.env.VITE_API_BASE_URL || 'http://localhost:3000/api';
+      
+      // Build query parameters from current filters
+      const params = new URLSearchParams();
+      if (statusFilter !== 'all') params.append('status', statusFilter);
+      if (urgencyFilter !== 'all') params.append('urgency', urgencyFilter);
+      if (dateFrom) params.append('date_from', dateFrom);
+      if (dateTo) params.append('date_to', dateTo);
+      if (searchQuery.trim()) params.append('email', searchQuery.trim());
+
+      const queryString = params.toString();
+      const url = `${API_BASE_URL}/admin/imagery-requests/export${queryString ? `?${queryString}` : ''}`;
+
+      const response = await fetch(url, {
+        headers: {
+          'Authorization': `Bearer ${localStorage.getItem('auth_token')}`
+        }
+      });
+
+      if (!response.ok) {
+        throw new Error('Failed to export imagery requests');
+      }
+
+      // Get the CSV content
+      const blob = await response.blob();
+      
+      // Create a download link and trigger it
+      const downloadUrl = window.URL.createObjectURL(blob);
+      const link = document.createElement('a');
+      link.href = downloadUrl;
+      
+      // Get filename from Content-Disposition header or use default
+      const contentDisposition = response.headers.get('Content-Disposition');
+      const filenameMatch = contentDisposition?.match(/filename="(.+)"/);
+      const filename = filenameMatch ? filenameMatch[1] : `imagery-requests-${new Date().toISOString().split('T')[0]}.csv`;
+      
+      link.download = filename;
+      document.body.appendChild(link);
+      link.click();
+      document.body.removeChild(link);
+      window.URL.revokeObjectURL(downloadUrl);
+
+      toast.success('Imagery requests exported successfully');
+    } catch (error) {
+      console.error('Error exporting imagery requests:', error);
+      toast.error('Failed to export imagery requests');
+    }
   };
 
   if (loading) {
@@ -194,33 +314,128 @@ export default function ImageryRequestsPage() {
         <BackButton to="/admin/dashboard" label="Back to Admin Dashboard" />
         
         {/* Header */}
-        <div className="mb-8">
-          <h1 className="text-3xl font-bold mb-2">Imagery Requests Management</h1>
-          <p className="text-gray-400">Manage satellite imagery requests from users</p>
+        <div className="mb-8 flex items-center justify-between">
+          <div>
+            <h1 className="text-3xl font-bold mb-2">Imagery Requests Management</h1>
+            <p className="text-gray-400">Manage satellite imagery requests from users</p>
+          </div>
+          <Button
+            onClick={handleExport}
+            className="bg-yellow-500 hover:bg-yellow-600 text-black"
+          >
+            <Download className="h-4 w-4 mr-2" />
+            Export CSV
+          </Button>
         </div>
 
         {/* Filters */}
         <Card className="bg-gray-800 border-gray-700 mb-6">
           <CardContent className="pt-6">
-            <div className="flex items-center gap-4">
-              <div className="flex items-center gap-2">
-                <Filter className="h-4 w-4 text-gray-400" />
-                <Select value={statusFilter} onValueChange={setStatusFilter}>
-                  <SelectTrigger className="w-[180px] bg-gray-700 border-gray-600 text-white">
-                    <SelectValue placeholder="Filter by status" />
-                  </SelectTrigger>
-                  <SelectContent className="bg-gray-700 border-gray-600">
-                    <SelectItem value="all">All Statuses</SelectItem>
-                    <SelectItem value="pending">Pending</SelectItem>
-                    <SelectItem value="reviewing">Reviewing</SelectItem>
-                    <SelectItem value="quoted">Quoted</SelectItem>
-                    <SelectItem value="approved">Approved</SelectItem>
-                    <SelectItem value="completed">Completed</SelectItem>
-                    <SelectItem value="cancelled">Cancelled</SelectItem>
-                  </SelectContent>
-                </Select>
+            <div className="space-y-4">
+              {/* Filter Header */}
+              <div className="flex items-center justify-between">
+                <div className="flex items-center gap-2">
+                  <Filter className="h-4 w-4 text-gray-400" />
+                  <span className="font-medium">Filters</span>
+                  {getActiveFilterCount() > 0 && (
+                    <Badge variant="secondary" className="bg-yellow-500/20 text-yellow-500 border-yellow-500/50">
+                      {getActiveFilterCount()} active
+                    </Badge>
+                  )}
+                </div>
+                {getActiveFilterCount() > 0 && (
+                  <Button
+                    variant="ghost"
+                    size="sm"
+                    onClick={clearFilters}
+                    className="text-gray-400 hover:text-white hover:bg-gray-700"
+                  >
+                    <X className="h-4 w-4 mr-1" />
+                    Clear All
+                  </Button>
+                )}
               </div>
-              <div className="text-sm text-gray-400">
+
+              {/* Search Bar */}
+              <div className="relative">
+                <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-gray-400" />
+                <Input
+                  type="text"
+                  placeholder="Search by request ID, user name, or email..."
+                  value={searchQuery}
+                  onChange={(e) => setSearchQuery(e.target.value)}
+                  className="pl-10 bg-gray-700 border-gray-600 text-white placeholder:text-gray-400"
+                />
+              </div>
+
+              {/* Filter Controls */}
+              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
+                {/* Status Filter */}
+                <div>
+                  <label className="text-sm text-gray-400 mb-2 block">Status</label>
+                  <Select value={statusFilter} onValueChange={setStatusFilter}>
+                    <SelectTrigger className="bg-gray-700 border-gray-600 text-white">
+                      <SelectValue placeholder="All Statuses" />
+                    </SelectTrigger>
+                    <SelectContent className="bg-gray-700 border-gray-600">
+                      <SelectItem value="all">All Statuses</SelectItem>
+                      <SelectItem value="pending">Pending</SelectItem>
+                      <SelectItem value="reviewing">Reviewing</SelectItem>
+                      <SelectItem value="quoted">Quoted</SelectItem>
+                      <SelectItem value="approved">Approved</SelectItem>
+                      <SelectItem value="completed">Completed</SelectItem>
+                      <SelectItem value="cancelled">Cancelled</SelectItem>
+                    </SelectContent>
+                  </Select>
+                </div>
+
+                {/* Urgency Filter */}
+                <div>
+                  <label className="text-sm text-gray-400 mb-2 block">Urgency</label>
+                  <Select value={urgencyFilter} onValueChange={setUrgencyFilter}>
+                    <SelectTrigger className="bg-gray-700 border-gray-600 text-white">
+                      <SelectValue placeholder="All Urgencies" />
+                    </SelectTrigger>
+                    <SelectContent className="bg-gray-700 border-gray-600">
+                      <SelectItem value="all">All Urgencies</SelectItem>
+                      <SelectItem value="standard">Standard</SelectItem>
+                      <SelectItem value="urgent">Urgent</SelectItem>
+                      <SelectItem value="emergency">Emergency</SelectItem>
+                    </SelectContent>
+                  </Select>
+                </div>
+
+                {/* Date From */}
+                <div>
+                  <label className="text-sm text-gray-400 mb-2 block flex items-center gap-1">
+                    <Calendar className="h-3 w-3" />
+                    Date From
+                  </label>
+                  <Input
+                    type="date"
+                    value={dateFrom}
+                    onChange={(e) => setDateFrom(e.target.value)}
+                    className="bg-gray-700 border-gray-600 text-white"
+                  />
+                </div>
+
+                {/* Date To */}
+                <div>
+                  <label className="text-sm text-gray-400 mb-2 block flex items-center gap-1">
+                    <Calendar className="h-3 w-3" />
+                    Date To
+                  </label>
+                  <Input
+                    type="date"
+                    value={dateTo}
+                    onChange={(e) => setDateTo(e.target.value)}
+                    className="bg-gray-700 border-gray-600 text-white"
+                  />
+                </div>
+              </div>
+
+              {/* Results Count */}
+              <div className="text-sm text-gray-400 pt-2 border-t border-gray-700">
                 Showing {filteredRequests.length} of {requests.length} requests
               </div>
             </div>
@@ -228,84 +443,15 @@ export default function ImageryRequestsPage() {
         </Card>
 
         {/* Requests Table */}
-        <Card className="bg-gray-800 border-gray-700">
-          <CardHeader>
-            <CardTitle className="text-white">Imagery Requests</CardTitle>
-            <CardDescription className="text-gray-400">
-              All satellite imagery requests from users
-            </CardDescription>
-          </CardHeader>
-          <CardContent>
-            {filteredRequests.length === 0 ? (
-              <div className="text-center py-12 text-gray-400">
-                <Satellite className="h-12 w-12 mx-auto mb-4 opacity-50" />
-                <p>No imagery requests found</p>
-              </div>
-            ) : (
-              <div className="overflow-x-auto">
-                <Table>
-                  <TableHeader>
-                    <TableRow className="border-gray-700 hover:bg-gray-700/50">
-                      <TableHead className="text-gray-300">User</TableHead>
-                      <TableHead className="text-gray-300">Email</TableHead>
-                      <TableHead className="text-gray-300">AOI Type</TableHead>
-                      <TableHead className="text-gray-300">Area (km²)</TableHead>
-                      <TableHead className="text-gray-300">Status</TableHead>
-                      <TableHead className="text-gray-300">Created</TableHead>
-                      <TableHead className="text-gray-300">Actions</TableHead>
-                    </TableRow>
-                  </TableHeader>
-                  <TableBody>
-                    {filteredRequests.map((request) => (
-                      <TableRow key={request._id} className="border-gray-700 hover:bg-gray-700/50">
-                        <TableCell className="text-white font-medium">
-                          {getUserName(request)}
-                        </TableCell>
-                        <TableCell className="text-gray-300">{getUserEmail(request)}</TableCell>
-                        <TableCell className="text-gray-300 capitalize">{request.aoi_type}</TableCell>
-                        <TableCell className="text-gray-300">
-                          {request.aoi_area_km2.toFixed(2)}
-                        </TableCell>
-                        <TableCell>{getStatusBadge(request.status)}</TableCell>
-                        <TableCell className="text-gray-300">
-                          {new Date(request.created_at).toLocaleDateString()}
-                        </TableCell>
-                        <TableCell>
-                          <div className="flex items-center gap-2">
-                            <Button
-                              size="sm"
-                              variant="ghost"
-                              onClick={() => viewDetails(request)}
-                              className="text-gray-300 hover:text-white hover:bg-gray-700"
-                            >
-                              <Eye className="h-4 w-4" />
-                            </Button>
-                            <Select
-                              value={request.status}
-                              onValueChange={(value) => updateRequestStatus(request._id, value)}
-                            >
-                              <SelectTrigger className="w-[120px] h-8 bg-gray-700 border-gray-600 text-white text-xs">
-                                <SelectValue />
-                              </SelectTrigger>
-                              <SelectContent className="bg-gray-700 border-gray-600">
-                                <SelectItem value="pending">Pending</SelectItem>
-                                <SelectItem value="reviewing">Reviewing</SelectItem>
-                                <SelectItem value="quoted">Quoted</SelectItem>
-                                <SelectItem value="approved">Approved</SelectItem>
-                                <SelectItem value="completed">Completed</SelectItem>
-                                <SelectItem value="cancelled">Cancelled</SelectItem>
-                              </SelectContent>
-                            </Select>
-                          </div>
-                        </TableCell>
-                      </TableRow>
-                    ))}
-                  </TableBody>
-                </Table>
-              </div>
-            )}
-          </CardContent>
-        </Card>
+        <RequestsTable
+          requests={filteredRequests}
+          isLoading={loading}
+          onViewDetails={viewDetails}
+          page={page}
+          limit={limit}
+          totalPages={totalPages}
+          onPageChange={handlePageChange}
+        />
 
         {/* Details Dialog */}
         <Dialog open={detailsOpen} onOpenChange={setDetailsOpen}>
@@ -317,200 +463,10 @@ export default function ImageryRequestsPage() {
               </DialogDescription>
             </DialogHeader>
             {selectedRequest && (
-              <div className="space-y-6">
-                {/* User Information */}
-                <div>
-                  <h3 className="text-lg font-semibold mb-3 flex items-center gap-2">
-                    <Satellite className="h-5 w-5" />
-                    User Information
-                  </h3>
-                  <div className="grid grid-cols-2 gap-4">
-                    <div>
-                      <label className="text-sm text-gray-400">Name</label>
-                      <p className="text-white font-medium">{getUserName(selectedRequest)}</p>
-                    </div>
-                    <div>
-                      <label className="text-sm text-gray-400">Email</label>
-                      <p className="text-white font-medium">{getUserEmail(selectedRequest)}</p>
-                    </div>
-                    {selectedRequest.company && (
-                      <div>
-                        <label className="text-sm text-gray-400">Company</label>
-                        <p className="text-white font-medium">{selectedRequest.company}</p>
-                      </div>
-                    )}
-                    {selectedRequest.phone && (
-                      <div>
-                        <label className="text-sm text-gray-400">Phone</label>
-                        <p className="text-white font-medium">{selectedRequest.phone}</p>
-                      </div>
-                    )}
-                    <div>
-                      <label className="text-sm text-gray-400">Status</label>
-                      <div className="mt-1">{getStatusBadge(selectedRequest.status)}</div>
-                    </div>
-                    <div>
-                      <label className="text-sm text-gray-400">Urgency</label>
-                      <p className="text-white font-medium capitalize">{selectedRequest.urgency}</p>
-                    </div>
-                    <div>
-                      <label className="text-sm text-gray-400">Created Date</label>
-                      <p className="text-white font-medium">
-                        {new Date(selectedRequest.created_at).toLocaleString()}
-                      </p>
-                    </div>
-                  </div>
-                </div>
-
-                {/* AOI Information */}
-                <div className="border-t border-gray-700 pt-4">
-                  <h3 className="text-lg font-semibold mb-3 flex items-center gap-2">
-                    <MapPin className="h-5 w-5" />
-                    Area of Interest (AOI)
-                  </h3>
-                  <div className="grid grid-cols-2 gap-4">
-                    <div>
-                      <label className="text-sm text-gray-400">Type</label>
-                      <p className="text-white font-medium capitalize">{selectedRequest.aoi_type}</p>
-                    </div>
-                    <div>
-                      <label className="text-sm text-gray-400">Area</label>
-                      <p className="text-white font-medium">{selectedRequest.aoi_area_km2.toFixed(2)} km²</p>
-                    </div>
-                    <div>
-                      <label className="text-sm text-gray-400">Center Latitude</label>
-                      <p className="text-white font-medium font-mono">{selectedRequest.aoi_center.lat.toFixed(6)}</p>
-                    </div>
-                    <div>
-                      <label className="text-sm text-gray-400">Center Longitude</label>
-                      <p className="text-white font-medium font-mono">{selectedRequest.aoi_center.lng.toFixed(6)}</p>
-                    </div>
-                  </div>
-                  <div className="mt-3">
-                    <label className="text-sm text-gray-400">Coordinates</label>
-                    <pre className="text-white mt-1 p-3 bg-gray-700 rounded-md text-xs overflow-x-auto">
-                      {JSON.stringify(selectedRequest.aoi_coordinates.coordinates, null, 2)}
-                    </pre>
-                  </div>
-                </div>
-
-                {/* Date Range */}
-                <div className="border-t border-gray-700 pt-4">
-                  <h3 className="text-lg font-semibold mb-3">Date Range</h3>
-                  <div className="grid grid-cols-2 gap-4">
-                    <div>
-                      <label className="text-sm text-gray-400">Start Date</label>
-                      <p className="text-white font-medium">
-                        {new Date(selectedRequest.date_range.start_date).toLocaleDateString()}
-                      </p>
-                    </div>
-                    <div>
-                      <label className="text-sm text-gray-400">End Date</label>
-                      <p className="text-white font-medium">
-                        {new Date(selectedRequest.date_range.end_date).toLocaleDateString()}
-                      </p>
-                    </div>
-                  </div>
-                </div>
-
-                {/* Filters */}
-                {selectedRequest.filters && (
-                  <div className="border-t border-gray-700 pt-4">
-                    <h3 className="text-lg font-semibold mb-3">Filters Applied</h3>
-                    <div className="grid grid-cols-2 gap-4">
-                      {selectedRequest.filters.max_cloud_coverage !== undefined && (
-                        <div>
-                          <label className="text-sm text-gray-400">Max Cloud Coverage</label>
-                          <p className="text-white font-medium">{selectedRequest.filters.max_cloud_coverage}%</p>
-                        </div>
-                      )}
-                    </div>
-                    {selectedRequest.filters.resolution_category && selectedRequest.filters.resolution_category.length > 0 && (
-                      <div className="mt-3">
-                        <label className="text-sm text-gray-400">Resolutions</label>
-                        <div className="flex flex-wrap gap-2 mt-1">
-                          {selectedRequest.filters.resolution_category.map((res) => (
-                            <Badge key={res} variant="outline" className="text-white">
-                              {res.toUpperCase()}
-                            </Badge>
-                          ))}
-                        </div>
-                      </div>
-                    )}
-                    {selectedRequest.filters.providers && selectedRequest.filters.providers.length > 0 && (
-                      <div className="mt-3">
-                        <label className="text-sm text-gray-400">Providers</label>
-                        <div className="flex flex-wrap gap-2 mt-1">
-                          {selectedRequest.filters.providers.map((provider) => (
-                            <Badge key={provider} variant="outline" className="text-white">
-                              {provider}
-                            </Badge>
-                          ))}
-                        </div>
-                      </div>
-                    )}
-                    {selectedRequest.filters.bands && selectedRequest.filters.bands.length > 0 && (
-                      <div className="mt-3">
-                        <label className="text-sm text-gray-400">Bands</label>
-                        <div className="flex flex-wrap gap-2 mt-1">
-                          {selectedRequest.filters.bands.map((band) => (
-                            <Badge key={band} variant="outline" className="text-white">
-                              {band}
-                            </Badge>
-                          ))}
-                        </div>
-                      </div>
-                    )}
-                    {selectedRequest.filters.image_types && selectedRequest.filters.image_types.length > 0 && (
-                      <div className="mt-3">
-                        <label className="text-sm text-gray-400">Image Types</label>
-                        <div className="flex flex-wrap gap-2 mt-1">
-                          {selectedRequest.filters.image_types.map((type) => (
-                            <Badge key={type} variant="outline" className="text-white capitalize">
-                              {type}
-                            </Badge>
-                          ))}
-                        </div>
-                      </div>
-                    )}
-                  </div>
-                )}
-
-                {/* Additional Requirements */}
-                {selectedRequest.additional_requirements && (
-                  <div className="border-t border-gray-700 pt-4">
-                    <h3 className="text-lg font-semibold mb-3">Additional Requirements</h3>
-                    <p className="text-white p-3 bg-gray-700 rounded-md whitespace-pre-wrap">
-                      {selectedRequest.additional_requirements}
-                    </p>
-                  </div>
-                )}
-
-                {/* Admin Notes */}
-                {selectedRequest.admin_notes && (
-                  <div className="border-t border-gray-700 pt-4">
-                    <h3 className="text-lg font-semibold mb-3">Admin Notes</h3>
-                    <p className="text-white p-3 bg-gray-700 rounded-md whitespace-pre-wrap">
-                      {selectedRequest.admin_notes}
-                    </p>
-                  </div>
-                )}
-
-                {/* Quote Information */}
-                {selectedRequest.quote_amount && (
-                  <div className="border-t border-gray-700 pt-4">
-                    <h3 className="text-lg font-semibold mb-3">Quote Information</h3>
-                    <div className="grid grid-cols-2 gap-4">
-                      <div>
-                        <label className="text-sm text-gray-400">Quote Amount</label>
-                        <p className="text-white font-medium">
-                          {selectedRequest.quote_currency} {selectedRequest.quote_amount.toLocaleString()}
-                        </p>
-                      </div>
-                    </div>
-                  </div>
-                )}
-              </div>
+              <RequestDetailPanel
+                request={selectedRequest}
+                onUpdate={(updates) => updateRequestStatus(selectedRequest._id, updates)}
+              />
             )}
           </DialogContent>
         </Dialog>

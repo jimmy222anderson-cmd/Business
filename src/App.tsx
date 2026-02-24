@@ -51,6 +51,7 @@ import PartnerFormPage from "./pages/admin/PartnerFormPage";
 import BlogFormPage from "./pages/admin/BlogFormPage";
 import AdminSatelliteProductsPage from "./pages/admin/AdminSatelliteProductsPage";
 import SatelliteProductFormPage from "./pages/admin/SatelliteProductFormPage";
+import AdminAnalyticsPage from "./pages/admin/AdminAnalyticsPage";
 import ExplorerPage from "./pages/ExplorerPage";
 import UserImageryDashboard from "./pages/UserImageryDashboard";
 
@@ -294,6 +295,14 @@ const App = () => (
                 element={
                   <ProtectedRoute requireAdmin>
                     <SatelliteProductFormPage />
+                  </ProtectedRoute>
+                } 
+              />
+              <Route 
+                path="/admin/analytics" 
+                element={
+                  <ProtectedRoute requireAdmin>
+                    <AdminAnalyticsPage />
                   </ProtectedRoute>
                 } 
               />
