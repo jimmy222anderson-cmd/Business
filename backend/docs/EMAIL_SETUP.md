@@ -1,6 +1,6 @@
 # Email Service Configuration Guide
 
-This guide explains how to configure the email service for the Earth Intelligence Platform backend.
+This guide explains how to configure the email service for the Earth Observation Platform backend.
 
 ## Overview
 
@@ -25,7 +25,7 @@ SendGrid is a reliable, scalable email service with excellent deliverability rat
 1. Log in to SendGrid dashboard
 2. Go to **Settings** → **API Keys**
 3. Click **Create API Key**
-4. Name it (e.g., "Earth Intelligence Platform")
+4. Name it (e.g., "Earth Observation Platform")
 5. Select **Full Access** or **Restricted Access** with Mail Send permissions
 6. Copy the API key (you won't be able to see it again!)
 
@@ -54,7 +54,7 @@ Add to your `.env` file:
 EMAIL_SERVICE=sendgrid
 EMAIL_API_KEY=SG.your-api-key-here
 EMAIL_FROM=noreply@yourdomain.com
-EMAIL_FROM_NAME=Earth Intelligence Platform
+EMAIL_FROM_NAME=Earth Observation Platform
 SALES_EMAIL=sales@yourdomain.com
 SUPPORT_EMAIL=support@yourdomain.com
 ```
@@ -72,7 +72,7 @@ SUPPORT_EMAIL=support@yourdomain.com
 1. In Google Account settings, go to **Security**
 2. Under "Signing in to Google", select **App passwords**
 3. Select **Mail** and **Other (Custom name)**
-4. Name it "Earth Intelligence Platform"
+4. Name it "Earth Observation Platform"
 5. Copy the 16-character password
 
 #### 3. Configure Environment Variables
@@ -86,7 +86,7 @@ SMTP_PORT=587
 SMTP_USER=your-email@gmail.com
 SMTP_PASS=your-16-char-app-password
 EMAIL_FROM=your-email@gmail.com
-EMAIL_FROM_NAME=Earth Intelligence Platform
+EMAIL_FROM_NAME=Earth Observation Platform
 SALES_EMAIL=sales@yourdomain.com
 SUPPORT_EMAIL=support@yourdomain.com
 ```
@@ -102,7 +102,7 @@ SMTP_PORT=587
 SMTP_USER=your-username
 SMTP_PASS=your-password
 EMAIL_FROM=noreply@yourdomain.com
-EMAIL_FROM_NAME=Earth Intelligence Platform
+EMAIL_FROM_NAME=Earth Observation Platform
 SALES_EMAIL=sales@yourdomain.com
 SUPPORT_EMAIL=support@yourdomain.com
 ```
@@ -160,7 +160,7 @@ Templates use `{{variable}}` syntax for dynamic content.
 | `SMTP_USER` | SMTP only | SMTP username | `user@gmail.com` |
 | `SMTP_PASS` | SMTP only | SMTP password | `app-password` |
 | `EMAIL_FROM` | Yes | Sender email address | `noreply@domain.com` |
-| `EMAIL_FROM_NAME` | No | Sender display name | `Earth Intelligence` |
+| `EMAIL_FROM_NAME` | No | Sender display name | `Earth Observation` |
 | `SALES_EMAIL` | Yes | Sales team email | `sales@domain.com` |
 | `SUPPORT_EMAIL` | Yes | Support team email | `support@domain.com` |
 | `FRONTEND_URL` | Yes | Frontend URL for links | `https://yourdomain.com` |

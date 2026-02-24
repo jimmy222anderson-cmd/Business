@@ -65,11 +65,11 @@ const Hero = () => {
           initial={{ opacity: 0, y: 30 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ delay: 0.5, duration: 0.8 }}
-          className="font-display text-5xl md:text-7xl lg:text-8xl font-bold tracking-tight mb-6"
+          className="font-display text-4xl sm:text-5xl md:text-6xl lg:text-7xl xl:text-8xl font-bold tracking-tight mb-6 px-4"
         >
-          Earth Intelligence
-          <br />
-          <span className="text-gradient">Platform</span>
+          <span className="block sm:inline">ATLAS Space</span>
+          <span className="block sm:inline"> </span>
+          <span className="text-gradient block sm:inline">& Data Systems</span>
         </motion.h1>
 
         <motion.p
@@ -79,7 +79,7 @@ const Hero = () => {
           className="text-lg md:text-xl text-muted-foreground max-w-2xl mx-auto mb-10"
         >
           Access the world's satellite data marketplace. High-resolution imagery,
-          analytics, and insights — all in one platform.
+          analytics, and space-based intelligence — all in one platform.
         </motion.p>
 
         <motion.div

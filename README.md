@@ -1,4 +1,4 @@
-# Earth Intelligence Platform
+# Earth Observation Platform
 
 A modern, dark-themed marketing website built with React/TypeScript showcasing satellite data products, industries served, pricing, and partners.
 

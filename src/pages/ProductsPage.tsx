@@ -54,7 +54,7 @@ export function ProductsPage() {
           <p className="text-lg text-muted-foreground max-w-3xl mx-auto">
             Explore our comprehensive suite of satellite data products and services.
             From high-resolution imagery to advanced analytics, we provide the tools
-            you need for earth intelligence.
+            you need for space-based intelligence.
           </p>
         </motion.div>
 

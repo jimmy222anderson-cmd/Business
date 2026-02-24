@@ -1,5 +1,5 @@
 /**
- * API Client for Earth Intelligence Platform
+ * API Client for ATLAS Space & Data Systems
  * Handles all HTTP requests to the backend API
  */
 

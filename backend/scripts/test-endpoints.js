@@ -90,7 +90,7 @@ async function testEndpoint(name, method, path, data = null, token = null, expec
 
 async function runTests() {
   log('='.repeat(60), 'yellow');
-  log('EARTH INTELLIGENCE PLATFORM - BACKEND ENDPOINT TESTS', 'yellow');
+  log('Earth Observation PLATFORM - BACKEND ENDPOINT TESTS', 'yellow');
   log('='.repeat(60), 'yellow');
 
   let passedTests = 0;

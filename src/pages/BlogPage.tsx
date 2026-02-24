@@ -71,7 +71,7 @@ const BlogPage = () => {
             Latest <span className="text-gradient">Insights</span>
           </h1>
           <p className="text-muted-foreground text-lg max-w-2xl mx-auto mb-8">
-            Stay updated with the latest news, insights, and developments in satellite intelligence and Earth observation.
+            Stay updated with the latest news, insights, and developments in satellite intelligence and space-based observation.
           </p>
 
           {/* Search Bar */}

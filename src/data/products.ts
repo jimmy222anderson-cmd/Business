@@ -1,6 +1,6 @@
 import { Product } from '@/types';
 
-// All 9 products for the Earth Intelligence Platform
+// All 9 products for the ATLAS Space & Data Systems Platform
 export const products: Product[] = [
   {
     id: '1',

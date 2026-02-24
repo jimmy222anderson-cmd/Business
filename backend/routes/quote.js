@@ -39,19 +39,19 @@ async function sendQuoteConfirmation(email, name, quoteId) {
     });
   }
 
-  const subject = 'Quote Request Received - Earth Intelligence Platform';
+  const subject = 'Quote Request Received - Earth Observation Platform';
   const html = `
     <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto;">
       <h1 style="color: #1a1a1a;">Quote Request Received</h1>
       <p>Hi ${name},</p>
-      <p>Thank you for your interest in Earth Intelligence Platform!</p>
+      <p>Thank you for your interest in Earth Observation Platform!</p>
       <div style="background-color: #f5f5f5; padding: 20px; border-radius: 5px; margin: 20px 0;">
         <p><strong>Quote Request ID:</strong> ${quoteId}</p>
       </div>
       <p>We've received your quote request and our sales team is reviewing your requirements.</p>
       <p>You can expect to hear from us within 1-2 business days with a customized quote tailored to your needs.</p>
       <p>If you have any urgent questions, please contact us at sales@earthintelligence.com</p>
-      <p>Best regards,<br>The Earth Intelligence Sales Team</p>
+      <p>Best regards,<br>The Earth Observation Sales Team</p>
     </div>
   `;
   const text = `Quote Request Received. Hi ${name}, Thank you for your interest! Quote Request ID: ${quoteId}. Our sales team will contact you within 1-2 business days.`;

@@ -1,4 +1,4 @@
-// Core type definitions for the Earth Intelligence Platform
+// Core type definitions for the ATLAS Space & Data Systems Platform
 
 // Product types
 export interface Product {

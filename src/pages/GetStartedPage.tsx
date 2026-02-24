@@ -52,7 +52,7 @@ const GetStartedPage = () => {
             transition={{ duration: 0.6 }}
           >
             <h1 className="text-4xl sm:text-5xl lg:text-6xl font-bold mb-6">
-              Get Started with <span className="text-primary">Earth Intelligence</span>
+              Get Started with <span className="text-primary">ATLAS Space & Data Systems</span>
             </h1>
             <p className="text-xl text-muted-foreground max-w-2xl mx-auto">
               Transform your business with satellite data and geospatial insights. Follow these simple steps to begin your journey.
@@ -201,7 +201,7 @@ const GetStartedPage = () => {
               Ready to Transform Your Business?
             </h2>
             <p className="text-lg text-muted-foreground mb-8">
-              Join hundreds of organizations already using Earth Intelligence Platform to make better decisions with satellite data.
+              Join hundreds of organizations already using ATLAS Space & Data Systems to make better decisions with satellite data.
             </p>
             <div className="flex flex-col sm:flex-row gap-4 justify-center">
               <Button size="lg" className="bg-primary text-primary-foreground" asChild>

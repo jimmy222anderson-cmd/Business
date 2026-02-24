@@ -110,15 +110,27 @@ export const Navbar = () => {
       }`}
     >
       <div className="container mx-auto px-4">
-        <div className="flex items-center justify-between h-16 md:h-20">
+        <div className="flex items-center justify-between h-10 md:h-20">
           {/* Logo */}
-          <Link to="/" className="flex items-center space-x-2">
-            <div className="w-8 h-8 bg-primary rounded-lg flex items-center justify-center">
-              <span className="text-primary-foreground font-bold text-lg">E</span>
+          <Link to="/" className="flex items-center space-x-2 md:space-x-3 py-2">
+            <img 
+              src="/atlas-logo.png" 
+              alt="ATLAS Space & Data Systems Logo" 
+              className="h-16 md:h-16 w-auto flex-shrink-0"
+              onError={(e) => {
+                // Fallback to SVG if image not found
+                e.currentTarget.style.display = 'none';
+                e.currentTarget.nextElementSibling?.classList.remove('hidden');
+              }}
+            />
+            <div className="hidden w-14 h-14 md:w-16 md:h-16 flex items-center justify-center flex-shrink-0">
+              <svg className="w-12 h-12 md:w-14 md:h-14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+                <circle cx="12" cy="12" r="10" />
+                <polygon points="12 2 15 8 12 12 9 8" fill="currentColor" />
+                <line x1="12" y1="2" x2="12" y2="22" />
+                <line x1="2" y1="12" x2="22" y2="12" />
+              </svg>
             </div>
-            <span className="text-xl font-display font-bold text-foreground">
-              Earth Intelligence
-            </span>
           </Link>
 
           {/* Desktop Navigation */}

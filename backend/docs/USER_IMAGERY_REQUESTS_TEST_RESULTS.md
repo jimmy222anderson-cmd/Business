@@ -11,7 +11,7 @@ February 17, 2026
 ### 1. Health Check ✓
 - **Status**: PASSED
 - **Description**: Verified server is running and responding
-- **Response**: `{ status: 'ok', message: 'Earth Intelligence Platform API is running' }`
+- **Response**: `{ status: 'ok', message: 'Earth Observation Platform API is running' }`
 
 ### 2. Unauthorized Access ✓
 - **Status**: PASSED

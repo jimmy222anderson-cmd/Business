@@ -62,7 +62,7 @@ const testEmailTemplates = () => {
   // Test confirmation email template
   console.log('📧 Confirmation Email Template:');
   console.log('   To:', mockRequest.email);
-  console.log('   Subject: Imagery Request Received - Earth Intelligence Platform');
+  console.log('   Subject: Imagery Request Received - Earth Observation Platform');
   console.log('   ✅ Contains Request ID:', mockRequest._id);
   console.log('   ✅ Contains Customer Name:', mockRequest.full_name);
   console.log('   ✅ Contains AOI Details: Type, Area, Center');

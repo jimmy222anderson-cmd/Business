@@ -108,7 +108,7 @@ export default function UserImageryDashboard() {
   return (
     <>
       <Helmet>
-        <title>My Dashboard | Earth Intelligence Platform</title>
+        <title>My Dashboard | ATLAS Space & Data Systems</title>
         <meta name="description" content="View your imagery requests and saved areas of interest" />
       </Helmet>
 

@@ -24,7 +24,7 @@ const teamMembers: TeamMember[] = [
     id: '1',
     name: 'Dr. Sarah Chen',
     role: 'Chief Executive Officer',
-    bio: 'Former NASA scientist with 15+ years in satellite technology and earth observation.',
+    bio: 'Former space agency scientist with 15+ years in satellite technology and space-based intelligence.',
     image: '/placeholder.svg',
   },
   {
@@ -55,7 +55,7 @@ const milestones: Milestone[] = [
   {
     year: '2018',
     title: 'Company Founded',
-    description: 'Earth Intelligence Platform launched with a vision to democratize satellite data access.',
+    description: 'ATLAS Space & Data Systems launched with a vision to democratize satellite data access.',
   },
   {
     year: '2019',
@@ -160,7 +160,7 @@ export default function AboutPage() {
               About Us
             </h1>
             <p className="text-lg md:text-xl text-muted-foreground">
-              Empowering decision-makers with actionable earth intelligence through
+              Empowering decision-makers with actionable space-based intelligence through
               cutting-edge satellite technology and AI-powered analytics.
             </p>
           </motion.div>
@@ -182,10 +182,10 @@ export default function AboutPage() {
               </h2>
               <div className="space-y-4 text-muted-foreground">
                 <p>
-                  Founded in 2018, Earth Intelligence Platform was born from a simple yet
+                  Founded in 2018, ATLAS Space & Data Systems was born from a simple yet
                   powerful vision: to make satellite data accessible, actionable, and
                   affordable for organizations of all sizes. Our founders, a team of former
-                  NASA scientists and technology entrepreneurs, recognized that while
+                  space agency scientists and technology entrepreneurs, recognized that while
                   satellite technology had advanced dramatically, accessing and analyzing
                   this data remained complex and expensive.
                 </p>
@@ -197,7 +197,7 @@ export default function AboutPage() {
                   intelligence through an intuitive interface.
                 </p>
                 <p>
-                  We believe that earth observation data should be a tool for positive
+                  We believe that space-based observation data should be a tool for positive
                   change—helping farmers optimize yields, enabling governments to respond to
                   disasters, supporting environmental conservation, and driving sustainable
                   development worldwide.
@@ -236,7 +236,7 @@ export default function AboutPage() {
                 </div>
                 <h3 className="text-xl font-bold text-foreground mb-2">Our Vision</h3>
                 <p className="text-sm text-muted-foreground">
-                  A world where earth observation data drives sustainable development and
+                  A world where space-based observation data drives sustainable development and
                   positive global impact.
                 </p>
               </motion.div>
@@ -278,7 +278,7 @@ export default function AboutPage() {
               </h2>
             </div>
             <p className="text-lg text-muted-foreground max-w-2xl mx-auto">
-              Meet the experts driving innovation in earth intelligence and satellite
+              Meet the experts driving innovation in space-based intelligence and satellite
               technology.
             </p>
           </motion.div>
@@ -307,7 +307,7 @@ export default function AboutPage() {
               </h2>
             </div>
             <p className="text-lg text-muted-foreground max-w-2xl mx-auto">
-              Key milestones in our mission to transform earth intelligence.
+              Key milestones in our mission to transform space-based intelligence.
             </p>
           </motion.div>
 

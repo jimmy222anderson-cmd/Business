@@ -1,7 +1,7 @@
 # Security and Validation Implementation
 
 ## Overview
-This document describes the security and validation features implemented for the Earth Intelligence Platform backend API.
+This document describes the security and validation features implemented for the Earth Observation Platform backend API.
 
 ## Implemented Features
 

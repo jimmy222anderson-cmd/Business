@@ -1,6 +1,6 @@
-# Earth Intelligence Platform - Backend API
+# Earth Observation Platform - Backend API
 
-This is the backend API for the Earth Intelligence Platform, built with Node.js, Express, and MongoDB.
+This is the backend API for the Earth Observation Platform, built with Node.js, Express, and MongoDB.
 
 ## Prerequisites
 

@@ -21,7 +21,7 @@ async function testResend() {
     console.log('Test 1: Sending simple test email...');
     const result1 = await sendEmail({
       to: 'test@example.com',
-      subject: 'Test Email from Earth Intelligence Platform',
+      subject: 'Test Email from Earth Observation Platform',
       text: 'This is a test email to verify Resend integration.',
       html: '<h1>Test Email</h1><p>This is a test email to verify Resend integration.</p>'
     });

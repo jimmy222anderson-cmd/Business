@@ -98,7 +98,7 @@ app.use('/api/', apiLimiter);
 
 // Health check endpoint
 app.get('/api/health', (req, res) => {
-  res.json({ status: 'ok', message: 'Earth Intelligence Platform API is running' });
+  res.json({ status: 'ok', message: 'Earth Observation Platform API is running' });
 });
 
 // Test routes for authentication middleware

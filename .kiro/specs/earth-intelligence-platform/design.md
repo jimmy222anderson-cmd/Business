@@ -1,8 +1,8 @@
-# Design Document: Earth Intelligence Platform Website
+# Design Document: Earth Observation Platform Website
 
 ## 1. Overview
 
-The Earth Intelligence Platform is a modern, dark-themed marketing website built with React/TypeScript that showcases satellite data products, industries served, pricing, and partners. The platform will be developed in three phases:
+The Earth Observation Platform is a modern, dark-themed marketing website built with React/TypeScript that showcases satellite data products, industries served, pricing, and partners. The platform will be developed in three phases:
 
 - **Phase 1**: Foundation & Homepage with core navigation, hero section, product carousel, industries tabs, and static content
 - **Phase 2**: Additional pages (Products, Industries, Pricing, Partners, About, Blog, Specs)
@@ -1525,13 +1525,13 @@ router.post('/', async (req, res) => {
   // Send confirmation email
   await sendEmail({
     to: booking.email,
-    subject: 'Demo Booking Confirmation - Earth Intelligence Platform',
+    subject: 'Demo Booking Confirmation - Earth Observation Platform',
     html: `
       <h1>Demo Booking Confirmed</h1>
       <p>Hi ${booking.full_name},</p>
       <p>Your demo has been booked for <strong>${booking.preferred_date}</strong> at <strong>${booking.preferred_time}</strong>.</p>
       <p>We'll send you a calendar invite shortly.</p>
-      <p>Best regards,<br>Earth Intelligence Platform Team</p>
+      <p>Best regards,<br>Earth Observation Platform Team</p>
     `
   });
   

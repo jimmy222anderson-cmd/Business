@@ -105,7 +105,7 @@ const BookDemoPage = () => {
             transition={{ duration: 0.6, delay: 0.1 }}
             className="text-xl text-muted-foreground max-w-2xl mx-auto"
           >
-            See how Earth Intelligence Platform can transform your business with satellite data and analytics.
+            See how ATLAS Space & Data Systems can transform your business with satellite data and analytics.
           </motion.p>
         </div>
       </section>

@@ -118,7 +118,7 @@ async function sendEmail({ to, subject, text, html }) {
  * @returns {Promise<Object>}
  */
 async function sendWelcomeEmail(email, name) {
-  const subject = 'Welcome to Earth Intelligence Platform';
+  const subject = 'Welcome to ATLAS Space & Data Systems';
   
   const frontendUrl = process.env.FRONTEND_URL || 'http://localhost:5173';
   const html = loadTemplate('welcomeEmail.html', {
@@ -132,7 +132,7 @@ async function sendWelcomeEmail(email, name) {
     githubLink: 'https://github.com/earthintelligence'
   });
   
-  const text = `Welcome to Earth Intelligence Platform! Hi ${name}, Thank you for joining Earth Intelligence Platform. We're excited to have you on board!`;
+  const text = `Welcome to Earth Observation Platform! Hi ${name}, Thank you for joining Earth Observation Platform. We're excited to have you on board!`;
 
   return sendEmail({ to: email, subject, text, html });
 }
@@ -145,7 +145,7 @@ async function sendWelcomeEmail(email, name) {
  * @returns {Promise<Object>}
  */
 async function sendDemoConfirmation(email, name, bookingId) {
-  const subject = 'Demo Booking Confirmation - Earth Intelligence Platform';
+  const subject = 'Demo Booking Confirmation - Earth Observation Platform';
   
   const html = `
     <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto;">
@@ -157,7 +157,7 @@ async function sendDemoConfirmation(email, name, bookingId) {
       </div>
       <p>Our team will reach out to you shortly to schedule your demo and provide meeting details.</p>
       <p>If you have any questions, please contact us at support@earthintelligence.com</p>
-      <p>Best regards,<br>The Earth Intelligence Team</p>
+      <p>Best regards,<br>The Earth Observation Team</p>
     </div>
   `;
   const text = `Demo Booking Confirmed. Hi ${name}, Your demo request has been successfully submitted! Booking ID: ${bookingId}. Our team will reach out to you shortly.`;
@@ -204,14 +204,14 @@ async function sendDemoNotification(booking) {
  * @returns {Promise<Object>}
  */
 async function sendContactConfirmation(email, name) {
-  const subject = 'We Received Your Message - Earth Intelligence Platform';
+  const subject = 'We Received Your Message - Earth Observation Platform';
   const html = `
     <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto;">
       <h1 style="color: #1a1a1a;">Thank You for Contacting Us</h1>
       <p>Hi ${name},</p>
       <p>We've received your message and our team will get back to you within 24-48 hours.</p>
       <p>In the meantime, feel free to explore our platform and learn more about our services.</p>
-      <p>Best regards,<br>The Earth Intelligence Team</p>
+      <p>Best regards,<br>The Earth Observation Team</p>
     </div>
   `;
   const text = `Thank You for Contacting Us. Hi ${name}, We've received your message and our team will get back to you within 24-48 hours.`;
@@ -260,19 +260,19 @@ async function sendContactNotification(inquiry) {
  * @returns {Promise<Object>}
  */
 async function sendQuoteRequestConfirmation(email, name, quoteRequestId) {
-  const subject = 'Quote Request Received - Earth Intelligence Platform';
+  const subject = 'Quote Request Received - Earth Observation Platform';
   const html = `
     <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto;">
       <h1 style="color: #1a1a1a;">Quote Request Received</h1>
       <p>Hi ${name},</p>
-      <p>Thank you for your interest in Earth Intelligence Platform! We've received your quote request.</p>
+      <p>Thank you for your interest in Earth Observation Platform! We've received your quote request.</p>
       <div style="background-color: #f5f5f5; padding: 20px; border-radius: 5px; margin: 20px 0;">
         <p><strong>Request ID:</strong> ${quoteRequestId}</p>
       </div>
       <p>Our sales team will review your requirements and get back to you with a customized quote within 1-2 business days.</p>
       <p>In the meantime, feel free to explore our products and services on our website.</p>
       <p>If you have any urgent questions, please contact us at sales@earthintelligence.com</p>
-      <p>Best regards,<br>The Earth Intelligence Team</p>
+      <p>Best regards,<br>The Earth Observation Team</p>
     </div>
   `;
   const text = `Quote Request Received. Hi ${name}, We've received your quote request (ID: ${quoteRequestId}). Our sales team will get back to you within 1-2 business days.`;
@@ -322,12 +322,12 @@ async function sendQuoteRequestNotification(quoteRequest) {
  * @returns {Promise<Object>}
  */
 async function sendQuoteEmail(email, name, quoteDetails) {
-  const subject = 'Your Custom Quote - Earth Intelligence Platform';
+  const subject = 'Your Custom Quote - Earth Observation Platform';
   const html = `
     <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto;">
       <h1 style="color: #1a1a1a;">Your Custom Quote</h1>
       <p>Hi ${name},</p>
-      <p>Thank you for your interest in Earth Intelligence Platform. We're pleased to provide you with a customized quote based on your requirements.</p>
+      <p>Thank you for your interest in Earth Observation Platform. We're pleased to provide you with a customized quote based on your requirements.</p>
       <div style="background-color: #f0fdf4; border-left: 4px solid #10b981; padding: 20px; border-radius: 5px; margin: 20px 0;">
         <h2 style="margin-top: 0; color: #065f46;">Quote Details</h2>
         <p><strong>Pricing:</strong></p>
@@ -338,7 +338,7 @@ async function sendQuoteEmail(email, name, quoteDetails) {
       </div>
       <p>This quote is valid until ${new Date(quoteDetails.validUntil).toLocaleDateString()}. If you have any questions or would like to proceed, please reply to this email or contact our sales team.</p>
       <p>We look forward to working with you!</p>
-      <p>Best regards,<br>The Earth Intelligence Sales Team</p>
+      <p>Best regards,<br>The Earth Observation Sales Team</p>
     </div>
   `;
   const text = `Your Custom Quote. Hi ${name}, We're pleased to provide you with a customized quote. Pricing: ${quoteDetails.pricing}. Valid until: ${new Date(quoteDetails.validUntil).toLocaleDateString()}`;
@@ -356,7 +356,7 @@ async function sendQuoteEmail(email, name, quoteDetails) {
 async function sendPasswordResetEmail(email, name, resetToken) {
   const frontendUrl = process.env.FRONTEND_URL || 'http://localhost:5173';
   const resetUrl = `${frontendUrl}/auth/reset-password?token=${resetToken}`;
-  const subject = 'Password Reset Request - Earth Intelligence Platform';
+  const subject = 'Password Reset Request - Earth Observation Platform';
   
   const html = loadTemplate('passwordReset.html', {
     fullName: name,
@@ -379,7 +379,7 @@ async function sendPasswordResetEmail(email, name, resetToken) {
 async function sendEmailVerification(email, name, verificationToken) {
   const frontendUrl = process.env.FRONTEND_URL || 'http://localhost:5173';
   const verificationUrl = `${frontendUrl}/auth/verify-email?token=${verificationToken}`;
-  const subject = 'Verify Your Email - Earth Intelligence Platform';
+  const subject = 'Verify Your Email - Earth Observation Platform';
   
   const html = loadTemplate('emailVerification.html', {
     fullName: name,
@@ -399,7 +399,7 @@ async function sendEmailVerification(email, name, verificationToken) {
  * @returns {Promise<Object>}
  */
 async function sendPasswordChangedEmail(email, name) {
-  const subject = 'Password Changed Successfully - Earth Intelligence Platform';
+  const subject = 'Password Changed Successfully - Earth Observation Platform';
   const html = `
     <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto;">
       <h1 style="color: #1a1a1a;">🔒 Password Changed</h1>
@@ -410,7 +410,7 @@ async function sendPasswordChangedEmail(email, name) {
         <p style="margin: 8px 0 0; font-size: 14px; color: #166534;">You can now sign in with your new password.</p>
       </div>
       <p>If you didn't make this change, please contact our support team immediately at support@earthintelligence.com</p>
-      <p>Best regards,<br>The Earth Intelligence Team</p>
+      <p>Best regards,<br>The Earth Observation Team</p>
     </div>
   `;
   const text = `Password Changed. Hello ${name}, Your password has been successfully changed. If you didn't make this change, please contact support immediately.`;
@@ -426,7 +426,7 @@ async function sendPasswordChangedEmail(email, name) {
  * @returns {Promise<Object>}
  */
 async function sendImageryRequestConfirmation(email, name, request) {
-  const subject = 'Imagery Request Received - Earth Intelligence Platform';
+  const subject = 'Imagery Request Received - Earth Observation Platform';
   
   // Format date range
   const startDate = new Date(request.date_range.start_date).toLocaleDateString();
@@ -458,7 +458,7 @@ async function sendImageryRequestConfirmation(email, name, request) {
     <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto;">
       <h1 style="color: #1a1a1a;">Imagery Request Received</h1>
       <p>Hi ${name},</p>
-      <p>Thank you for your interest in Earth Intelligence Platform! We've received your satellite imagery request.</p>
+      <p>Thank you for your interest in Earth Observation Platform! We've received your satellite imagery request.</p>
       <div style="background-color: #f5f5f5; padding: 20px; border-radius: 5px; margin: 20px 0;">
         <p><strong>Request ID:</strong> ${request._id}</p>
         <p><strong>Status:</strong> <span style="color: #EAB308; font-weight: bold;">${request.status.toUpperCase()}</span></p>
@@ -479,7 +479,7 @@ async function sendImageryRequestConfirmation(email, name, request) {
       <p>Our team will review your request and get back to you within 1-2 business days with availability and pricing information.</p>
       <p>You can track the status of your request using the Request ID above.</p>
       <p>If you have any urgent questions, please contact us at sales@earthintelligence.com</p>
-      <p>Best regards,<br>The Earth Intelligence Team</p>
+      <p>Best regards,<br>The Earth Observation Team</p>
     </div>
   `;
   
@@ -661,7 +661,7 @@ async function sendImageryRequestStatusUpdate(email, name, request, oldStatus, n
       
       <p>If you have any questions or need assistance, please don't hesitate to contact us at sales@earthintelligence.com</p>
       
-      <p>Best regards,<br>The Earth Intelligence Team</p>
+      <p>Best regards,<br>The Earth Observation Team</p>
     </div>
   `;
   

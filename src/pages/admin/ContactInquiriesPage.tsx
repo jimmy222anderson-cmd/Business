@@ -170,7 +170,7 @@ export default function ContactInquiriesPage() {
 
   const openReply = (inquiry: ContactInquiry) => {
     setSelectedInquiry(inquiry);
-    setReplyMessage(`Hi ${inquiry.full_name},\n\nThank you for contacting Earth Intelligence Platform.\n\n`);
+    setReplyMessage(`Hi ${inquiry.full_name},\n\nThank you for contacting ATLAS Space & Data Systems.\n\n`);
     setReplyOpen(true);
   };
 

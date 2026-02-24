@@ -311,7 +311,7 @@ export default function ExplorerPage() {
   return (
     <>
       <Helmet>
-        <title>Platform Features | Earth Intelligence Platform</title>
+        <title>Platform Features | ATLAS Space & Data Systems</title>
         <meta 
           name="description" 
           content="Explore and request satellite imagery data with our interactive map. Define areas of interest, filter by resolution and sensor type, and submit custom imagery requests." 
@@ -323,7 +323,7 @@ export default function ExplorerPage() {
         
         {/* Open Graph / Facebook */}
         <meta property="og:type" content="website" />
-        <meta property="og:title" content="Platform Features | Earth Intelligence Platform" />
+        <meta property="og:title" content="Platform Features | ATLAS Space & Data Systems" />
         <meta 
           property="og:description" 
           content="Explore and request satellite imagery data with our interactive map. Define areas of interest and submit custom imagery requests." 
@@ -332,7 +332,7 @@ export default function ExplorerPage() {
         
         {/* Twitter */}
         <meta name="twitter:card" content="summary_large_image" />
-        <meta name="twitter:title" content="Platform Features | Earth Intelligence Platform" />
+        <meta name="twitter:title" content="Platform Features | ATLAS Space & Data Systems" />
         <meta 
           name="twitter:description" 
           content="Explore and request satellite imagery data with our interactive map. Define areas of interest and submit custom imagery requests." 

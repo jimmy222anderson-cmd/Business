@@ -1,7 +1,7 @@
 {
   "info": {
-    "name": "Earth Intelligence Platform API",
-    "description": "Complete API collection for Earth Intelligence Platform backend",
+    "name": "Earth Observation Platform API",
+    "description": "Complete API collection for Earth Observation Platform backend",
     "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json",
     "version": "1.0.0"
   },

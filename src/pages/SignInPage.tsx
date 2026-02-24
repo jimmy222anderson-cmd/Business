@@ -49,7 +49,7 @@ const SignInPage = () => {
       // Show success message
       toast({
         title: "Sign In Successful!",
-        description: "Welcome back to Earth Intelligence Platform.",
+        description: "Welcome back to ATLAS Space & Data Systems.",
       });
 
       // Reset form

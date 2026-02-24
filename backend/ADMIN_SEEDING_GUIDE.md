@@ -12,7 +12,7 @@ The seed script creates 3 admin users with the following credentials:
 - **Email**: `admin@earthintelligence.com`
 - **Password**: `Admin@123456`
 - **Name**: System Administrator
-- **Company**: Earth Intelligence
+- **Company**: Earth Observation
 - **Role**: admin
 - **Email Verified**: Yes
 
@@ -20,7 +20,7 @@ The seed script creates 3 admin users with the following credentials:
 - **Email**: `james.admin@earthintelligence.com`
 - **Password**: `James@123456`
 - **Name**: James Anderson
-- **Company**: Earth Intelligence
+- **Company**: Earth Observation
 - **Role**: admin
 - **Email Verified**: Yes
 
@@ -28,7 +28,7 @@ The seed script creates 3 admin users with the following credentials:
 - **Email**: `sarah.admin@earthintelligence.com`
 - **Password**: `Sarah@123456`
 - **Name**: Sarah Mitchell
-- **Company**: Earth Intelligence
+- **Company**: Earth Observation
 - **Role**: admin
 - **Email Verified**: Yes
 

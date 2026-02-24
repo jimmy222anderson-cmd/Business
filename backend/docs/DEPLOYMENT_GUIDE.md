@@ -1,8 +1,8 @@
-# Earth Intelligence Platform - Deployment Guide
+# Earth Observation Platform - Deployment Guide
 
 ## Overview
 
-This guide provides step-by-step instructions for deploying the Earth Intelligence Platform backend API to production. The platform consists of a Node.js/Express backend with MongoDB database and email notification services.
+This guide provides step-by-step instructions for deploying the Earth Observation Platform backend API to production. The platform consists of a Node.js/Express backend with MongoDB database and email notification services.
 
 ---
 
@@ -56,7 +56,7 @@ JWT_SECRET=your_super_secret_jwt_key_here_min_32_chars
 # Option 1: SendGrid
 SENDGRID_API_KEY=SG.your_sendgrid_api_key_here
 EMAIL_FROM=noreply@earthintelligence.com
-EMAIL_FROM_NAME=Earth Intelligence Platform
+EMAIL_FROM_NAME=Earth Observation Platform
 
 # Option 2: SMTP (e.g., Gmail, AWS SES)
 SMTP_HOST=smtp.gmail.com
@@ -65,7 +65,7 @@ SMTP_SECURE=false
 SMTP_USER=your_email@gmail.com
 SMTP_PASS=your_app_password
 EMAIL_FROM=noreply@earthintelligence.com
-EMAIL_FROM_NAME=Earth Intelligence Platform
+EMAIL_FROM_NAME=Earth Observation Platform
 
 # Admin Email (for notifications)
 ADMIN_EMAIL=admin@earthintelligence.com
@@ -264,7 +264,7 @@ mongorestore --uri="mongodb://localhost:27017/earth_intelligence" /backup/202401
 2. **Create API Key**
    - Go to Settings > API Keys
    - Click "Create API Key"
-   - Name: "Earth Intelligence Platform"
+   - Name: "Earth Observation Platform"
    - Permissions: "Full Access" or "Mail Send"
    - Copy the API key (shown only once)
    - Add to `.env` as `SENDGRID_API_KEY`

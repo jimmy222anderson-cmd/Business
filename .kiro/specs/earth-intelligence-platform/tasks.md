@@ -1,8 +1,8 @@
-# Implementation Plan: Earth Intelligence Platform Website
+# Implementation Plan: Earth Observation Platform Website
 
 ## Overview
 
-This implementation plan breaks down the Earth Intelligence Platform into three phases:
+This implementation plan breaks down the Earth Observation Platform into three phases:
 - **Phase 1**: Foundation & Homepage (core navigation, hero, carousels, static content)
 - **Phase 2**: Additional Pages (Products, Industries, Pricing, Partners, About, Blog, Specs)
 - **Phase 3**: Backend Integration (authentication, CMS, forms, user management)

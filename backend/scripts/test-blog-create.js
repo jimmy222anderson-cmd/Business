@@ -33,7 +33,7 @@ async function testBlogCreate() {
     const testBlogPost = {
       title: 'Test Blog Post - Satellite Technology',
       slug: 'test-blog-post-satellite-technology',
-      excerpt: 'This is a test blog post about satellite technology and earth intelligence.',
+      excerpt: 'This is a test blog post about satellite technology and Earth Observation.',
       content: `# Introduction to Satellite Technology
 
 Satellite technology has revolutionized the way we observe and understand our planet. From weather forecasting to environmental monitoring, satellites provide critical data that helps us make informed decisions.
@@ -51,7 +51,7 @@ Satellite technology has revolutionized the way we observe and understand our pl
 As technology advances, we can expect even more sophisticated satellite systems that will provide unprecedented insights into our planet's health and changes.`,
       author_id: adminUser._id,
       featured_image_url: 'https://images.unsplash.com/photo-1446776653964-20c1d3a81b06?w=800&h=600&fit=crop',
-      tags: ['Satellite', 'Technology', 'Earth Intelligence'],
+      tags: ['Satellite', 'Technology', 'Earth Observation'],
       status: 'published',
       published_at: new Date()
     };

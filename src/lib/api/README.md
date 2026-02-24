@@ -1,6 +1,6 @@
 # API Client Documentation
 
-This directory contains the API client implementation for the Earth Intelligence Platform, including error handling, loading states, and success notifications.
+This directory contains the API client implementation for the Earth Observation Platform, including error handling, loading states, and success notifications.
 
 ## Overview
 

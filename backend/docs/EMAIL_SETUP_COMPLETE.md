@@ -266,7 +266,7 @@ Edit the HTML files to match your brand:
 - **Domain Setup**: https://resend.com/docs/dashboard/domains/introduction
 - **Troubleshooting**: https://resend.com/docs/dashboard/emails/troubleshooting
 
-### Earth Intelligence Platform Docs
+### Earth Observation Platform Docs
 - **API Documentation**: `backend/docs/API_DOCUMENTATION.md`
 - **Email Service Code**: `backend/services/email.js`
 - **Email Templates**: `backend/templates/`

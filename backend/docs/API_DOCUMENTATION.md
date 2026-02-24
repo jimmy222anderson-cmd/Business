@@ -1,8 +1,8 @@
-# Earth Intelligence Platform - API Documentation
+# Earth Observation Platform - API Documentation
 
 ## Overview
 
-This document provides comprehensive documentation for the Earth Intelligence Platform backend API. The API is built with Node.js/Express and uses MongoDB for data persistence.
+This document provides comprehensive documentation for the Earth Observation Platform backend API. The API is built with Node.js/Express and uses MongoDB for data persistence.
 
 **Base URL**: `http://localhost:3000/api` (development)  
 **Production URL**: `https://api.earthintelligence.com/api`

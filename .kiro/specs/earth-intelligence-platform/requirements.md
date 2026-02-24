@@ -1,7 +1,7 @@
-# Requirements: Earth Intelligence Platform Website
+# Requirements: Earth Observation Platform Website
 
 ## 1. Overview
-Build a comprehensive Earth Intelligence Platform website showcasing satellite data products, industries served, pricing, and partners. The platform will be developed in three phases: Foundation & Homepage, Additional Pages, and Backend & Full Functionality.
+Build a comprehensive Earth Observation Platform website showcasing satellite data products, industries served, pricing, and partners. The platform will be developed in three phases: Foundation & Homepage, Additional Pages, and Backend & Full Functionality.
 
 ## 2. User Stories
 
@@ -56,7 +56,7 @@ As a content admin, I want to:
 ### 3.2 Hero Section
 - [ ] 3.2.1 Full-screen hero with dark background and satellite imagery
 - [ ] 3.2.2 Coordinates overlay text with typing animation effect
-- [ ] 3.2.3 Main heading "Earth Intelligence Platform" fades in on load
+- [ ] 3.2.3 Main heading "Earth Observation Platform" fades in on load
 - [ ] 3.2.4 CTA button has hover effects
 - [ ] 3.2.5 Animated satellite detection boxes float over imagery
 

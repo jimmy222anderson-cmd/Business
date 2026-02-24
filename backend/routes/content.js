@@ -105,7 +105,7 @@ router.post('/seed', async (req, res) => {
         {
           id: 'introduction',
           title: 'Introduction',
-          content: "Earth Intelligence Platform ('we', 'our', or 'us') is committed to protecting your privacy and ensuring the security of your personal information. This Privacy Policy explains how we collect, use, disclose, and safeguard your information when you use our satellite intelligence platform and services."
+          content: "Earth Observation Platform ('we', 'our', or 'us') is committed to protecting your privacy and ensuring the security of your personal information. This Privacy Policy explains how we collect, use, disclose, and safeguard your information when you use our satellite intelligence platform and services."
         },
         {
           id: 'information-we-collect',
@@ -154,12 +154,12 @@ router.post('/seed', async (req, res) => {
         {
           id: 'acceptance',
           title: 'Acceptance of Terms',
-          content: "By accessing or using the Earth Intelligence Platform, you agree to be bound by these Terms of Service. If you do not agree to these Terms, you may not access or use the Platform."
+          content: "By accessing or using the Earth Observation Platform, you agree to be bound by these Terms of Service. If you do not agree to these Terms, you may not access or use the Platform."
         },
         {
           id: 'description',
           title: 'Description of Service',
-          content: "Earth Intelligence Platform provides satellite intelligence services, including access to satellite imagery, geospatial data analysis, AI-powered insights, and related tools and features."
+          content: "Earth Observation Platform provides satellite intelligence services, including access to satellite imagery, geospatial data analysis, AI-powered insights, and related tools and features."
         },
         {
           id: 'user-accounts',
@@ -174,7 +174,7 @@ router.post('/seed', async (req, res) => {
         {
           id: 'intellectual-property',
           title: 'Intellectual Property Rights',
-          content: "The Platform and its entire contents are owned by Earth Intelligence Platform and are protected by copyright, trademark, patent, trade secret, and other intellectual property laws."
+          content: "The Platform and its entire contents are owned by Earth Observation Platform and are protected by copyright, trademark, patent, trade secret, and other intellectual property laws."
         },
         {
           id: 'payment-billing',
@@ -184,7 +184,7 @@ router.post('/seed', async (req, res) => {
         {
           id: 'limitation-liability',
           title: 'Limitation of Liability',
-          content: "TO THE MAXIMUM EXTENT PERMITTED BY LAW, IN NO EVENT SHALL EARTH INTELLIGENCE PLATFORM BE LIABLE FOR ANY INDIRECT, INCIDENTAL, SPECIAL, CONSEQUENTIAL, OR PUNITIVE DAMAGES."
+          content: "TO THE MAXIMUM EXTENT PERMITTED BY LAW, IN NO EVENT SHALL Earth Observation PLATFORM BE LIABLE FOR ANY INDIRECT, INCIDENTAL, SPECIAL, CONSEQUENTIAL, OR PUNITIVE DAMAGES."
         },
         {
           id: 'termination',

@@ -1,6 +1,6 @@
 @echo off
 echo ========================================
-echo Starting Earth Intelligence Platform
+echo Starting Earth Observation Platform
 echo ========================================
 echo.
 

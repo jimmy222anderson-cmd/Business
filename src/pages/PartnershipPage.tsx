@@ -83,7 +83,7 @@ const PartnershipPage = () => {
             transition={{ duration: 0.6, delay: 0.1 }}
             className="text-xl text-muted-foreground max-w-3xl mx-auto"
           >
-            Join our ecosystem of technology partners, data providers, and resellers to deliver cutting-edge Earth intelligence solutions.
+            Join our ecosystem of technology partners, data providers, and resellers to deliver cutting-edge space-based intelligence solutions.
           </motion.p>
         </div>
       </section>

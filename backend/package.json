@@ -1,7 +1,7 @@
 {
-  "name": "earth-intelligence-backend",
+  "name": "atlas-space-data-systems-backend",
   "version": "1.0.0",
-  "description": "Backend API for Earth Intelligence Platform",
+  "description": "Backend API for ATLAS Space & Data Systems Platform",
   "main": "server.js",
   "type": "commonjs",
   "scripts": {
@@ -14,7 +14,8 @@
     "test": "echo \"Error: no test specified\" && exit 1"
   },
   "keywords": [
-    "earth-intelligence",
+    "atlas",
+    "space-data",
     "satellite",
     "api"
   ],

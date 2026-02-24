@@ -1,8 +1,8 @@
-# Earth Intelligence Platform - Admin User Guide
+# Earth Observation Platform - Admin User Guide
 
 ## Overview
 
-This guide provides comprehensive instructions for administrators to manage the Earth Intelligence Platform backend. As an admin, you have access to manage demo bookings, contact inquiries, quote requests, users, and content.
+This guide provides comprehensive instructions for administrators to manage the Earth Observation Platform backend. As an admin, you have access to manage demo bookings, contact inquiries, quote requests, users, and content.
 
 ---
 

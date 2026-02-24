@@ -14,7 +14,7 @@
 ```bash
 curl http://localhost:3000/api/health
 ```
-**Expected**: `{"status":"ok","message":"Earth Intelligence Platform API is running"}`
+**Expected**: `{"status":"ok","message":"Earth Observation Platform API is running"}`
 
 ---
 

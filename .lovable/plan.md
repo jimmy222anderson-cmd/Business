@@ -1,6 +1,6 @@
 
 
-# Earth Intelligence Platform — Full Website
+# Earth Observation Platform — Full Website
 
 ## Phase 1: Foundation & Homepage
 Build the core layout and stunning homepage with smooth animations.
@@ -14,7 +14,7 @@ Build the core layout and stunning homepage with smooth animations.
 ### Hero Section
 - Full-screen dark background with satellite imagery/animation
 - Coordinates overlay text with typing animation
-- Large heading "Earth Intelligence Platform" with fade-in
+- Large heading "Earth Observation Platform" with fade-in
 - CTA button with hover effects
 - Animated satellite detection boxes floating over the imagery
 

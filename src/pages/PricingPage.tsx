@@ -56,7 +56,7 @@ const PricingPage = () => {
             className="text-4xl sm:text-5xl lg:text-6xl font-bold mb-6"
           >
             Transparent Pricing for
-            <span className="text-primary"> Earth Intelligence</span>
+            <span className="text-primary"> Space-Based Intelligence</span>
           </motion.h1>
           <motion.p
             initial="hidden"

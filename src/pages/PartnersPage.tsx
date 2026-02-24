@@ -169,7 +169,7 @@ export default function PartnersPage() {
             </h1>
             <p className="text-lg md:text-xl text-muted-foreground">
               We collaborate with leading satellite providers, data sources, and technology
-              companies to deliver comprehensive earth intelligence solutions. Our partner
+              companies to deliver comprehensive space-based intelligence solutions. Our partner
               network ensures you have access to the best data and tools available.
             </p>
           </motion.div>

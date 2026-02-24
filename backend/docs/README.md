@@ -1,6 +1,6 @@
-# Earth Intelligence Platform - Backend Documentation
+# Earth Observation Platform - Backend Documentation
 
-Welcome to the Earth Intelligence Platform backend documentation. This directory contains comprehensive guides for developers, administrators, and DevOps teams.
+Welcome to the Earth Observation Platform backend documentation. This directory contains comprehensive guides for developers, administrators, and DevOps teams.
 
 ## Documentation Index
 
