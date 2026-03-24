@@ -10,6 +10,7 @@
     "seed:content": "node seeds/content.js",
     "seed:admins": "node seeds/adminUsers.js",
     "seed:satellites": "node seeds/satelliteProducts.js",
+    "db:indexes": "node scripts/create-indexes.js",
     "test:email": "node scripts/test-email.js",
     "test": "jest --testTimeout=30000 --forceExit",
     "test:integration": "jest tests/integration.test.js --testTimeout=30000 --forceExit"

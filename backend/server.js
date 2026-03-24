@@ -14,6 +14,18 @@ dns.setServers(['8.8.8.8', '8.8.4.4', '1.1.1.1', '1.0.0.1']);
 
 const app = express();
 
+const crypto = require('crypto');
+app.use((req, res, next) => {
+  const id = crypto.randomUUID();
+  res.setHeader('X-Request-Id', id);
+  const start = process.hrtime.bigint();
+  res.on('finish', () => {
+    const ms = Number(process.hrtime.bigint() - start) / 1e6;
+    console.log(`${req.method} ${req.originalUrl} ${res.statusCode} ${ms.toFixed(1)}ms id=${id}`);
+  });
+  next();
+});
+
 // Connect to MongoDB (skip in test environment - tests manage their own connection)
 if (process.env.NODE_ENV !== 'test') {
   connectDB();
@@ -58,8 +70,8 @@ const corsOptions = {
       process.env.FRONTEND_URL || 'http://localhost:5173',
       'http://localhost:5173',
       'http://localhost:3000',
-      'http://localhost:8003',  // Lovable frontend
-      'http://localhost:8081',  // Lovable frontend (actual port)
+      'http://localhost:8003', 
+      'http://localhost:8081', 
       'http://127.0.0.1:5173',
       'http://127.0.0.1:8003',
       'http://127.0.0.1:8081'

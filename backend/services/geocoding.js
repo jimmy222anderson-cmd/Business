@@ -13,10 +13,15 @@ class GeocodingService {
         enabled: true,
         priority: 1
       },
+      photon: {
+        name: 'Photon (Komoot)',
+        enabled: true,
+        priority: 2
+      },
       mapbox: {
         name: 'Mapbox',
         enabled: !!process.env.MAPBOX_ACCESS_TOKEN,
-        priority: 2,
+        priority: 3,
         token: process.env.MAPBOX_ACCESS_TOKEN
       }
     };
@@ -114,7 +119,8 @@ class GeocodingService {
         q: query,
         format: 'json',
         addressdetails: 1,
-        limit: 10
+        limit: 10,
+        'accept-language': 'en'
       },
       headers: {
         'User-Agent': 'EarthIntelligencePlatform/1.0'
@@ -137,6 +143,86 @@ class GeocodingService {
   }
 
   /**
+   * Photon (Komoot) forward geocoding
+   * Useful for partial queries/autocomplete, English only
+   */
+  async geocodePhoton(query) {
+    const response = await axios.get('https://photon.komoot.io/api/', {
+      params: {
+        q: query,
+        limit: 10,
+        lang: 'en'
+      },
+      timeout: 5000
+    });
+
+    const features = response.data.features || [];
+    return features.map(f => {
+      const props = f.properties || {};
+      const parts = [
+        props.name,
+        props.city || props.town || props.village,
+        props.state,
+        props.country
+      ].filter(Boolean);
+      const label = Array.from(new Set(parts)).join(', ');
+
+      const coords = (f.geometry && f.geometry.coordinates) || [0, 0];
+      // Photon sometimes provides 'extent' as [west, south, east, north]
+      const extent = props.extent && Array.isArray(props.extent) && props.extent.length === 4
+        ? props.extent
+        : undefined;
+
+      return {
+        name: label || props.name || query,
+        lat: coords[1],
+        lng: coords[0],
+        bbox: extent,
+        provider: 'photon'
+      };
+    });
+  }
+
+  /**
+   * Photon autocomplete (same as geocode with smaller limit)
+   */
+  async autocompletePhoton(query) {
+    const response = await axios.get('https://photon.komoot.io/api/', {
+      params: {
+        q: query,
+        limit: 5,
+        lang: 'en'
+      },
+      timeout: 5000
+    });
+
+    const features = response.data.features || [];
+    return features.map(f => {
+      const props = f.properties || {};
+      const parts = [
+        props.name,
+        props.city || props.town || props.village,
+        props.state,
+        props.country
+      ].filter(Boolean);
+      const label = Array.from(new Set(parts)).join(', ');
+
+      const coords = (f.geometry && f.geometry.coordinates) || [0, 0];
+      const extent = props.extent && Array.isArray(props.extent) && props.extent.length === 4
+        ? props.extent
+        : undefined;
+
+      return {
+        name: label || props.name || query,
+        lat: coords[1],
+        lng: coords[0],
+        bbox: extent,
+        provider: 'photon'
+      };
+    });
+  }
+
+  /**
    * Nominatim reverse geocoding
    */
   async reverseGeocodeNominatim(lat, lng) {
@@ -145,7 +231,8 @@ class GeocodingService {
         lat,
         lon: lng,
         format: 'json',
-        addressdetails: 1
+        addressdetails: 1,
+        'accept-language': 'en'
       },
       headers: {
         'User-Agent': 'EarthIntelligencePlatform/1.0'
@@ -187,7 +274,8 @@ class GeocodingService {
       {
         params: {
           access_token: this.providers.mapbox.token,
-          limit: 10
+          limit: 10,
+          language: 'en'
         },
         timeout: 5000
       }
@@ -214,7 +302,8 @@ class GeocodingService {
       `https://api.mapbox.com/geocoding/v5/mapbox.places/${lng},${lat}.json`,
       {
         params: {
-          access_token: this.providers.mapbox.token
+          access_token: this.providers.mapbox.token,
+          language: 'en'
         },
         timeout: 5000
       }
@@ -248,7 +337,8 @@ class GeocodingService {
         params: {
           access_token: this.providers.mapbox.token,
           limit: 5,
-          autocomplete: true
+          autocomplete: true,
+          language: 'en'
         },
         timeout: 5000
       }
