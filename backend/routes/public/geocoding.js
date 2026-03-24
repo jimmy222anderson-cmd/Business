@@ -1,14 +1,15 @@
 const express = require('express');
 const router = express.Router();
-const axios = require('axios');
+const geocodingService = require('../../services/geocoding');
 
 /**
  * POST /api/public/geocode
- * Geocode a location search query using Nominatim (OpenStreetMap)
+ * Geocode a location search query
+ * Supports both forward geocoding (name -> coordinates) and reverse geocoding (coordinates -> name)
  */
 router.post('/geocode', async (req, res) => {
   try {
-    const { query } = req.body;
+    const { query, provider } = req.body;
 
     if (!query || typeof query !== 'string' || query.trim().length === 0) {
       return res.status(400).json({ 
@@ -32,74 +33,97 @@ router.post('/geocode', async (req, res) => {
         });
       }
 
-      // Reverse geocode to get place name
-      const reverseResponse = await axios.get('https://nominatim.openstreetmap.org/reverse', {
-        params: {
-          lat,
-          lon: lng,
-          format: 'json',
-          addressdetails: 1
-        },
-        headers: {
-          'User-Agent': 'EarthIntelligencePlatform/1.0'
-        }
-      });
-
-      const result = {
-        name: reverseResponse.data.display_name || `${lat}, ${lng}`,
-        lat,
-        lng,
-        bbox: reverseResponse.data.boundingbox ? [
-          parseFloat(reverseResponse.data.boundingbox[2]), // west
-          parseFloat(reverseResponse.data.boundingbox[0]), // south
-          parseFloat(reverseResponse.data.boundingbox[3]), // east
-          parseFloat(reverseResponse.data.boundingbox[1])  // north
-        ] : undefined
-      };
+      const result = await geocodingService.reverseGeocode(lat, lng, provider);
+      
+      if (!result) {
+        return res.status(404).json({ 
+          error: 'Location not found',
+          results: []
+        });
+      }
 
       return res.json({ results: [result] });
     }
 
-    // Regular location search using Nominatim
-    const response = await axios.get('https://nominatim.openstreetmap.org/search', {
-      params: {
-        q: query,
-        format: 'json',
-        addressdetails: 1,
-        limit: 10
-      },
-      headers: {
-        'User-Agent': 'EarthIntelligencePlatform/1.0'
-      }
-    });
-
-    // Transform Nominatim results to our format
-    const results = response.data.map(item => ({
-      name: item.display_name,
-      lat: parseFloat(item.lat),
-      lng: parseFloat(item.lon),
-      bbox: item.boundingbox ? [
-        parseFloat(item.boundingbox[2]), // west
-        parseFloat(item.boundingbox[0]), // south
-        parseFloat(item.boundingbox[3]), // east
-        parseFloat(item.boundingbox[1])  // north
-      ] : undefined
-    }));
-
+    // Regular location search (forward geocoding)
+    const results = await geocodingService.geocode(query, provider);
     res.json({ results });
   } catch (error) {
     console.error('Geocoding error:', error.message);
     
-    if (error.response) {
-      // Nominatim API error
-      return res.status(error.response.status).json({ 
-        error: 'Geocoding service error',
-        message: error.response.data?.error || 'Failed to geocode location'
+    res.status(500).json({ 
+      error: 'Failed to geocode location',
+      message: process.env.NODE_ENV === 'development' ? error.message : undefined
+    });
+  }
+});
+
+/**
+ * POST /api/public/geocode/reverse
+ * Reverse geocoding - convert coordinates to place name
+ */
+router.post('/reverse', async (req, res) => {
+  try {
+    const { lat, lng, provider } = req.body;
+
+    if (typeof lat !== 'number' || typeof lng !== 'number') {
+      return res.status(400).json({ 
+        error: 'Latitude and longitude must be numbers' 
       });
     }
 
+    // Validate coordinate ranges
+    if (lat < -90 || lat > 90 || lng < -180 || lng > 180) {
+      return res.status(400).json({ 
+        error: 'Invalid coordinates. Latitude must be between -90 and 90, longitude between -180 and 180' 
+      });
+    }
+
+    const result = await geocodingService.reverseGeocode(lat, lng, provider);
+    
+    if (!result) {
+      return res.status(404).json({ 
+        error: 'Location not found'
+      });
+    }
+
+    res.json(result);
+  } catch (error) {
+    console.error('Reverse geocoding error:', error.message);
+    
     res.status(500).json({ 
-      error: 'Failed to geocode location',
+      error: 'Failed to reverse geocode location',
+      message: process.env.NODE_ENV === 'development' ? error.message : undefined
+    });
+  }
+});
+
+/**
+ * POST /api/public/geocode/autocomplete
+ * Get autocomplete suggestions for location search
+ */
+router.post('/autocomplete', async (req, res) => {
+  try {
+    const { query, provider } = req.body;
+
+    if (!query || typeof query !== 'string' || query.trim().length === 0) {
+      return res.status(400).json({ 
+        error: 'Query parameter is required and must be a non-empty string' 
+      });
+    }
+
+    // Require at least 2 characters for autocomplete
+    if (query.trim().length < 2) {
+      return res.json({ suggestions: [] });
+    }
+
+    const suggestions = await geocodingService.autocomplete(query, provider);
+    res.json({ suggestions });
+  } catch (error) {
+    console.error('Autocomplete error:', error.message);
+    
+    res.status(500).json({ 
+      error: 'Failed to get autocomplete suggestions',
       message: process.env.NODE_ENV === 'development' ? error.message : undefined
     });
   }

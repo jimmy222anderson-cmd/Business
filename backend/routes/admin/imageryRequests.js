@@ -166,6 +166,18 @@ router.get('/export', requireAuth, requireAdmin, async (req, res) => {
       .select('-__v')
       .lean();
 
+    // Determine maximum number of vertices across all requests
+    let maxVertices = 0;
+    requests.forEach(request => {
+      if (request.aoi_coordinates?.coordinates?.[0]) {
+        // Subtract 1 to exclude the closing coordinate
+        const vertexCount = request.aoi_coordinates.coordinates[0].length - 1;
+        if (vertexCount > maxVertices) {
+          maxVertices = vertexCount;
+        }
+      }
+    });
+
     // Generate CSV content
     const csvRows = [];
     
@@ -181,7 +193,17 @@ router.get('/export', requireAuth, requireAdmin, async (req, res) => {
       'AOI Type',
       'AOI Area (km²)',
       'AOI Center Lat',
-      'AOI Center Lng',
+      'AOI Center Lng'
+    ];
+
+    // Add vertex coordinate headers dynamically
+    for (let i = 1; i <= maxVertices; i++) {
+      headers.push(`Vertex ${i} Lat`);
+      headers.push(`Vertex ${i} Lng`);
+    }
+
+    // Add remaining headers
+    headers.push(
       'Date Range Start',
       'Date Range End',
       'Resolution Categories',
@@ -197,7 +219,8 @@ router.get('/export', requireAuth, requireAdmin, async (req, res) => {
       'Updated At',
       'Reviewed At',
       'Reviewed By'
-    ];
+    );
+    
     csvRows.push(headers.join(','));
 
     // CSV Data Rows
@@ -211,9 +234,28 @@ router.get('/export', requireAuth, requireAdmin, async (req, res) => {
         escapeCsvValue(request.company || ''),
         escapeCsvValue(request.phone || ''),
         request.aoi_type,
-        request.aoi_area_km2,
-        request.aoi_center.lat,
-        request.aoi_center.lng,
+        request.aoi_area_km2.toFixed(2),
+        request.aoi_center.lat.toFixed(4),
+        request.aoi_center.lng.toFixed(4)
+      ];
+
+      // Add vertex coordinates (excluding the closing coordinate)
+      const vertices = request.aoi_coordinates?.coordinates?.[0] || [];
+      const uniqueVertices = vertices.slice(0, -1); // Remove closing coordinate
+      
+      for (let i = 0; i < maxVertices; i++) {
+        if (i < uniqueVertices.length) {
+          const coord = uniqueVertices[i];
+          row.push(coord[1].toFixed(4)); // Latitude
+          row.push(coord[0].toFixed(4)); // Longitude
+        } else {
+          row.push(''); // Empty if this request has fewer vertices
+          row.push('');
+        }
+      }
+
+      // Add remaining data
+      row.push(
         new Date(request.date_range.start_date).toISOString().split('T')[0],
         new Date(request.date_range.end_date).toISOString().split('T')[0],
         escapeCsvValue((request.filters?.resolution_category || []).join('; ')),
@@ -229,7 +271,8 @@ router.get('/export', requireAuth, requireAdmin, async (req, res) => {
         new Date(request.updated_at).toISOString(),
         request.reviewed_at ? new Date(request.reviewed_at).toISOString() : '',
         request.reviewed_by ? escapeCsvValue(request.reviewed_by.full_name || request.reviewed_by.email) : ''
-      ];
+      );
+      
       csvRows.push(row.join(','));
     });
 

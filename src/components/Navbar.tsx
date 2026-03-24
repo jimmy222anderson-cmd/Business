@@ -40,6 +40,7 @@ export const Navbar = () => {
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
   const [industries, setIndustries] = useState<Industry[]>([]);
   const [products, setProducts] = useState<Product[]>([]);
+  const [expandedProducts, setExpandedProducts] = useState<Set<string>>(new Set());
   const { user, isAuthenticated, signOut } = useAuth();
   const navigate = useNavigate();
 
@@ -101,6 +102,18 @@ export const Navbar = () => {
     return user.full_name[0].toUpperCase();
   };
 
+  const toggleProductExpansion = (productId: string) => {
+    setExpandedProducts(prev => {
+      const newSet = new Set(prev);
+      if (newSet.has(productId)) {
+        newSet.delete(productId);
+      } else {
+        newSet.add(productId);
+      }
+      return newSet;
+    });
+  };
+
   return (
     <nav
       className={`fixed top-0 left-0 right-0 z-50 transition-all duration-300 ${
@@ -117,6 +130,8 @@ export const Navbar = () => {
               src="/atlas-logo.png" 
               alt="ATLAS Space & Data Systems Logo" 
               className="h-16 md:h-16 w-auto flex-shrink-0"
+              loading="eager"
+              decoding="async"
               onError={(e) => {
                 // Fallback to SVG if image not found
                 e.currentTarget.style.display = 'none';
@@ -298,8 +313,8 @@ export const Navbar = () => {
                 )}
               </Button>
             </SheetTrigger>
-            <SheetContent side="right" className="w-[300px] sm:w-[400px]">
-              <nav className="flex flex-col space-y-6 mt-8">
+            <SheetContent side="right" className="w-[300px] sm:w-[400px] overflow-y-auto">
+              <nav className="flex flex-col space-y-6 mt-8 pb-8">
                 {/* Products - Mobile */}
                 <div className="space-y-3">
                   <div className="text-lg font-medium text-foreground">Products</div>
@@ -308,26 +323,38 @@ export const Navbar = () => {
                       <div key={product._id}>
                         {product.subProducts && product.subProducts.length > 0 ? (
                           <div className="space-y-2">
-                            <div className="font-medium text-foreground/90">{product.name}</div>
-                            <div className="pl-4 space-y-1">
-                              {product.subProducts.map((subProduct) => (
+                            <button
+                              onClick={() => toggleProductExpansion(product._id)}
+                              className="flex items-center justify-between w-full font-medium text-foreground/90 hover:text-primary transition-colors text-left"
+                            >
+                              <span>{product.name}</span>
+                              <ChevronRight 
+                                className={`h-4 w-4 transition-transform ${
+                                  expandedProducts.has(product._id) ? 'rotate-90' : ''
+                                }`}
+                              />
+                            </button>
+                            {expandedProducts.has(product._id) && (
+                              <div className="pl-4 space-y-1">
+                                {product.subProducts.map((subProduct) => (
+                                  <Link
+                                    key={subProduct._id}
+                                    to={`/products/${product.slug}/${subProduct.slug}`}
+                                    className="block text-sm text-foreground/70 hover:text-primary transition-colors"
+                                    onClick={() => setIsMobileMenuOpen(false)}
+                                  >
+                                    {subProduct.name}
+                                  </Link>
+                                ))}
                                 <Link
-                                  key={subProduct._id}
-                                  to={`/products/${product.slug}/${subProduct.slug}`}
-                                  className="block text-sm text-foreground/70 hover:text-primary transition-colors"
+                                  to={`/products/${product.slug}`}
+                                  className="block text-sm text-primary font-semibold hover:text-primary/80 transition-colors pt-1"
                                   onClick={() => setIsMobileMenuOpen(false)}
                                 >
-                                  {subProduct.name}
+                                  View All {product.name}
                                 </Link>
-                              ))}
-                              <Link
-                                to={`/products/${product.slug}`}
-                                className="block text-sm text-primary font-semibold hover:text-primary/80 transition-colors pt-1"
-                                onClick={() => setIsMobileMenuOpen(false)}
-                              >
-                                View All {product.name}
-                              </Link>
-                            </div>
+                              </div>
+                            )}
                           </div>
                         ) : (
                           <Link

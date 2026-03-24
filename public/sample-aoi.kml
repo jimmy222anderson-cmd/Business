@@ -1,0 +1,23 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<kml xmlns="http://www.opengis.net/kml/2.2">
+  <Document>
+    <name>Sample AOI</name>
+    <Placemark>
+      <name>San Francisco Bay Area</name>
+      <description>Sample area of interest for testing (2D coordinates)</description>
+      <Polygon>
+        <outerBoundaryIs>
+          <LinearRing>
+            <coordinates>
+              -122.4,37.8
+              -122.4,37.7
+              -122.3,37.7
+              -122.3,37.8
+              -122.4,37.8
+            </coordinates>
+          </LinearRing>
+        </outerBoundaryIs>
+      </Polygon>
+    </Placemark>
+  </Document>
+</kml>

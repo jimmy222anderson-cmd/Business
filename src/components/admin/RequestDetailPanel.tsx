@@ -267,6 +267,24 @@ export function RequestDetailPanel({ request, onUpdate }: RequestDetailPanelProp
             </div>
           </div>
 
+          {/* Vertex Coordinates for Polygons/Rectangles */}
+          {(request.aoi_type === 'polygon' || request.aoi_type === 'rectangle') && 
+           request.aoi_coordinates?.coordinates?.[0] && (
+            <div className="mt-4">
+              <Label className="text-xs text-slate-500 mb-2 block">Vertex Coordinates</Label>
+              <div className="max-h-[200px] overflow-y-auto bg-slate-1000 dark:bg-slate-900 rounded-lg p-3 space-y-1">
+                {request.aoi_coordinates.coordinates[0].slice(0, -1).map((coord: number[], index: number) => (
+                  <div key={index} className="text-sm font-mono">
+                    <span className="text-slate-500">Vertex {index + 1}:</span>{' '}
+                    <span className="font-medium">
+                      {coord[1].toFixed(4)}, {coord[0].toFixed(4)}
+                    </span>
+                  </div>
+                ))}
+              </div>
+            </div>
+          )}
+
           {/* Interactive Map */}
           <div className="mt-4">
             <Label className="text-xs text-slate-500 mb-2 block">Map View</Label>

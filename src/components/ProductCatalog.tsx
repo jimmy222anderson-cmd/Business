@@ -11,6 +11,7 @@ import {
 import { useToast } from '@/hooks/use-toast';
 import { FilterState } from '@/components/FilterPanel';
 import { ProductGridSkeleton } from '@/components/ProductSkeleton';
+import { cn } from '@/lib/utils';
 
 interface ProductCatalogProps {
   filterState?: FilterState | null;
@@ -177,18 +178,18 @@ export function ProductCatalog({ filterState, className }: ProductCatalogProps) 
 
   return (
     <div className={className}>
-      {/* Controls bar */}
-      <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 mb-6">
+      {/* Controls bar - Mobile optimized */}
+      <div className="flex flex-col gap-3 mb-6">
         {/* Results count */}
         <p className="text-sm text-muted-foreground">
           Showing {products.length} of {total} products
         </p>
 
-        {/* Sort and page size controls */}
-        <div className="flex items-center gap-4">
+        {/* Sort and page size controls - Stacked on mobile */}
+        <div className="flex flex-col sm:flex-row items-stretch sm:items-center gap-3 sm:gap-4">
           {/* Sort dropdown */}
-          <div className="flex items-center gap-2">
-            <label htmlFor="sort" className="text-sm text-muted-foreground">
+          <div className="flex items-center gap-2 flex-1">
+            <label htmlFor="sort" className="text-sm text-muted-foreground whitespace-nowrap">
               Sort by:
             </label>
             <select
@@ -200,7 +201,7 @@ export function ProductCatalog({ filterState, className }: ProductCatalogProps) 
                 setSortOrder(order as 'asc' | 'desc');
                 setPage(1); // Reset to first page
               }}
-              className="text-sm border border-input bg-background px-3 py-1.5 rounded-md focus:outline-none focus:ring-2 focus:ring-yellow-500"
+              className="flex-1 text-sm border border-input bg-background px-3 py-2 rounded-md focus:outline-none focus:ring-2 focus:ring-yellow-500 min-h-[44px]"
             >
               <option value="order-asc">Default</option>
               <option value="name-asc">Name (A-Z)</option>
@@ -213,8 +214,8 @@ export function ProductCatalog({ filterState, className }: ProductCatalogProps) 
           </div>
 
           {/* Page size selector */}
-          <div className="flex items-center gap-2">
-            <label htmlFor="pageSize" className="text-sm text-muted-foreground">
+          <div className="flex items-center gap-2 flex-1 sm:flex-initial">
+            <label htmlFor="pageSize" className="text-sm text-muted-foreground whitespace-nowrap">
               Per page:
             </label>
             <select
@@ -224,7 +225,7 @@ export function ProductCatalog({ filterState, className }: ProductCatalogProps) 
                 setLimit(Number(e.target.value));
                 setPage(1); // Reset to first page
               }}
-              className="text-sm border border-input bg-background px-3 py-1.5 rounded-md focus:outline-none focus:ring-2 focus:ring-yellow-500"
+              className="flex-1 sm:flex-initial text-sm border border-input bg-background px-3 py-2 rounded-md focus:outline-none focus:ring-2 focus:ring-yellow-500 min-h-[44px]"
             >
               <option value="20">20</option>
               <option value="50">50</option>
@@ -234,9 +235,9 @@ export function ProductCatalog({ filterState, className }: ProductCatalogProps) 
         </div>
       </div>
 
-      {/* Product grid */}
+      {/* Product grid - Mobile optimized with single column on small screens */}
       <motion.div 
-        className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6 mb-8"
+        className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4 sm:gap-6 mb-8"
         initial={{ opacity: 0 }}
         animate={{ opacity: 1 }}
         transition={{ duration: 0.3 }}
@@ -248,13 +249,15 @@ export function ProductCatalog({ filterState, className }: ProductCatalogProps) 
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.3, delay: index * 0.05 }}
           >
-            <Card className="p-4 hover:shadow-lg transition-shadow duration-200">
-              <div className="space-y-3">
+            <Card className="p-3 sm:p-4 hover:shadow-lg transition-shadow duration-200 touch-manipulation">
+              <div className="space-y-2 sm:space-y-3">
                 {/* Sample image */}
                 <div className="aspect-video bg-slate-100 dark:bg-slate-800 rounded-md overflow-hidden">
                   <img
                     src={product.sample_image_url}
                     alt={product.name}
+                    loading="lazy"
+                    decoding="async"
                     className="w-full h-full object-cover transition-transform duration-300 hover:scale-105"
                     onError={(e) => {
                       const target = e.target as HTMLImageElement;
@@ -265,7 +268,7 @@ export function ProductCatalog({ filterState, className }: ProductCatalogProps) 
 
                 {/* Product info */}
                 <div>
-                  <h3 className="font-semibold text-sm line-clamp-1">{product.name}</h3>
+                  <h3 className="font-semibold text-sm sm:text-base line-clamp-1">{product.name}</h3>
                   <p className="text-xs text-muted-foreground line-clamp-1">{product.provider}</p>
                 </div>
 
@@ -279,11 +282,11 @@ export function ProductCatalog({ filterState, className }: ProductCatalogProps) 
                   </span>
                 </div>
 
-                {/* View details button */}
+                {/* View details button - Touch optimized */}
                 <Button
                   variant="outline"
                   size="sm"
-                  className="w-full"
+                  className="w-full min-h-[44px] touch-manipulation"
                   onClick={() => {
                     // TODO: Open product detail modal
                     console.log('View details:', product._id);
@@ -297,54 +300,67 @@ export function ProductCatalog({ filterState, className }: ProductCatalogProps) 
         ))}
       </motion.div>
 
-      {/* Pagination controls */}
+      {/* Pagination controls - Mobile optimized */}
       {totalPages > 1 && (
-        <div className="flex items-center justify-center gap-2">
-          <Button
-            variant="outline"
-            size="sm"
-            onClick={() => handlePageChange(page - 1)}
-            disabled={page === 1}
-          >
-            Previous
-          </Button>
-
-          <div className="flex items-center gap-1">
-            {Array.from({ length: Math.min(totalPages, 5) }, (_, i) => {
-              let pageNum: number;
-              
-              if (totalPages <= 5) {
-                pageNum = i + 1;
-              } else if (page <= 3) {
-                pageNum = i + 1;
-              } else if (page >= totalPages - 2) {
-                pageNum = totalPages - 4 + i;
-              } else {
-                pageNum = page - 2 + i;
-              }
-
-              return (
-                <Button
-                  key={pageNum}
-                  variant={page === pageNum ? 'default' : 'outline'}
-                  size="sm"
-                  onClick={() => handlePageChange(pageNum)}
-                  className={page === pageNum ? 'bg-yellow-500 hover:bg-yellow-600 text-slate-900' : ''}
-                >
-                  {pageNum}
-                </Button>
-              );
-            })}
+        <div className="flex flex-col sm:flex-row items-center justify-center gap-3 sm:gap-2">
+          {/* Mobile: Show page info */}
+          <div className="text-sm text-muted-foreground sm:hidden">
+            Page {page} of {totalPages}
           </div>
+          
+          <div className="flex items-center gap-2 w-full sm:w-auto">
+            <Button
+              variant="outline"
+              size="sm"
+              onClick={() => handlePageChange(page - 1)}
+              disabled={page === 1}
+              className="flex-1 sm:flex-initial min-h-[44px] touch-manipulation"
+            >
+              Previous
+            </Button>
 
-          <Button
-            variant="outline"
-            size="sm"
-            onClick={() => handlePageChange(page + 1)}
-            disabled={page === totalPages}
-          >
-            Next
-          </Button>
+            {/* Desktop: Show page numbers */}
+            <div className="hidden sm:flex items-center gap-1">
+              {Array.from({ length: Math.min(totalPages, 5) }, (_, i) => {
+                let pageNum: number;
+                
+                if (totalPages <= 5) {
+                  pageNum = i + 1;
+                } else if (page <= 3) {
+                  pageNum = i + 1;
+                } else if (page >= totalPages - 2) {
+                  pageNum = totalPages - 4 + i;
+                } else {
+                  pageNum = page - 2 + i;
+                }
+
+                return (
+                  <Button
+                    key={pageNum}
+                    variant={page === pageNum ? 'default' : 'outline'}
+                    size="sm"
+                    onClick={() => handlePageChange(pageNum)}
+                    className={cn(
+                      'min-h-[44px] min-w-[44px] touch-manipulation',
+                      page === pageNum ? 'bg-yellow-500 hover:bg-yellow-600 text-slate-900' : ''
+                    )}
+                  >
+                    {pageNum}
+                  </Button>
+                );
+              })}
+            </div>
+
+            <Button
+              variant="outline"
+              size="sm"
+              onClick={() => handlePageChange(page + 1)}
+              disabled={page === totalPages}
+              className="flex-1 sm:flex-initial min-h-[44px] touch-manipulation"
+            >
+              Next
+            </Button>
+          </div>
         </div>
       )}
     </div>

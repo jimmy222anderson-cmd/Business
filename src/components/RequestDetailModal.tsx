@@ -1,5 +1,5 @@
 import { MapPin, Calendar, Clock, User, Mail, Building2, Phone, FileText, DollarSign, Filter, CheckCircle2, XCircle, Copy } from 'lucide-react';
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useRef } from 'react';
 import { useNavigate } from 'react-router-dom';
 import {
   Dialog,
@@ -17,6 +17,8 @@ import { Label } from '@/components/ui/label';
 import { ImageryRequest, cancelImageryRequest } from '@/lib/api/imageryRequests';
 import { useToast } from '@/hooks/use-toast';
 import { format } from 'date-fns';
+import L from 'leaflet';
+import 'leaflet/dist/leaflet.css';
 
 interface RequestDetailModalProps {
   open: boolean;
@@ -69,11 +71,88 @@ export function RequestDetailModal({ open, onOpenChange, request, onRequestUpdat
   const [showCancelDialog, setShowCancelDialog] = useState(false);
   const [cancellationReason, setCancellationReason] = useState('');
   const [isCancelling, setIsCancelling] = useState(false);
+  const mapRef = useRef<L.Map | null>(null);
+  const containerRef = useRef<HTMLDivElement>(null);
 
   // Debug: Log when showCancelDialog changes
   useEffect(() => {
     console.log('showCancelDialog changed to:', showCancelDialog);
   }, [showCancelDialog]);
+
+  // Initialize map — use ResizeObserver so we init exactly when the container
+  // gets real dimensions (after the dialog animation), not on a fragile timeout
+  useEffect(() => {
+    if (!open || !request) return;
+
+    // Destroy any previous map instance when the modal closes/request changes
+    return () => {
+      if (mapRef.current) {
+        mapRef.current.remove();
+        mapRef.current = null;
+      }
+    };
+  }, [open, request]);
+
+  useEffect(() => {
+    if (!open || !request || !containerRef.current) return;
+
+    const container = containerRef.current;
+
+    const initMap = () => {
+      if (mapRef.current) return; // already initialised
+
+      try {
+        const map = L.map(container, {
+          center: [request.aoi_center.lat, request.aoi_center.lng],
+          zoom: 10,
+          zoomControl: true,
+        });
+
+        mapRef.current = map;
+
+        L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+          attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors',
+          maxZoom: 19,
+        }).addTo(map);
+
+        if (request.aoi_coordinates?.coordinates?.[0]) {
+          const coords: [number, number][] = request.aoi_coordinates.coordinates[0].map(
+            (coord: number[]) => [coord[1], coord[0]] as [number, number]
+          );
+
+          const polygon = L.polygon(coords, {
+            color: '#EAB308',
+            fillColor: '#EAB308',
+            fillOpacity: 0.3,
+            weight: 2,
+          }).addTo(map);
+
+          map.invalidateSize();
+          map.fitBounds(polygon.getBounds(), { padding: [50, 50] });
+        }
+      } catch (error) {
+        console.error('Error rendering AOI on map:', error);
+      }
+    };
+
+    // If the container already has dimensions, init immediately.
+    // Otherwise wait for ResizeObserver to fire once it gets a real size.
+    if (container.offsetWidth > 0 && container.offsetHeight > 0) {
+      initMap();
+    } else {
+      const ro = new ResizeObserver((entries) => {
+        for (const entry of entries) {
+          if (entry.contentRect.width > 0 && entry.contentRect.height > 0) {
+            ro.disconnect();
+            initMap();
+            break;
+          }
+        }
+      });
+      ro.observe(container);
+      return () => ro.disconnect();
+    }
+  }, [open, request]);
 
   if (!request) return null;
 
@@ -166,7 +245,8 @@ export function RequestDetailModal({ open, onOpenChange, request, onRequestUpdat
   return (
     <>
       <Dialog open={open} onOpenChange={onOpenChange}>
-        <DialogContent className="max-w-3xl max-h-[90vh] overflow-y-auto">
+        <DialogContent className="max-w-3xl max-h-[90vh]">
+          <div className="overflow-y-auto max-h-[calc(90vh-4rem)] pr-1">
           <DialogHeader>
             <DialogTitle>Imagery Request Details</DialogTitle>
             <DialogDescription>
@@ -319,6 +399,34 @@ export function RequestDetailModal({ open, onOpenChange, request, onRequestUpdat
                     {request.aoi_center.lat.toFixed(4)}, {request.aoi_center.lng.toFixed(4)}
                   </p>
                 </div>
+              </div>
+
+              {/* Vertex Coordinates for Polygons/Rectangles */}
+              {(request.aoi_type === 'polygon' || request.aoi_type === 'rectangle') && 
+               request.aoi_coordinates?.coordinates?.[0] && (
+                <div className="mt-4">
+                  <p className="text-xs text-slate-500 mb-2">Vertex Coordinates</p>
+                  <div className="max-h-[200px] overflow-y-auto bg-slate-1000 dark:bg-slate-900 rounded-lg p-3 space-y-1">
+                    {request.aoi_coordinates.coordinates[0].slice(0, -1).map((coord: number[], index: number) => (
+                      <div key={index} className="text-sm font-mono">
+                        <span className="text-slate-500">Vertex {index + 1}:</span>{' '}
+                        <span className="font-medium">
+                          {coord[1].toFixed(4)}, {coord[0].toFixed(4)}
+                        </span>
+                      </div>
+                    ))}
+                  </div>
+                </div>
+              )}
+
+              {/* Interactive Map */}
+              <div className="mt-4">
+                <p className="text-xs text-slate-500 mb-2">Map View</p>
+                <div
+                  ref={containerRef}
+                  className="w-full rounded-lg border border-slate-200 dark:border-slate-800"
+                  style={{ height: '300px', minHeight: '300px', position: 'relative', zIndex: 0 }}
+                />
               </div>
             </Card>
           </div>
@@ -481,6 +589,7 @@ export function RequestDetailModal({ open, onOpenChange, request, onRequestUpdat
             </Button>
           )}
         </DialogFooter>
+          </div>
       </DialogContent>
     </Dialog>
 

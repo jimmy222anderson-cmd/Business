@@ -244,6 +244,10 @@ imageryRequestSchema.index({ status: 1, created_at: -1 });
 imageryRequestSchema.index({ created_at: -1 });
 imageryRequestSchema.index({ email: 1 });
 
+// Additional compound indexes for admin queries
+imageryRequestSchema.index({ status: 1, urgency: 1, created_at: -1 });
+imageryRequestSchema.index({ user_id: 1, status: 1, created_at: -1 });
+
 // Index for geospatial queries (optional, for future use)
 imageryRequestSchema.index({ 'aoi_coordinates': '2dsphere' });
 

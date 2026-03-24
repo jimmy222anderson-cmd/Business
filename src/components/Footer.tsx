@@ -41,7 +41,7 @@ export const Footer = () => {
         <div className="grid grid-cols-1 md:grid-cols-5 gap-8 lg:gap-12 mb-12">
           <div className="md:col-span-2 space-y-2">
             <Link to="/" className="inline-block">
-              <img src="/atlas-logo.png" alt="ATLAS Space & Data Systems Logo" className="h-40 md:h-40 w-auto" />
+              <img src="/atlas-logo.png" alt="ATLAS Space & Data Systems Logo" className="h-40 md:h-40 w-auto" loading="lazy" decoding="async" />
             </Link>
             <p className="text-sm text-slate-400 max-w-sm leading-relaxed -mt-16">Empowering decisions with satellite data and space-based intelligence solutions.</p>
             <div className="flex space-x-4">

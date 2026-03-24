@@ -107,10 +107,22 @@ const satelliteProductSchema = new mongoose.Schema({
 });
 
 // Indexes for common queries
-satelliteProductSchema.index({ status: 1, order: 1 });
+// Compound index for the most common query pattern (status + filters + sort)
+satelliteProductSchema.index({ status: 1, resolution_category: 1, order: 1 });
+satelliteProductSchema.index({ status: 1, sensor_type: 1, order: 1 });
+satelliteProductSchema.index({ status: 1, availability: 1, order: 1 });
+
+// Single field indexes for individual filters
 satelliteProductSchema.index({ resolution_category: 1 });
 satelliteProductSchema.index({ sensor_type: 1 });
 satelliteProductSchema.index({ provider: 1 });
 satelliteProductSchema.index({ availability: 1 });
+
+// Index for sorting by resolution
+satelliteProductSchema.index({ status: 1, resolution: 1 });
+
+// Index for admin queries (all products)
+satelliteProductSchema.index({ created_at: -1 });
+satelliteProductSchema.index({ updated_at: -1 });
 
 module.exports = mongoose.model('SatelliteProduct', satelliteProductSchema);

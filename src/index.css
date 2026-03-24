@@ -502,3 +502,70 @@
     margin-top: -7px !important;
   }
 }
+
+/* Mobile-specific touch optimizations */
+.touch-manipulation {
+  touch-action: manipulation;
+  -webkit-tap-highlight-color: transparent;
+}
+
+/* Ensure minimum touch target size of 44x44px for accessibility */
+@media (max-width: 768px) {
+  button,
+  a,
+  input[type="button"],
+  input[type="submit"],
+  .clickable {
+    min-height: 44px;
+    min-width: 44px;
+  }
+  
+  /* Improve form input touch targets */
+  input[type="text"],
+  input[type="email"],
+  input[type="tel"],
+  input[type="number"],
+  input[type="password"],
+  select,
+  textarea {
+    min-height: 44px;
+    font-size: 16px; /* Prevents zoom on iOS */
+  }
+  
+  /* Improve checkbox and radio button touch targets */
+  input[type="checkbox"],
+  input[type="radio"] {
+    min-width: 24px;
+    min-height: 24px;
+  }
+  
+  /* Improve slider touch targets */
+  input[type="range"] {
+    min-height: 44px;
+  }
+}
+
+/* Prevent text selection on touch devices for UI elements */
+@media (hover: none) and (pointer: coarse) {
+  button,
+  .no-select {
+    -webkit-user-select: none;
+    -moz-user-select: none;
+    -ms-user-select: none;
+    user-select: none;
+  }
+}
+
+/* Smooth scrolling for mobile */
+@media (max-width: 768px) {
+  * {
+    -webkit-overflow-scrolling: touch;
+  }
+}
+
+/* Mobile bottom navigation safe area */
+@supports (padding-bottom: env(safe-area-inset-bottom)) {
+  .mobile-bottom-nav {
+    padding-bottom: calc(12px + env(safe-area-inset-bottom));
+  }
+}

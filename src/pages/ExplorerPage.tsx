@@ -2,15 +2,17 @@ import { useRef, useState, useCallback, useEffect } from 'react';
 import { useNavigate, useLocation } from 'react-router-dom';
 import { Helmet } from 'react-helmet-async';
 import L from 'leaflet';
-import { MapContainer } from '@/components/MapContainer';
+import { LazyMapContainer } from '@/components/MapContainer.lazy';
 import { SearchBar } from '@/components/SearchBar';
 import { FilterPanel, FilterState } from '@/components/FilterPanel';
 import { RequestForm, AOIData } from '@/components/forms/RequestForm';
 import { SaveAOIDialog } from '@/components/SaveAOIDialog';
 import { SavedAOIsList } from '@/components/SavedAOIsList';
+import { AOIFileUpload } from '@/components/AOIFileUpload';
+import { MobileBottomNav } from '@/components/MobileBottomNav';
 import { Button } from '@/components/ui/button';
 import { Card } from '@/components/ui/card';
-import { Send, MapPin, Layers, Calendar, Search as SearchIcon, ArrowLeft, Filter, Save, BookmarkIcon } from 'lucide-react';
+import { Send, MapPin, Layers, Calendar, Search as SearchIcon, ArrowLeft, Filter, Save, BookmarkIcon, Upload } from 'lucide-react';
 import { useAuth } from '@/contexts/AuthContext';
 import { SavedAOI } from '@/lib/api/savedAOIs';
 import {
@@ -80,6 +82,9 @@ export default function ExplorerPage() {
   // State to hold duplicated request data
   const [pendingDuplicateRequest, setPendingDuplicateRequest] = useState<any>(null);
   const [duplicateRequestData, setDuplicateRequestData] = useState<any>(null);
+  
+  // State to hold uploaded geometries
+  const [uploadedGeometries, setUploadedGeometries] = useState<any[] | null>(null);
 
   // Handle AOI loaded from navigation state (e.g., from dashboard)
   useEffect(() => {
@@ -232,6 +237,17 @@ export default function ExplorerPage() {
     setIsSavedAOIsSheetOpen(false);
   }, []);
 
+  // Handler: Uploaded Geometries
+  const handleGeometriesLoaded = useCallback((geometries: any[]) => {
+    setUploadedGeometries(geometries);
+  }, []);
+
+  // Handler: Clear AOI (when uploaded file is removed)
+  const handleClearAOI = useCallback(() => {
+    setCurrentAOI(null);
+    setUploadedGeometries(null);
+  }, []);
+
   // Process pending loaded AOI when map is ready
   useEffect(() => {
     if (pendingLoadedAOI && mapRef.current) {
@@ -308,6 +324,19 @@ export default function ExplorerPage() {
     }
   }, [pendingDuplicateRequest]);
 
+  // Calculate active filter count for mobile nav
+  const getActiveFilterCount = useCallback(() => {
+    if (!filterState) return 0;
+    let count = 0;
+    if (filterState.selectedResolutions?.length > 0) count++;
+    if (filterState.cloudCoverage !== undefined && filterState.cloudCoverage < 100) count++;
+    if (filterState.selectedProviders?.length > 0) count++;
+    if (filterState.selectedBands?.length > 0) count++;
+    if (filterState.imageType) count++;
+    if (filterState.dateRange?.startDate || filterState.dateRange?.endDate) count++;
+    return count;
+  }, [filterState]);
+
   return (
     <>
       <Helmet>
@@ -364,7 +393,7 @@ export default function ExplorerPage() {
       />
 
       {/* Left Sidebar Panel - Responsive */}
-      <div className="w-full md:w-80 lg:w-96 bg-slate-900 text-white flex flex-col shadow-2xl z-10 overflow-y-auto max-h-[40vh] md:max-h-none">
+      <div className="w-full md:w-80 lg:w-96 bg-slate-900 text-white flex flex-col shadow-2xl z-10 overflow-y-auto max-h-[40vh] md:max-h-none pb-20 md:pb-0">
         {/* Header */}
         <div className="p-4 md:p-6 border-b border-slate-700 flex-shrink-0 pt-16 md:pt-16">
           <div className="flex items-center justify-between mb-1 md:mb-2">
@@ -443,6 +472,23 @@ export default function ExplorerPage() {
                       {currentAOI.center.lat.toFixed(4)}, {currentAOI.center.lng.toFixed(4)}
                     </span>
                   </div>
+                  
+                  {/* Display vertex coordinates for polygon and rectangle AOIs */}
+                  {(currentAOI.type === 'polygon' || currentAOI.type === 'rectangle') && currentAOI.coordinates && currentAOI.coordinates[0] && (
+                    <div className="pt-2 border-t border-slate-700">
+                      <span className="text-xs text-slate-400 block mb-1.5">Vertices:</span>
+                      <div className="max-h-32 overflow-y-auto space-y-1 pr-1">
+                        {currentAOI.coordinates[0].slice(0, -1).map((coord: number[], index: number) => (
+                          <div key={index} className="flex justify-between items-center">
+                            <span className="text-xs text-slate-500">Vertex {index + 1}:</span>
+                            <span className="text-xs font-mono">
+                              {coord[1].toFixed(4)}, {coord[0].toFixed(4)}
+                            </span>
+                          </div>
+                        ))}
+                      </div>
+                    </div>
+                  )}
                 </div>
                 
                 {/* Save AOI Button - Only for authenticated users */}
@@ -495,6 +541,23 @@ export default function ExplorerPage() {
             )}
           </div>
 
+          {/* File Upload Section */}
+          <div className="p-3 md:p-6 border-b border-slate-700">
+            <div className="flex items-center gap-2 mb-2 md:mb-3">
+              <Upload className="h-4 w-4 text-slate-400" />
+              <h2 className="text-xs md:text-sm font-semibold text-slate-300">UPLOAD FILE</h2>
+            </div>
+            <p className="text-xs text-slate-400 mb-3 md:mb-4">
+              Upload a KML or GeoJSON file to define your area
+            </p>
+            
+            <AOIFileUpload 
+              onGeometriesLoaded={handleGeometriesLoaded}
+              onClearAOI={handleClearAOI}
+              currentAOI={currentAOI}
+            />
+          </div>
+
           {/* Data Type Section (Placeholder for future) - Hidden on mobile */}
           <div className="hidden md:block p-3 md:p-6 border-b border-slate-700">
             <div className="flex items-center gap-2 mb-2 md:mb-3">
@@ -531,8 +594,8 @@ export default function ExplorerPage() {
           </div>
         </div>
 
-        {/* Submit Button - Fixed at bottom */}
-        <div className="p-3 md:p-6 border-t border-slate-700 flex-shrink-0 bg-slate-900">
+        {/* Submit Button - Fixed at bottom - Hidden on mobile (using bottom nav instead) */}
+        <div className="hidden md:block p-3 md:p-6 border-t border-slate-700 flex-shrink-0 bg-slate-900">
           <Button
             size="lg"
             onClick={handleSubmitRequest}
@@ -550,9 +613,19 @@ export default function ExplorerPage() {
         </div>
       </div>
 
+      {/* Mobile Bottom Navigation - Only visible on mobile */}
+      <MobileBottomNav
+        onFilterClick={() => setIsFilterPanelOpen(true)}
+        onSavedAOIsClick={() => setIsSavedAOIsSheetOpen(true)}
+        onSubmitClick={handleSubmitRequest}
+        hasAOI={!!currentAOI}
+        filterCount={getActiveFilterCount()}
+        isAuthenticated={isAuthenticated}
+      />
+
       {/* Map Container */}
       <div className="flex-1 relative min-h-[60vh] md:min-h-0">
-        <MapContainer 
+        <LazyMapContainer 
           onMapReady={handleMapReady}
           onAOIChange={handleAOIChange}
           loadedAOI={currentAOI ? {
@@ -561,11 +634,12 @@ export default function ExplorerPage() {
             area: currentAOI.area,
             center: currentAOI.center,
           } : null}
+          uploadedGeometries={uploadedGeometries}
         />
         
         {/* Total Search Area Badge (top center) - Responsive */}
         {currentAOI && (
-          <div className="absolute top-4 left-1/2 -translate-x-1/2 z-[1000]">
+          <div className="absolute top-4 right-4 md:left-1/2 md:-translate-x-1/2 md:right-auto z-[1000]">
             <Card className="bg-slate-900/95 backdrop-blur-sm border-yellow-500/50 px-3 py-2 md:px-6 md:py-3 shadow-xl">
               <div className="text-center">
                 <p className="text-xs text-slate-400 mb-0.5 md:mb-1">Total Search Area</p>

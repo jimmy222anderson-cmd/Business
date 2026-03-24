@@ -143,7 +143,7 @@ export default function SatelliteProductForm({
   };
 
   return (
-    <form onSubmit={handleSubmit} className="space-y-6">
+    <form onSubmit={handleSubmit} aria-label="Satellite product form" className="space-y-6">
       {/* Basic Information */}
       <Card className="bg-gray-800 border-gray-700">
         <CardHeader>
@@ -204,7 +204,7 @@ export default function SatelliteProductForm({
                   setFormData({ ...formData, sensor_type: value })
                 }
               >
-                <SelectTrigger className="bg-gray-700 border-gray-600 text-white">
+                <SelectTrigger id="sensor_type" className="bg-gray-700 border-gray-600 text-white">
                   <SelectValue />
                 </SelectTrigger>
                 <SelectContent>
@@ -225,7 +225,7 @@ export default function SatelliteProductForm({
                   setFormData({ ...formData, availability: value })
                 }
               >
-                <SelectTrigger className="bg-gray-700 border-gray-600 text-white">
+                <SelectTrigger id="availability" className="bg-gray-700 border-gray-600 text-white">
                   <SelectValue />
                 </SelectTrigger>
                 <SelectContent>
@@ -287,7 +287,7 @@ export default function SatelliteProductForm({
                   setFormData({ ...formData, resolution_category: value })
                 }
               >
-                <SelectTrigger className="bg-gray-700 border-gray-600 text-white">
+                <SelectTrigger id="resolution_category" className="bg-gray-700 border-gray-600 text-white">
                   <SelectValue />
                 </SelectTrigger>
                 <SelectContent>
@@ -450,7 +450,7 @@ export default function SatelliteProductForm({
                   setFormData({ ...formData, status: value })
                 }
               >
-                <SelectTrigger className="bg-gray-700 border-gray-600 text-white">
+                <SelectTrigger id="status" className="bg-gray-700 border-gray-600 text-white">
                   <SelectValue />
                 </SelectTrigger>
                 <SelectContent>

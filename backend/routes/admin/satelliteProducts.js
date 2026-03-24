@@ -7,6 +7,7 @@ const {
   validateCreateSatelliteProduct, 
   validateUpdateSatelliteProduct 
 } = require('../../middleware/validation');
+const cacheService = require('../../services/cacheService');
 
 // GET /api/admin/satellite-products - Get all products (including inactive)
 router.get('/', requireAuth, requireAdmin, async (req, res) => {
@@ -112,6 +113,10 @@ router.post('/', requireAuth, requireAdmin, validateCreateSatelliteProduct, asyn
   try {
     const product = new SatelliteProduct(req.body);
     await product.save();
+    
+    // Invalidate product catalog cache
+    cacheService.invalidateProductCatalog();
+    
     res.status(201).json(product);
   } catch (error) {
     console.error('Error creating satellite product:', error);
@@ -144,6 +149,9 @@ router.put('/:id', requireAuth, requireAdmin, validateObjectId, validateUpdateSa
       return res.status(404).json({ message: 'Product not found' });
     }
 
+    // Invalidate cache for this product and catalog
+    cacheService.invalidateProduct(id);
+
     res.json(product);
   } catch (error) {
     console.error('Error updating satellite product:', error);
@@ -171,6 +179,9 @@ router.delete('/:id', requireAuth, requireAdmin, validateObjectId, async (req, r
     if (!product) {
       return res.status(404).json({ message: 'Product not found' });
     }
+
+    // Invalidate cache for this product and catalog
+    cacheService.invalidateProduct(id);
 
     res.json({ 
       message: 'Satellite product deleted successfully',

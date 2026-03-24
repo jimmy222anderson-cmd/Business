@@ -1,6 +1,7 @@
 const express = require('express');
 const cors = require('cors');
 const helmet = require('helmet');
+const compression = require('compression');
 const dns = require('dns');
 const path = require('path');
 const connectDB = require('./config/database');
@@ -13,8 +14,10 @@ dns.setServers(['8.8.8.8', '8.8.4.4', '1.1.1.1', '1.0.0.1']);
 
 const app = express();
 
-// Connect to MongoDB
-connectDB();
+// Connect to MongoDB (skip in test environment - tests manage their own connection)
+if (process.env.NODE_ENV !== 'test') {
+  connectDB();
+}
 
 // Security headers with helmet
 app.use(helmet({
@@ -86,6 +89,24 @@ app.use(cors(corsOptions));
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 
+// Enable gzip compression for all responses
+// This significantly reduces response size for JSON and text data
+app.use(compression({
+  // Only compress responses larger than 1KB
+  threshold: 1024,
+  // Compression level (0-9, where 6 is default and good balance)
+  level: 6,
+  // Filter function to determine what to compress
+  filter: (req, res) => {
+    // Don't compress if client doesn't support it
+    if (req.headers['x-no-compression']) {
+      return false;
+    }
+    // Use compression's default filter
+    return compression.filter(req, res);
+  }
+}));
+
 // Serve static files from uploads directory with CORS headers
 app.use('/uploads', (req, res, next) => {
   res.setHeader('Cross-Origin-Resource-Policy', 'cross-origin');
@@ -140,8 +161,10 @@ const publicContentRoutes = require('./routes/public/content');
 const publicSatelliteProductsRoutes = require('./routes/public/satelliteProducts');
 const publicImageryRequestsRoutes = require('./routes/public/imageryRequests');
 const publicGeocodingRoutes = require('./routes/public/geocoding');
+const publicUploadAOIRoutes = require('./routes/public/uploadAOI');
 const userImageryRequestsRoutes = require('./routes/user/imageryRequests');
 const userSavedAOIsRoutes = require('./routes/user/savedAOIs');
+const userFavoriteLocationsRoutes = require('./routes/user/favoriteLocations');
 const adminRoutes = require('./routes/admin');
 
 app.use('/api/auth', authRoutes);
@@ -156,8 +179,10 @@ app.use('/api/content', contentRoutes);
 app.use('/api/public/satellite-products', publicSatelliteProductsRoutes);
 app.use('/api/public/imagery-requests', publicImageryRequestsRoutes);
 app.use('/api/public', publicGeocodingRoutes);
-app.use('/api/user/imagery-requests', userImageryRequestsRoutes);
-app.use('/api/user/saved-aois', userSavedAOIsRoutes);
+app.use('/api/public', publicUploadAOIRoutes);
+app.use('/api/user/imagery-requests', requireAuth, userImageryRequestsRoutes);
+app.use('/api/user/saved-aois', requireAuth, userSavedAOIsRoutes);
+app.use('/api/user/favorite-locations', requireAuth, userFavoriteLocationsRoutes);
 app.use('/api/public', publicContentRoutes);
 app.use('/api/admin', adminRoutes);
 
@@ -176,7 +201,11 @@ app.use((req, res) => {
 });
 
 const PORT = process.env.PORT || 3000;
-app.listen(PORT, () => {
-  console.log(`Server running on port ${PORT}`);
-  console.log(`Environment: ${process.env.NODE_ENV || 'development'}`);
-});
+if (process.env.NODE_ENV !== 'test') {
+  app.listen(PORT, () => {
+    console.log(`Server running on port ${PORT}`);
+    console.log(`Environment: ${process.env.NODE_ENV || 'development'}`);
+  });
+}
+
+module.exports = app;

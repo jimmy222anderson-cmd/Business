@@ -26,7 +26,8 @@ import {
 } from "@/components/ui/select";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
-import { MapPin, Maximize2, CheckCircle2, Calendar, Filter } from "lucide-react";
+import { Collapsible, CollapsibleContent, CollapsibleTrigger } from "@/components/ui/collapsible";
+import { MapPin, Maximize2, CheckCircle2, Calendar, Filter, ChevronDown } from "lucide-react";
 import { submitImageryRequest } from "@/lib/api/imageryRequests";
 import { ApiError } from "@/lib/api/errorHandler";
 import { FilterState } from "@/components/FilterPanel";
@@ -306,15 +307,15 @@ export const RequestForm = ({
 
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
-      <DialogContent className="max-w-2xl max-h-[90vh] w-[95vw] md:w-full flex flex-col">
+      <DialogContent className="max-w-2xl max-h-[90vh] w-[95vw] sm:w-[90vw] md:w-full flex flex-col p-4 sm:p-6">
         <DialogHeader className="flex-shrink-0">
-          <DialogTitle className="text-lg md:text-xl">Request Satellite Imagery</DialogTitle>
-          <DialogDescription className="text-sm">
+          <DialogTitle className="text-base sm:text-lg md:text-xl">Request Satellite Imagery</DialogTitle>
+          <DialogDescription className="text-xs sm:text-sm">
             Fill out the form below to submit your imagery request. We'll review your request and get back to you with a quote.
           </DialogDescription>
         </DialogHeader>
 
-        <div className="flex-1 overflow-y-auto pr-2 dialog-scrollable">
+        <div className="flex-1 overflow-y-auto pr-1 sm:pr-2 dialog-scrollable">
           {submitSuccess ? (
             // Success State
             <div className="py-8 text-center space-y-4">
@@ -344,17 +345,17 @@ export const RequestForm = ({
             </div>
           ) : (
             // Form State
-            <form onSubmit={handleSubmit(handleFormSubmit)} className="space-y-6 pb-4">
+            <form onSubmit={handleSubmit(handleFormSubmit)} className="space-y-4 sm:space-y-6 pb-4">
               {/* AOI Summary Display */}
               {aoiData && (
                 <Card className="border-yellow-500 bg-slate-900 text-white">
-                  <CardHeader className="pb-2 md:pb-3">
-                    <CardTitle className="text-sm md:text-base flex items-center gap-2 text-white">
-                      <MapPin className="h-4 w-4 text-yellow-400" />
+                  <CardHeader className="pb-2 sm:pb-3 px-3 sm:px-6 pt-3 sm:pt-6">
+                    <CardTitle className="text-xs sm:text-sm md:text-base flex items-center gap-2 text-white">
+                      <MapPin className="h-3 w-3 sm:h-4 sm:w-4 text-yellow-400" />
                       Area of Interest Summary
                     </CardTitle>
                   </CardHeader>
-                  <CardContent className="space-y-2 md:space-y-3">
+                  <CardContent className="space-y-2 sm:space-y-3 px-3 sm:px-6 pb-3 sm:pb-6">
                     {/* AOI Type and Area */}
                     <div className="flex items-center gap-2 flex-wrap">
                       <Badge variant="outline" className="capitalize bg-slate-800 text-white border-slate-700 text-xs">
@@ -373,6 +374,30 @@ export const RequestForm = ({
                         {aoiData.center.lat.toFixed(6)}°, {aoiData.center.lng.toFixed(6)}°
                       </p>
                     </div>
+
+                    {/* Vertex Coordinates for Polygon/Rectangle */}
+                    {(aoiData.type === 'polygon' || aoiData.type === 'rectangle') && aoiData.coordinates && aoiData.coordinates[0] && (
+                      <Collapsible>
+                        <div className="space-y-1">
+                          <CollapsibleTrigger className="flex items-center justify-between w-full text-xs md:text-sm font-medium text-slate-300 hover:text-white transition-colors">
+                            <span>Vertex Coordinates</span>
+                            <ChevronDown className="h-4 w-4 transition-transform duration-200 data-[state=open]:rotate-180" />
+                          </CollapsibleTrigger>
+                          <CollapsibleContent className="pt-2">
+                            <div className="max-h-48 overflow-y-auto space-y-1 pr-1">
+                              {aoiData.coordinates[0].slice(0, -1).map((coord: number[], index: number) => (
+                                <div key={index} className="flex justify-between items-center text-xs md:text-sm">
+                                  <span className="text-slate-400">Vertex {index + 1}:</span>
+                                  <span className="font-mono text-white">
+                                    {coord[1].toFixed(4)}°, {coord[0].toFixed(4)}°
+                                  </span>
+                                </div>
+                              ))}
+                            </div>
+                          </CollapsibleContent>
+                        </div>
+                      </Collapsible>
+                    )}
 
                     {/* Bounding Box */}
                     {boundingBox && (
@@ -409,13 +434,13 @@ export const RequestForm = ({
                 filterState.dateRange.endDate
               ) && (
                 <Card className="border-blue-500 bg-slate-900 text-white">
-                  <CardHeader className="pb-2 md:pb-3">
-                    <CardTitle className="text-sm md:text-base flex items-center gap-2 text-white">
-                      <Filter className="h-4 w-4 text-blue-400" />
+                  <CardHeader className="pb-2 sm:pb-3 px-3 sm:px-6 pt-3 sm:pt-6">
+                    <CardTitle className="text-xs sm:text-sm md:text-base flex items-center gap-2 text-white">
+                      <Filter className="h-3 w-3 sm:h-4 sm:w-4 text-blue-400" />
                       Applied Filters
                     </CardTitle>
                   </CardHeader>
-                  <CardContent className="space-y-2 md:space-y-3">
+                  <CardContent className="space-y-2 sm:space-y-3 px-3 sm:px-6 pb-3 sm:pb-6">
                     {/* Date Range */}
                     {(filterState.dateRange.startDate || filterState.dateRange.endDate) && (
                       <div className="space-y-1">
@@ -490,25 +515,26 @@ export const RequestForm = ({
               )}
 
           {/* Full Name */}
-          <div className="space-y-2">
-            <Label htmlFor="full_name">Full Name *</Label>
+          <div className="space-y-1.5 sm:space-y-2">
+            <Label htmlFor="full_name" className="text-sm">Full Name *</Label>
             <Input
               id="full_name"
               placeholder="John Doe"
               {...register("full_name")}
               aria-invalid={errors.full_name ? "true" : "false"}
               aria-describedby={errors.full_name ? "full_name-error" : undefined}
+              className="min-h-[44px]"
             />
             {errors.full_name && (
-              <p id="full_name-error" className="text-sm text-destructive">
+              <p id="full_name-error" className="text-xs sm:text-sm text-destructive">
                 {errors.full_name.message}
               </p>
             )}
           </div>
 
           {/* Email */}
-          <div className="space-y-2">
-            <Label htmlFor="email">Email Address *</Label>
+          <div className="space-y-1.5 sm:space-y-2">
+            <Label htmlFor="email" className="text-sm">Email Address *</Label>
             <Input
               id="email"
               type="email"
@@ -516,34 +542,36 @@ export const RequestForm = ({
               {...register("email")}
               aria-invalid={errors.email ? "true" : "false"}
               aria-describedby={errors.email ? "email-error" : undefined}
+              className="min-h-[44px]"
             />
             {errors.email && (
-              <p id="email-error" className="text-sm text-destructive">
+              <p id="email-error" className="text-xs sm:text-sm text-destructive">
                 {errors.email.message}
               </p>
             )}
           </div>
 
           {/* Company */}
-          <div className="space-y-2">
-            <Label htmlFor="company">Company</Label>
+          <div className="space-y-1.5 sm:space-y-2">
+            <Label htmlFor="company" className="text-sm">Company</Label>
             <Input
               id="company"
               placeholder="Your Company"
               {...register("company")}
               aria-invalid={errors.company ? "true" : "false"}
               aria-describedby={errors.company ? "company-error" : undefined}
+              className="min-h-[44px]"
             />
             {errors.company && (
-              <p id="company-error" className="text-sm text-destructive">
+              <p id="company-error" className="text-xs sm:text-sm text-destructive">
                 {errors.company.message}
               </p>
             )}
           </div>
 
           {/* Phone */}
-          <div className="space-y-2">
-            <Label htmlFor="phone">Phone Number</Label>
+          <div className="space-y-1.5 sm:space-y-2">
+            <Label htmlFor="phone" className="text-sm">Phone Number</Label>
             <Input
               id="phone"
               type="tel"
@@ -551,23 +579,24 @@ export const RequestForm = ({
               {...register("phone")}
               aria-invalid={errors.phone ? "true" : "false"}
               aria-describedby={errors.phone ? "phone-error" : undefined}
+              className="min-h-[44px]"
             />
             {errors.phone && (
-              <p id="phone-error" className="text-sm text-destructive">
+              <p id="phone-error" className="text-xs sm:text-sm text-destructive">
                 {errors.phone.message}
               </p>
             )}
           </div>
 
           {/* Date Range */}
-          <div className="space-y-2">
-            <Label className="flex items-center gap-2">
-              <Calendar className="h-4 w-4" />
+          <div className="space-y-1.5 sm:space-y-2">
+            <Label className="flex items-center gap-2 text-sm">
+              <Calendar className="h-3 w-3 sm:h-4 sm:w-4" />
               Date Range *
             </Label>
-            <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 sm:gap-4">
               {/* Start Date */}
-              <div className="space-y-2">
+              <div className="space-y-1.5 sm:space-y-2">
                 <Label htmlFor="start_date" className="text-xs text-muted-foreground">Start Date</Label>
                 <Controller
                   name="start_date"
@@ -578,20 +607,20 @@ export const RequestForm = ({
                       onChange={(date) => field.onChange(date)}
                       maxDate={watch("end_date") || new Date()}
                       dateFormat="MMM d, yyyy"
-                      className="w-full px-3 py-2 text-sm rounded-md border border-input bg-background"
+                      className="w-full px-3 py-2 text-sm rounded-md border border-input bg-background min-h-[44px]"
                       placeholderText="Select start date"
                     />
                   )}
                 />
                 {errors.start_date && (
-                  <p className="text-sm text-destructive">
+                  <p className="text-xs sm:text-sm text-destructive">
                     {errors.start_date.message}
                   </p>
                 )}
               </div>
 
               {/* End Date */}
-              <div className="space-y-2">
+              <div className="space-y-1.5 sm:space-y-2">
                 <Label htmlFor="end_date" className="text-xs text-muted-foreground">End Date</Label>
                 <Controller
                   name="end_date"
@@ -603,13 +632,13 @@ export const RequestForm = ({
                       minDate={watch("start_date")}
                       maxDate={new Date()}
                       dateFormat="MMM d, yyyy"
-                      className="w-full px-3 py-2 text-sm rounded-md border border-input bg-background"
+                      className="w-full px-3 py-2 text-sm rounded-md border border-input bg-background min-h-[44px]"
                       placeholderText="Select end date"
                     />
                   )}
                 />
                 {errors.end_date && (
-                  <p className="text-sm text-destructive">
+                  <p className="text-xs sm:text-sm text-destructive">
                     {errors.end_date.message}
                   </p>
                 )}
@@ -621,13 +650,13 @@ export const RequestForm = ({
           </div>
 
           {/* Urgency */}
-          <div className="space-y-2">
-            <Label htmlFor="urgency">Urgency Level *</Label>
+          <div className="space-y-1.5 sm:space-y-2">
+            <Label htmlFor="urgency" className="text-sm">Urgency Level *</Label>
             <Select
               value={urgency}
               onValueChange={(value) => setValue("urgency", value as "standard" | "urgent" | "emergency")}
             >
-              <SelectTrigger id="urgency" aria-describedby={errors.urgency ? "urgency-error" : undefined}>
+              <SelectTrigger id="urgency" aria-describedby={errors.urgency ? "urgency-error" : undefined} className="min-h-[44px]">
                 <SelectValue placeholder="Select urgency level" />
               </SelectTrigger>
               <SelectContent>
@@ -637,25 +666,26 @@ export const RequestForm = ({
               </SelectContent>
             </Select>
             {errors.urgency && (
-              <p id="urgency-error" className="text-sm text-destructive">
+              <p id="urgency-error" className="text-xs sm:text-sm text-destructive">
                 {errors.urgency.message}
               </p>
             )}
           </div>
 
           {/* Additional Requirements */}
-          <div className="space-y-2">
-            <Label htmlFor="additional_requirements">Additional Requirements</Label>
+          <div className="space-y-1.5 sm:space-y-2">
+            <Label htmlFor="additional_requirements" className="text-sm">Additional Requirements</Label>
             <Textarea
               id="additional_requirements"
               placeholder="Please provide any additional details about your imagery requirements..."
-              rows={5}
+              rows={4}
               {...register("additional_requirements")}
               aria-invalid={errors.additional_requirements ? "true" : "false"}
               aria-describedby={errors.additional_requirements ? "additional_requirements-error" : undefined}
+              className="min-h-[100px] resize-y"
             />
             {errors.additional_requirements && (
-              <p id="additional_requirements-error" className="text-sm text-destructive">
+              <p id="additional_requirements-error" className="text-xs sm:text-sm text-destructive">
                 {errors.additional_requirements.message}
               </p>
             )}
@@ -668,14 +698,14 @@ export const RequestForm = ({
               variant="outline"
               onClick={() => onOpenChange(false)}
               disabled={isSubmitting}
-              className="w-full sm:w-auto"
+              className="w-full sm:w-auto min-h-[44px] order-2 sm:order-1"
             >
               Cancel
             </Button>
             <Button
               type="submit"
               disabled={isSubmitting || !aoiData}
-              className="w-full sm:w-auto bg-yellow-500 hover:bg-yellow-600 text-slate-900"
+              className="w-full sm:w-auto bg-yellow-500 hover:bg-yellow-600 text-slate-900 min-h-[44px] order-1 sm:order-2"
             >
               {isSubmitting ? "Submitting..." : "Submit Request"}
             </Button>

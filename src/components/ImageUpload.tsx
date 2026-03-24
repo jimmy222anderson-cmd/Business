@@ -102,6 +102,8 @@ export function ImageUpload({
           <img 
             src={previewUrl} 
             alt="Preview" 
+            loading="lazy"
+            decoding="async"
             className="w-full max-w-md h-48 object-cover rounded-lg border border-gray-600"
             onError={(e) => {
               console.error('Image load error:', previewUrl);

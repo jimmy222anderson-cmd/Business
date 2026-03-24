@@ -8,12 +8,13 @@ const isDevelopment = process.env.NODE_ENV === 'development';
 // Production: 5 requests per 15 minutes
 const authLimiter = rateLimit({
   windowMs: 15 * 60 * 1000, // 15 minutes
-  max: isDevelopment ? 1000 : 5, // Maximum in development for testing
+  max: isDevelopment ? 1000 : 5,
+  skip: () => isDevelopment, // Completely bypass in development
   message: {
     error: 'Too many authentication attempts from this IP, please try again after 15 minutes'
   },
-  standardHeaders: true, // Return rate limit info in the `RateLimit-*` headers
-  legacyHeaders: false, // Disable the `X-RateLimit-*` headers
+  standardHeaders: true,
+  legacyHeaders: false,
   skipSuccessfulRequests: false,
   skipFailedRequests: false,
 });

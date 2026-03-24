@@ -2,6 +2,7 @@ const express = require('express');
 const router = express.Router();
 const SatelliteProduct = require('../../models/SatelliteProduct');
 const { validateObjectId } = require('../../middleware/validation');
+const cacheService = require('../../services/cacheService');
 
 // GET /api/public/satellite-products - List with pagination and filters
 router.get('/', async (req, res) => {
@@ -15,6 +16,15 @@ router.get('/', async (req, res) => {
       page = 1,
       limit = 20
     } = req.query;
+
+    // Generate cache key
+    const cacheKey = cacheService.generateProductCatalogKey(req.query);
+    
+    // Check cache first
+    const cachedData = cacheService.get(cacheKey);
+    if (cachedData) {
+      return res.json(cachedData);
+    }
 
     // Build query for active products only
     const query = { status: 'active' };
@@ -59,7 +69,7 @@ router.get('/', async (req, res) => {
 
     const totalPages = Math.ceil(total / limitNum);
 
-    res.json({
+    const responseData = {
       products,
       pagination: {
         total,
@@ -67,7 +77,12 @@ router.get('/', async (req, res) => {
         limit: limitNum,
         totalPages
       }
-    });
+    };
+
+    // Cache the response for 5 minutes
+    cacheService.set(cacheKey, responseData, 300);
+
+    res.json(responseData);
   } catch (error) {
     console.error('Error fetching satellite products:', error);
     res.status(500).json({ message: 'Failed to fetch satellite products' });
@@ -79,6 +94,13 @@ router.get('/:id', validateObjectId, async (req, res) => {
   try {
     const { id } = req.params;
 
+    // Check cache first
+    const cacheKey = `product:${id}`;
+    const cachedProduct = cacheService.get(cacheKey);
+    if (cachedProduct) {
+      return res.json(cachedProduct);
+    }
+
     const product = await SatelliteProduct.findOne({
       _id: id,
       status: 'active'
@@ -89,6 +111,9 @@ router.get('/:id', validateObjectId, async (req, res) => {
     if (!product) {
       return res.status(404).json({ message: 'Product not found' });
     }
+
+    // Cache the product for 10 minutes
+    cacheService.set(cacheKey, product, 600);
 
     res.json(product);
   } catch (error) {
