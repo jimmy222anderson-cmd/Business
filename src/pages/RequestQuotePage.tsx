@@ -54,6 +54,10 @@ const RequestQuotePage = () => {
     dataType?: string;
     coverageArea?: number;
     frequency?: string;
+    urgency?: string;
+    collection?: string;
+    resolution?: string;
+    maxCloud?: number;
   } | null;
 
   const {
@@ -74,11 +78,28 @@ const RequestQuotePage = () => {
   // Pre-fill requirements if coming from calculator
   useEffect(() => {
     if (calculatorData) {
-      const requirements = `Data Type: ${calculatorData.dataType || 'N/A'}
-Coverage Area: ${calculatorData.coverageArea || 'N/A'} sq km
-Frequency: ${calculatorData.frequency || 'N/A'}
-Estimated Price: $${calculatorData.estimatedPrice?.toFixed(2) || 'N/A'}
+      const lines = [
+        `Data Type: ${calculatorData.dataType || 'N/A'}`,
+        `Coverage Area: ${calculatorData.coverageArea ?? 'N/A'} sq km`,
+        `Frequency: ${calculatorData.frequency || 'N/A'}`,
+      ];
+      if (calculatorData.collection) {
+        lines.push(`Collection: ${calculatorData.collection}`);
+      }
+      if (calculatorData.urgency) {
+        lines.push(`Urgency: ${calculatorData.urgency}`);
+      }
+      if (calculatorData.resolution) {
+        lines.push(`Resolution: ${calculatorData.resolution}`);
+      }
+      if (typeof calculatorData.maxCloud === 'number') {
+        lines.push(`Max Cloud Coverage: ${calculatorData.maxCloud}%`);
+      }
+      if (typeof calculatorData.estimatedPrice === 'number') {
+        lines.push(`Estimated Price: $${calculatorData.estimatedPrice.toFixed(2)}`);
+      }
 
+      const requirements = `${lines.join('\n')}
 Additional Requirements:
 `;
       setValue('requirements', requirements);
