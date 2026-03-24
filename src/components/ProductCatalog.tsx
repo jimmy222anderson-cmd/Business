@@ -8,6 +8,7 @@ import {
   SatelliteProduct,
   SatelliteProductsQueryParams,
 } from '@/lib/api/satelliteProducts';
+import { getUserFriendlyErrorMessage } from '@/lib/api/errorHandler';
 import { useToast } from '@/hooks/use-toast';
 import { FilterState } from '@/components/FilterPanel';
 import { ProductGridSkeleton } from '@/components/ProductSkeleton';
@@ -29,6 +30,21 @@ export function ProductCatalog({ filterState, className }: ProductCatalogProps) 
   const [sortBy, setSortBy] = useState<string>('order');
   const [sortOrder, setSortOrder] = useState<'asc' | 'desc'>('asc');
   const { toast } = useToast();
+  const [reducedMotion, setReducedMotion] = useState(false);
+
+  useEffect(() => {
+    const mq = window.matchMedia('(prefers-reduced-motion: reduce)');
+    setReducedMotion(mq.matches);
+    const handler = (e: MediaQueryListEvent) => setReducedMotion(e.matches);
+    if (mq.addEventListener) {
+      mq.addEventListener('change', handler);
+      return () => mq.removeEventListener('change', handler);
+    } else {
+      // Fallback for older browsers
+      mq.addListener(handler);
+      return () => mq.removeListener(handler);
+    }
+  }, []);
 
   // Convert FilterState to API query parameters
   const buildQueryParams = (): SatelliteProductsQueryParams => {
@@ -90,12 +106,12 @@ export function ProductCatalog({ filterState, className }: ProductCatalogProps) 
         setTotal(response.pagination.total);
         setTotalPages(response.pagination.totalPages);
       } catch (err) {
-        console.error('Error fetching satellite products:', err);
-        setError('Failed to load satellite products. Please try again.');
+        const friendly = getUserFriendlyErrorMessage(err);
+        setError(friendly);
         toast({
           variant: 'destructive',
           title: 'Error',
-          description: 'Failed to load satellite products. Please try again.',
+          description: friendly,
         });
       } finally {
         setLoading(false);
@@ -120,7 +136,7 @@ export function ProductCatalog({ filterState, className }: ProductCatalogProps) 
   // Loading state
   if (loading) {
     return (
-      <div className={className}>
+      <div className={className} role="status" aria-live="polite" aria-busy="true">
         {/* Controls bar skeleton */}
         <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 mb-6">
           <div className="h-5 w-48 bg-muted animate-pulse rounded" />
@@ -139,7 +155,7 @@ export function ProductCatalog({ filterState, className }: ProductCatalogProps) 
   // Error state
   if (error) {
     return (
-      <div className={`flex items-center justify-center py-12 ${className || ''}`}>
+      <div className={`flex items-center justify-center py-12 ${className || ''}`} role="alert" aria-live="assertive">
         <Card className="p-8 max-w-md text-center">
           <div className="space-y-4">
             <div className="text-destructive">
@@ -238,16 +254,16 @@ export function ProductCatalog({ filterState, className }: ProductCatalogProps) 
       {/* Product grid - Mobile optimized with single column on small screens */}
       <motion.div 
         className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4 sm:gap-6 mb-8"
-        initial={{ opacity: 0 }}
-        animate={{ opacity: 1 }}
-        transition={{ duration: 0.3 }}
+        initial={reducedMotion ? false : { opacity: 0 }}
+        animate={reducedMotion ? undefined : { opacity: 1 }}
+        transition={reducedMotion ? undefined : { duration: 0.3 }}
       >
         {products.map((product, index) => (
           <motion.div
             key={product._id}
-            initial={{ opacity: 0, y: 20 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.3, delay: index * 0.05 }}
+            initial={reducedMotion ? false : { opacity: 0, y: 20 }}
+            animate={reducedMotion ? undefined : { opacity: 1, y: 0 }}
+            transition={reducedMotion ? undefined : { duration: 0.3, delay: index * 0.05 }}
           >
             <Card className="p-3 sm:p-4 hover:shadow-lg transition-shadow duration-200 touch-manipulation">
               <div className="space-y-2 sm:space-y-3">
@@ -258,6 +274,8 @@ export function ProductCatalog({ filterState, className }: ProductCatalogProps) 
                     alt={product.name}
                     loading="lazy"
                     decoding="async"
+                    fetchPriority="low"
+                    sizes="(max-width: 640px) 100vw, (max-width: 1024px) 50vw, 25vw"
                     className="w-full h-full object-cover transition-transform duration-300 hover:scale-105"
                     onError={(e) => {
                       const target = e.target as HTMLImageElement;
@@ -288,8 +306,10 @@ export function ProductCatalog({ filterState, className }: ProductCatalogProps) 
                   size="sm"
                   className="w-full min-h-[44px] touch-manipulation"
                   onClick={() => {
-                    // TODO: Open product detail modal
-                    console.log('View details:', product._id);
+                    toast({
+                      title: 'Product Details',
+                      description: 'Detailed product view is coming soon.',
+                    });
                   }}
                 >
                   View Details

@@ -62,7 +62,8 @@ router.get('/', async (req, res) => {
         .sort(sortObj)
         .skip(skip)
         .limit(limitNum)
-        .select('-__v')
+        // Return only fields needed by the public catalog to reduce payload
+        .select('name provider sensor_type resolution resolution_category bands coverage availability description sample_image_url status order created_at updated_at')
         .lean(),
       SatelliteProduct.countDocuments(query)
     ]);

@@ -74,9 +74,7 @@ export function RequestDetailModal({ open, onOpenChange, request, onRequestUpdat
   const mapRef = useRef<L.Map | null>(null);
   const containerRef = useRef<HTMLDivElement>(null);
 
-  // Debug: Log when showCancelDialog changes
   useEffect(() => {
-    console.log('showCancelDialog changed to:', showCancelDialog);
   }, [showCancelDialog]);
 
   // Initialize map — use ResizeObserver so we init exactly when the container
@@ -167,9 +165,7 @@ export function RequestDetailModal({ open, onOpenChange, request, onRequestUpdat
   const canCancel = ['pending', 'reviewing'].includes(request.status.toLowerCase());
 
   const handleCancelClick = () => {
-    console.log('Cancel button clicked, current showCancelDialog:', showCancelDialog);
     setShowCancelDialog(true);
-    console.log('Set showCancelDialog to true');
   };
 
   const handleCancelRequest = async () => {
@@ -595,7 +591,6 @@ export function RequestDetailModal({ open, onOpenChange, request, onRequestUpdat
 
     {/* Cancel Confirmation Dialog - Using regular Dialog instead of AlertDialog */}
     <Dialog open={showCancelDialog} onOpenChange={(open) => {
-      console.log('Cancel Dialog onOpenChange called with:', open);
       setShowCancelDialog(open);
     }}>
       <DialogContent className="sm:max-w-md">
