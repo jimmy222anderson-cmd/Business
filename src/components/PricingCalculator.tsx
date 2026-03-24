@@ -12,6 +12,8 @@ interface PricingInputs {
   frequency: string;
   urgency: 'standard' | 'urgent' | 'emergency';
   collection: 'archive' | 'tasking';
+  resolution: 'vhr' | 'high' | 'medium' | 'low';
+  maxCloud: number; // percent
 }
 
 const dataTypePricing = {
@@ -47,18 +49,41 @@ const PricingCalculator = () => {
     frequency: "one-time",
     urgency: "standard",
     collection: "archive",
+    resolution: "high",
+    maxCloud: 30,
   });
+
+  const resolutionMultipliers: Record<PricingInputs['resolution'], { multiplier: number; name: string }> = {
+    vhr: { multiplier: 1.5, name: 'Very High (≤0.5m)' },
+    high: { multiplier: 1.2, name: 'High (0.5–2m)' },
+    medium: { multiplier: 1.0, name: 'Medium (2–10m)' },
+    low: { multiplier: 0.8, name: 'Low (10m+)' },
+  };
+
+  const cloudMultiplier = (maxCloud: number) => {
+    if (maxCloud <= 10) return 1.3;
+    if (maxCloud <= 20) return 1.2;
+    if (maxCloud <= 30) return 1.1;
+    return 1.0;
+  };
 
   const calculatePrice = (): number => {
     const dataType = dataTypePricing[inputs.dataType as keyof typeof dataTypePricing];
     const frequency = frequencyMultipliers[inputs.frequency as keyof typeof frequencyMultipliers];
     const urgency = urgencyMultipliers[inputs.urgency];
     const collection = collectionMultipliers[inputs.collection];
+    const resolution = resolutionMultipliers[inputs.resolution];
     
-    if (!dataType || !frequency || !urgency || !collection) return 0;
+    if (!dataType || !frequency || !urgency || !collection || !resolution) return 0;
     
     const basePrice = dataType.base + (dataType.perSqKm * inputs.coverageArea);
-    const finalPrice = basePrice * frequency.multiplier * urgency.multiplier * collection.multiplier;
+    const finalPrice =
+      basePrice *
+      frequency.multiplier *
+      urgency.multiplier *
+      collection.multiplier *
+      resolution.multiplier *
+      cloudMultiplier(inputs.maxCloud);
     
     return Math.max(0, finalPrice);
   };
@@ -73,6 +98,8 @@ const PricingCalculator = () => {
         frequency: frequencyMultipliers[inputs.frequency as keyof typeof frequencyMultipliers].name,
         urgency: urgencyMultipliers[inputs.urgency].name,
         collection: collectionMultipliers[inputs.collection].name,
+        resolution: resolutionMultipliers[inputs.resolution].name,
+        maxCloud: inputs.maxCloud,
       }
     });
   };
@@ -183,6 +210,45 @@ const PricingCalculator = () => {
               ))}
             </SelectContent>
           </Select>
+        </div>
+
+        <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+          <div className="space-y-2">
+            <Label htmlFor="resolution">Resolution</Label>
+            <Select
+              value={inputs.resolution}
+              onValueChange={(value: PricingInputs['resolution']) => setInputs({ ...inputs, resolution: value })}
+            >
+              <SelectTrigger id="resolution">
+                <SelectValue placeholder="Select resolution" />
+              </SelectTrigger>
+              <SelectContent>
+                {Object.entries(resolutionMultipliers).map(([key, value]) => (
+                  <SelectItem key={key} value={key}>
+                    {value.name}
+                  </SelectItem>
+                ))}
+              </SelectContent>
+            </Select>
+          </div>
+          <div className="space-y-2">
+            <Label htmlFor="max-cloud">
+              Max Cloud Coverage: {inputs.maxCloud}%
+            </Label>
+            <Slider
+              id="max-cloud"
+              min={0}
+              max={100}
+              step={5}
+              value={[inputs.maxCloud]}
+              onValueChange={(value) => setInputs({ ...inputs, maxCloud: value[0] })}
+              className="w-full"
+            />
+            <div className="flex justify-between text-xs text-muted-foreground">
+              <span>Clear (0%)</span>
+              <span>Flexible (100%)</span>
+            </div>
+          </div>
         </div>
 
         <div className="pt-6 border-t border-border">
