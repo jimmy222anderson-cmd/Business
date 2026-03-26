@@ -132,8 +132,8 @@ async function runVerification() {
   // Check 7: Documentation
   log('\n━━━ Check 7: Documentation ━━━', 'blue');
   if (checkFile('docs/API_PERFORMANCE_OPTIMIZATIONS.md', 'Performance optimization documentation exists')) passed++; else failed++;
-  if (checkFile('../TASK_24.2_API_PERFORMANCE_SUMMARY.md', 'Task summary exists')) passed++; else failed++;
-  if (checkFile('../TESTING_CHECKLIST.md', 'Testing checklist exists')) passed++; else failed++;
+  if (checkFile('../docs/reports/frontend/TASK_24.2_API_PERFORMANCE_SUMMARY.md', 'Task summary exists')) passed++; else failed++;
+  if (checkFile('../docs/reports/frontend/TESTING_CHECKLIST.md', 'Testing checklist exists')) passed++; else failed++;
   
   // Check 8: Test Scripts
   log('\n━━━ Check 8: Test Scripts ━━━', 'blue');
@@ -160,7 +160,7 @@ async function runVerification() {
     log('  2. Start the server: npm start', 'cyan');
     log('  3. Run cache tests: node scripts/test-cache-service.js', 'cyan');
     log('  4. Run API tests: node scripts/test-api-performance.js', 'cyan');
-    log('  5. See TESTING_CHECKLIST.md for complete testing guide', 'cyan');
+    log('  5. See docs/reports/frontend/TESTING_CHECKLIST.md for complete testing guide', 'cyan');
   } else {
     log('\n✗ Some optimizations are missing or incomplete.', 'red');
     log('  Please review the failed checks above.', 'yellow');

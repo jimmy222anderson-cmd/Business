@@ -48,7 +48,6 @@ const blogPostSchema = new mongoose.Schema({
 });
 
 // Indexes for performance
-blogPostSchema.index({ slug: 1 }, { unique: true });
 blogPostSchema.index({ status: 1, published_at: -1 });
 blogPostSchema.index({ tags: 1 });
 

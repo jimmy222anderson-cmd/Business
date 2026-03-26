@@ -81,7 +81,6 @@ describe('Preservation Property 3: Circle and Point Coordinate Display', () => {
     expect('coordinates' in mockCircleAOI).toBe(false);
     
     // This confirms the baseline: circles display only center, not vertices
-    console.log('Circle AOI baseline behavior confirmed: displays only center coordinates');
   });
 
   it('should verify point AOIs display only center coordinates', () => {
@@ -102,7 +101,6 @@ describe('Preservation Property 3: Circle and Point Coordinate Display', () => {
     expect('coordinates' in mockPointAOI).toBe(false);
     
     // This confirms the baseline: points display only center, not vertices
-    console.log('Point AOI baseline behavior confirmed: displays only center coordinates');
   });
 
   it('should verify circle AOIs with various radii display only center coordinates', () => {
@@ -131,7 +129,6 @@ describe('Preservation Property 3: Circle and Point Coordinate Display', () => {
       { numRuns: 50 }
     );
     
-    console.log('Property verified: All circle AOIs display only center coordinates');
   });
 
   it('should verify point AOIs at various locations display only center coordinates', () => {
@@ -158,7 +155,6 @@ describe('Preservation Property 3: Circle and Point Coordinate Display', () => {
       { numRuns: 50 }
     );
     
-    console.log('Property verified: All point AOIs display only center coordinates');
   });
 });
 
@@ -203,7 +199,6 @@ describe('Preservation Property 4: Backend Area Calculation', () => {
     const baselineArea = 114.6; // This is the correct backend calculation
     expect(area1).toBe(baselineArea);
     
-    console.log('Backend area calculation baseline confirmed:', area1, 'km²');
   });
 
   it('should verify backend area calculation for small polygon near 1 km²', () => {
@@ -231,7 +226,6 @@ describe('Preservation Property 4: Backend Area Calculation', () => {
     const area2 = calculateAreaFromCoordinatesBackend(smallPolygonCoordinates);
     expect(area2).toBe(baselineArea);
     
-    console.log('Small polygon backend area baseline:', baselineArea, 'km²');
   });
 
   it('should verify backend area calculation for large polygon', () => {
@@ -259,7 +253,6 @@ describe('Preservation Property 4: Backend Area Calculation', () => {
     const area2 = calculateAreaFromCoordinatesBackend(largePolygonCoordinates);
     expect(area2).toBe(baselineArea);
     
-    console.log('Large polygon backend area baseline:', baselineArea, 'km²');
   });
 
   it('should verify backend area calculation produces same results across many random polygons', () => {
@@ -295,7 +288,6 @@ describe('Preservation Property 4: Backend Area Calculation', () => {
       { numRuns: 100 }
     );
     
-    console.log('Property verified: Backend area calculation is deterministic across 100 random polygons');
   });
 
   it('should verify backend area calculation handles various polygon shapes correctly', () => {
@@ -351,7 +343,6 @@ describe('Preservation Property 4: Backend Area Calculation', () => {
       const area2 = calculateAreaFromCoordinatesBackend(coordinates);
       expect(area2).toBe(area);
       
-      console.log(`${name} backend area baseline:`, area, 'km²');
     });
   });
 });
@@ -398,7 +389,6 @@ describe('Preservation: Bounding Box Display', () => {
     expect(boundingBox.minLat).toBe(22.0);
     expect(boundingBox.maxLat).toBe(22.1);
     
-    console.log('Bounding box baseline confirmed:', boundingBox);
   });
 
   it('should verify bounding box calculation across various polygons', () => {
@@ -447,6 +437,5 @@ describe('Preservation: Bounding Box Display', () => {
       { numRuns: 100 }
     );
     
-    console.log('Property verified: Bounding box calculation is correct across 100 random polygons');
   });
 });

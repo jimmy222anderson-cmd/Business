@@ -23,7 +23,4 @@ const newsletterSubscriptionSchema = new mongoose.Schema({
   }
 });
 
-// Unique index on email
-newsletterSubscriptionSchema.index({ email: 1 }, { unique: true });
-
 module.exports = mongoose.model('NewsletterSubscription', newsletterSubscriptionSchema);

@@ -2,7 +2,9 @@ const express = require('express');
 const router = express.Router();
 const ContactInquiry = require('../models/ContactInquiry');
 const ProductInquiry = require('../models/ProductInquiry');
+const Product = require('../models/Product');
 const { requireAuth, requireAdmin, optionalAuth } = require('../middleware/auth');
+const emailHelper = require('../services/emailHelper');
 
 // POST /api/inquiries - Create general contact inquiry
 router.post('/', optionalAuth, async (req, res) => {
@@ -36,8 +38,13 @@ router.post('/', optionalAuth, async (req, res) => {
 
     await inquiry.save();
 
-    // TODO: Send confirmation email to user
-    // TODO: Send notification email to support team
+    // Send emails asynchronously
+    emailHelper.sendContactConfirmation(email, full_name).catch(err => 
+      console.error('Error sending contact confirmation email:', err)
+    );
+    emailHelper.sendContactNotification(inquiry).catch(err => 
+      console.error('Error sending contact notification email:', err)
+    );
 
     res.status(201).json({
       message: 'Inquiry submitted successfully',
@@ -97,8 +104,17 @@ router.post('/product', optionalAuth, async (req, res) => {
 
     await inquiry.save();
 
-    // TODO: Send confirmation email to user
-    // TODO: Send notification email to sales team
+    // Fetch product name for email
+    const product = await Product.findById(product_id).select('name');
+    const productName = product ? product.name : 'Unknown Product';
+
+    // Send emails asynchronously
+    emailHelper.sendProductInquiryConfirmation(email, full_name, productName).catch(err => 
+      console.error('Error sending product inquiry confirmation email:', err)
+    );
+    emailHelper.sendProductInquiryNotification(inquiry, productName).catch(err => 
+      console.error('Error sending product inquiry notification email:', err)
+    );
 
     res.status(201).json({
       message: 'Product inquiry submitted successfully',

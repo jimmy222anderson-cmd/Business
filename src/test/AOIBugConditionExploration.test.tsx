@@ -106,10 +106,6 @@ describe('Bug Condition Exploration: Area Calculation Consistency', () => {
     const frontendArea = calculateGeodesicAreaFrontend(frontendFormat);
     const backendArea = calculateAreaFromCoordinatesBackend(polygonCoordinates);
     
-    console.log('Frontend area:', frontendArea, 'km²');
-    console.log('Backend area:', backendArea, 'km²');
-    console.log('Difference:', Math.abs(frontendArea - backendArea), 'km²');
-    
     // EXPECTED TO FAIL: Frontend and backend should produce the same area within 0.01 km² tolerance
     // This test encodes the expected behavior after the fix
     expect(Math.abs(frontendArea - backendArea)).toBeLessThan(0.01);
@@ -132,10 +128,6 @@ describe('Bug Condition Exploration: Area Calculation Consistency', () => {
     const frontendArea = calculateGeodesicAreaFrontend(frontendFormat);
     const backendArea = calculateAreaFromCoordinatesBackend(smallPolygonCoordinates);
     
-    console.log('Small polygon - Frontend area:', frontendArea, 'km²');
-    console.log('Small polygon - Backend area:', backendArea, 'km²');
-    console.log('Small polygon - Difference:', Math.abs(frontendArea - backendArea), 'km²');
-    
     // EXPECTED TO FAIL: Areas should match within tolerance
     expect(Math.abs(frontendArea - backendArea)).toBeLessThan(0.01);
   });
@@ -156,10 +148,6 @@ describe('Bug Condition Exploration: Area Calculation Consistency', () => {
     
     const frontendArea = calculateGeodesicAreaFrontend(frontendFormat);
     const backendArea = calculateAreaFromCoordinatesBackend(largePolygonCoordinates);
-    
-    console.log('Large polygon - Frontend area:', frontendArea, 'km²');
-    console.log('Large polygon - Backend area:', backendArea, 'km²');
-    console.log('Large polygon - Difference:', Math.abs(frontendArea - backendArea), 'km²');
     
     // EXPECTED TO FAIL: Areas should match within tolerance
     expect(Math.abs(frontendArea - backendArea)).toBeLessThan(0.01);
@@ -208,8 +196,6 @@ describe('Bug Condition Exploration: Complete Vertex Coordinate Display', () => 
     // After fix, it should also display: "Vertex 1: 22.0000, 72.7000", etc.
     
     // Documenting the bug: Vertex coordinates exist but are not rendered
-    console.log('Vertex coordinates exist in data:', vertexCoordinates);
-    console.log('But ExplorerPage only displays center:', mockPolygonAOI.center);
   });
 
   it('should demonstrate that RequestForm does not display vertex coordinates for polygon AOIs', () => {
@@ -242,8 +228,6 @@ describe('Bug Condition Exploration: Complete Vertex Coordinate Display', () => 
     // After fix, it should also display: "Vertex Coordinates" section
     
     // Documenting the bug: Vertex coordinates exist but are not rendered
-    console.log('Vertex coordinates exist in data:', vertexCoordinates);
-    console.log('But RequestForm only displays center and bounding box');
   });
 });
 
@@ -291,15 +275,6 @@ describe('Bug Condition Exploration: Property-Based Tests', () => {
         
         // The property: frontend and backend should produce the same area within tolerance
         const difference = Math.abs(frontendArea - backendArea);
-        
-        // Log counterexamples for debugging
-        if (difference >= 0.01) {
-          console.log('Counterexample found:');
-          console.log('Coordinates:', JSON.stringify(coordinates));
-          console.log('Frontend area:', frontendArea, 'km²');
-          console.log('Backend area:', backendArea, 'km²');
-          console.log('Difference:', difference, 'km²');
-        }
         
         return difference < 0.01;
       }),

@@ -109,6 +109,34 @@ interface MapContainerProps {
   uploadedGeometries?: any[] | null;
 }
 
+const initializeEditableLayer = (layer: L.Layer) => {
+  const pmLayer = (layer as any).pm;
+  if (!pmLayer) return;
+
+  pmLayer.setOptions({
+    allowEditing: true,
+    allowRemoval: true,
+    draggable: true,
+  });
+};
+
+const bindLayerEditForwarding = (map: L.Map, layer: L.Layer) => {
+  if (!(layer instanceof L.Rectangle) && !(layer instanceof L.Polygon)) {
+    return;
+  }
+
+  const editableLayer = layer as any;
+  const forwardEdit = () => map.fire('pm:edit', { layer });
+
+  // Some Geoman builds fire layer-level events only.
+  editableLayer.on?.('pm:edit', forwardEdit);
+  editableLayer.on?.('pm:update', forwardEdit);
+  editableLayer.on?.('pm:change', forwardEdit);
+  editableLayer.on?.('pm:markerdragend', forwardEdit);
+  editableLayer.on?.('pm:vertexadded', forwardEdit);
+  editableLayer.on?.('pm:vertexremoved', forwardEdit);
+};
+
 export const MapContainer = ({
   onAOIChange,
   initialCenter = { lat: 20, lng: 0 },
@@ -233,6 +261,7 @@ export const MapContainer = ({
       position: 'topright',
       drawPolygon: true,
       drawRectangle: true,
+      drawText: true,
       drawCircle: false,
       drawCircleMarker: false,
       drawMarker: false,
@@ -273,6 +302,7 @@ export const MapContainer = ({
           html: `<div style="background-color: #9333EA; width: 100%; height: 100%; border-radius: 50%; border: 2px solid white;"></div>`,
         }),
       },
+      layerGroup: drawnItems,
     });
 
     // Make drawing control buttons larger on mobile
@@ -410,12 +440,18 @@ export const MapContainer = ({
     // Handle shape creation
     map.on('pm:create', (e: any) => {
       const layer = e.layer;
+      const shape = String(e.shape || '').toLowerCase();
       
       // Optimize layer for touch interaction on mobile
       optimizeLayerForTouch(layer, isMobile);
+      initializeEditableLayer(layer);
       
       // Limit to one AOI at a time - clear existing shapes
-      drawnItems.clearLayers();
+      drawnItems.eachLayer((existingLayer: L.Layer) => {
+        if (existingLayer !== layer) {
+          drawnItems.removeLayer(existingLayer);
+        }
+      });
       
       // Remove existing area label if any
       if (areaLabelRef.current) {
@@ -423,8 +459,16 @@ export const MapContainer = ({
         areaLabelRef.current = null;
       }
       
-      // Add the new shape
-      drawnItems.addLayer(layer);
+      // Ensure the new shape is tracked in the editable layer group
+      if (!drawnItems.hasLayer(layer)) {
+        drawnItems.addLayer(layer);
+      }
+      bindLayerEditForwarding(map, layer);
+
+      // Text annotations are non-AOI map layers; keep them editable/removable.
+      if (shape === 'text') {
+        return;
+      }
 
       // Get coordinates - handle both polygon and rectangle
       let latlngs: L.LatLng[];
@@ -489,7 +533,7 @@ export const MapContainer = ({
         const geoJSON = layer.toGeoJSON();
         
         onAOIChange({
-          type: e.shape.toLowerCase(), // Convert to lowercase for backend compatibility
+          type: shape, // Convert to lowercase for backend compatibility
           geoJSON,
           coordinates: geoJSON.geometry.coordinates,
           area: areaInKm2,
@@ -499,9 +543,16 @@ export const MapContainer = ({
       }
     });
 
-    // Handle shape editing with debouncing for better performance
-    map.on('pm:edit', (e: any) => {
-      const layer = e.layer;
+    // Handle shape editing with debouncing for better performance.
+    // Geoman can emit different events depending on interaction mode/version,
+    // so we normalize all of them through one updater.
+    const handleLayerEditUpdate = (e: any) => {
+      const layer = e?.layer;
+
+      // Only AOI polygon/rectangle edits should update AOI area.
+      if (!(layer instanceof L.Rectangle) && !(layer instanceof L.Polygon)) {
+        return;
+      }
       
       // Get coordinates - handle both polygon and rectangle
       let latlngs: L.LatLng[];
@@ -513,10 +564,8 @@ export const MapContainer = ({
           bounds.getNorthEast(),
           bounds.getSouthEast(),
         ];
-      } else if (layer instanceof L.Polygon) {
-        latlngs = layer.getLatLngs()[0] as L.LatLng[];
       } else {
-        return;
+        latlngs = layer.getLatLngs()[0] as L.LatLng[];
       }
       
       // Calculate area in square kilometers
@@ -529,7 +578,6 @@ export const MapContainer = ({
           description: 'The edited area must be at least 1 km². Please make it larger.',
           variant: 'destructive',
         });
-        // Revert the edit by removing and not updating
         return;
       }
       
@@ -539,7 +587,6 @@ export const MapContainer = ({
           description: 'The edited area must not exceed 5,000 km². Please make it smaller.',
           variant: 'destructive',
         });
-        // Revert the edit by removing and not updating
         return;
       }
       
@@ -551,19 +598,6 @@ export const MapContainer = ({
         map.removeLayer(areaLabelRef.current);
       }
       
-      // Area is displayed in the top panel, no need for tooltip on map
-      // const areaLabel = L.popup({
-      //   closeButton: false,
-      //   autoClose: false,
-      //   closeOnClick: false,
-      //   className: 'aoi-area-label',
-      // })
-      //   .setLatLng([center.lat, center.lng])
-      //   .setContent(`<div style="font-weight: bold; color: #9333EA;">Area: ${areaInKm2.toFixed(2)} km²</div>`)
-      //   .openOn(map);
-      
-      // areaLabelRef.current = areaLabel;
-      
       // Use debounced AOI change for better performance during editing
       const geoJSON = layer.toGeoJSON();
       debouncedAOIChange({
@@ -574,7 +608,11 @@ export const MapContainer = ({
         center,
         layer,
       });
-    });
+    };
+
+    map.on('pm:edit', handleLayerEditUpdate);
+    map.on('pm:update', handleLayerEditUpdate);
+    map.on('pm:change', handleLayerEditUpdate);
 
     // Handle shape removal
     map.on('pm:remove', () => {
@@ -670,8 +708,9 @@ export const MapContainer = ({
 
       // Enable editing for the layer
       if ((layer as any).pm) {
-        (layer as any).pm.enable();
+        initializeEditableLayer(layer);
       }
+      bindLayerEditForwarding(map, layer);
       // Area is displayed in the top panel, no need for tooltip on map
       // const areaLabel = L.popup({
       //   closeButton: false,
@@ -800,8 +839,9 @@ export const MapContainer = ({
 
       // Enable editing for the layer (if it's a polygon)
       if ((layer as any).pm) {
-        (layer as any).pm.enable();
+        initializeEditableLayer(layer);
       }
+      bindLayerEditForwarding(map, layer);
 
       // Calculate area and center for polygons
       if (geometry.type === 'Polygon' || geometry.type === 'MultiPolygon') {

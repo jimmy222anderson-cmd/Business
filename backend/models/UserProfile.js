@@ -65,9 +65,6 @@ const userProfileSchema = new mongoose.Schema({
   timestamps: { createdAt: 'created_at', updatedAt: 'updated_at' }
 });
 
-// Index for faster queries
-userProfileSchema.index({ email: 1 });
-
 // Don't return password hash in JSON responses
 userProfileSchema.set('toJSON', {
   transform: function(doc, ret) {

@@ -63,6 +63,15 @@
   touch-action: none;
 }
 
+/* Keep map controls above floating overlays/badges */
+.leaflet-top,
+.leaflet-bottom,
+.leaflet-control-container .leaflet-control,
+.leaflet-pm-toolbar {
+  z-index: 1200 !important;
+  pointer-events: auto;
+}
+
 /* Improve visibility of drawing hints on mobile */
 @media (max-width: 768px) {
   .leaflet-pm-action {

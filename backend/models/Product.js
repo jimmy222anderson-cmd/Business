@@ -110,7 +110,6 @@ const productSchema = new mongoose.Schema({
   timestamps: { createdAt: 'created_at', updatedAt: 'updated_at' }
 });
 
-productSchema.index({ slug: 1 }, { unique: true });
 productSchema.index({ status: 1, order: 1 });
 productSchema.index({ category: 1 });
 

@@ -628,7 +628,7 @@ export default function ExplorerPage() {
         <LazyMapContainer 
           onMapReady={handleMapReady}
           onAOIChange={handleAOIChange}
-          loadedAOI={currentAOI ? {
+          loadedAOI={currentAOI && !currentAOI.layer ? {
             type: currentAOI.type,
             coordinates: currentAOI.coordinates,
             area: currentAOI.area,
@@ -639,7 +639,7 @@ export default function ExplorerPage() {
         
         {/* Total Search Area Badge (top center) - Responsive */}
         {currentAOI && (
-          <div className="absolute top-4 right-4 md:left-1/2 md:-translate-x-1/2 md:right-auto z-[1000]">
+          <div className="absolute top-4 right-4 md:left-1/2 md:-translate-x-1/2 md:right-auto z-[900] pointer-events-none">
             <Card className="bg-slate-900/95 backdrop-blur-sm border-yellow-500/50 px-3 py-2 md:px-6 md:py-3 shadow-xl">
               <div className="text-center">
                 <p className="text-xs text-slate-400 mb-0.5 md:mb-1">Total Search Area</p>

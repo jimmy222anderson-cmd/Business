@@ -211,6 +211,33 @@ async function sendImageryRequestStatusUpdate(email, name, request, oldStatus, n
   return await emailService.sendImageryRequestStatusUpdate(email, name, request, oldStatus, newStatus);
 }
 
+/**
+ * Send product inquiry confirmation
+ * @param {string} email - User email
+ * @param {string} name - User name
+ * @param {string} productName - Product name
+ * @returns {Promise<Object>}
+ */
+async function sendProductInquiryConfirmation(email, name, productName) {
+  if (USE_QUEUE) {
+    return await emailQueue.addEmailToQueue('productInquiryConfirmation', { email, name, productName });
+  }
+  return await emailService.sendProductInquiryConfirmation(email, name, productName);
+}
+
+/**
+ * Send product inquiry notification to sales team
+ * @param {Object} inquiry - Inquiry object
+ * @param {string} productName - Product name
+ * @returns {Promise<Object>}
+ */
+async function sendProductInquiryNotification(inquiry, productName) {
+  if (USE_QUEUE) {
+    return await emailQueue.addEmailToQueue('productInquiryNotification', { inquiry, productName });
+  }
+  return await emailService.sendProductInquiryNotification(inquiry, productName);
+}
+
 module.exports = {
   sendWelcomeEmail,
   sendEmailVerification,
@@ -226,5 +253,7 @@ module.exports = {
   sendImageryRequestConfirmation,
   sendImageryRequestNotification,
   sendImageryRequestStatusUpdate,
+  sendProductInquiryConfirmation,
+  sendProductInquiryNotification,
   USE_QUEUE
 };

@@ -44,7 +44,4 @@ const contentSchema = new mongoose.Schema({
   timestamps: { createdAt: 'created_at', updatedAt: 'updated_at' }
 });
 
-// Index for faster queries
-contentSchema.index({ type: 1 }, { unique: true });
-
 module.exports = mongoose.model('Content', contentSchema);

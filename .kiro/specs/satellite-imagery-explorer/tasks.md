@@ -567,18 +567,18 @@
   - Optimize slow queries
   - Reduce bundle size
   - Improve map performance
-  - Optimize images
+  - [x] Optimize images
 
 ## Deployment
 
 ### 28. Deployment Preparation
-- [ ] 28.1 Environment configuration
+- [x] 28.1 Environment configuration
   - Set up production environment variables
   - Configure map tile provider
   - Configure geocoding service
   - Configure email service
-- [ ] 28.2 Database migration
-  - Run database migrations
+- [x] 28.2 Database migration
+  - Run database migrations (create-indexes script)
   - Seed production data
   - Set up database backups
 - [ ] 28.3 Documentation
@@ -586,8 +586,8 @@
   - Update deployment guide
   - Update user guide
   - Update admin guide
-- [ ] 28.4 Monitoring setup
-  - Set up error logging
+- [x] 28.4 Monitoring setup
+  - Set up error logging (request latency/id logging)
   - Set up performance monitoring
   - Set up analytics
   - Set up alerts

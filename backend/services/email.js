@@ -253,6 +253,62 @@ async function sendContactNotification(inquiry) {
 }
 
 /**
+ * Send product inquiry confirmation email
+ * @param {string} email - User email
+ * @param {string} name - User name
+ * @param {string} productName - Product name
+ * @returns {Promise<Object>}
+ */
+async function sendProductInquiryConfirmation(email, name, productName) {
+  const subject = `Inquiry Received: ${productName} - Earth Observation Platform`;
+  const html = `
+    <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto;">
+      <h1 style="color: #1a1a1a;">Thank You for Your Inquiry</h1>
+      <p>Hi ${name},</p>
+      <p>We've received your inquiry regarding <strong>${productName}</strong>.</p>
+      <p>Our sales team is reviewing your request and will get back to you with more information within 24-48 hours.</p>
+      <p>Best regards,<br>The Earth Observation Team</p>
+    </div>
+  `;
+  const text = `Thank You for Your Inquiry. Hi ${name}, We've received your inquiry regarding ${productName}. Our team will get back to you within 24-48 hours.`;
+
+  return sendEmail({ to: email, subject, text, html });
+}
+
+/**
+ * Send product inquiry notification to sales team
+ * @param {Object} inquiry - Product inquiry object
+ * @param {string} productName - Product name
+ * @returns {Promise<Object>}
+ */
+async function sendProductInquiryNotification(inquiry, productName) {
+  const salesEmail = process.env.SALES_EMAIL || 'sales@earthintelligence.com';
+  const subject = `New Product Inquiry: ${productName}`;
+  
+  const html = `
+    <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto;">
+      <h1 style="color: #1a1a1a;">New Product Inquiry</h1>
+      <p>A new inquiry has been submitted for <strong>${productName}</strong>:</p>
+      <div style="background-color: #f5f5f5; padding: 20px; border-radius: 5px; margin: 20px 0;">
+        <p><strong>Inquiry ID:</strong> ${inquiry._id}</p>
+        <p><strong>Product:</strong> ${productName} (ID: ${inquiry.product_id})</p>
+        <p><strong>Name:</strong> ${inquiry.full_name}</p>
+        <p><strong>Email:</strong> ${inquiry.email}</p>
+        <p><strong>Company:</strong> ${inquiry.company || 'N/A'}</p>
+        <p><strong>Message:</strong></p>
+        <p style="white-space: pre-wrap;">${inquiry.message}</p>
+        <p><strong>Status:</strong> ${inquiry.status}</p>
+        <p><strong>Created:</strong> ${new Date(inquiry.created_at).toLocaleString()}</p>
+      </div>
+      <p>Please follow up with the customer within 24-48 hours.</p>
+    </div>
+  `;
+  const text = `New Product Inquiry: ${productName}. Inquiry ID: ${inquiry._id}, Name: ${inquiry.full_name}, Email: ${inquiry.email}, Product: ${productName}.`;
+
+  return sendEmail({ to: salesEmail, subject, text, html });
+}
+
+/**
  * Send quote request confirmation email
  * @param {string} email - User email
  * @param {string} name - User name
@@ -685,5 +741,7 @@ module.exports = {
   sendQuoteEmail,
   sendImageryRequestConfirmation,
   sendImageryRequestNotification,
-  sendImageryRequestStatusUpdate
+  sendImageryRequestStatusUpdate,
+  sendProductInquiryConfirmation,
+  sendProductInquiryNotification
 };

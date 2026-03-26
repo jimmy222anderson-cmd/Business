@@ -104,7 +104,6 @@ const savedAOISchema = new mongoose.Schema({
 
 // Indexes for common queries
 savedAOISchema.index({ user_id: 1, created_at: -1 });
-savedAOISchema.index({ user_id: 1, name: 1 });
 savedAOISchema.index({ user_id: 1, last_used_at: -1 });
 
 // Index for geospatial queries (optional, for future use)

@@ -54,7 +54,6 @@ const industrySchema = new mongoose.Schema({
   timestamps: { createdAt: 'created_at', updatedAt: 'updated_at' }
 });
 
-industrySchema.index({ slug: 1 }, { unique: true });
 industrySchema.index({ status: 1, order: 1 });
 
 module.exports = mongoose.model('Industry', industrySchema);
