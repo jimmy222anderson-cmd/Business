@@ -112,6 +112,7 @@ router.post('/signup', authLimiter, validateSignup, async (req, res) => {
         email: user.email,
         full_name: user.full_name,
         company: user.company,
+        phone: user.phone_number,
         role: user.role,
         email_verified: user.email_verified,
         created_at: user.created_at,
@@ -188,6 +189,7 @@ router.post('/signin', authLimiter, validateSignin, async (req, res) => {
         email: user.email,
         full_name: user.full_name,
         company: user.company,
+        phone: user.phone_number,
         role: user.role,
         created_at: user.created_at,
         updated_at: user.updated_at
@@ -215,6 +217,7 @@ router.get('/me', requireAuth, async (req, res) => {
         email: req.user.email,
         full_name: req.user.full_name,
         company: req.user.company,
+        phone: req.user.phone_number,
         role: req.user.role,
         created_at: req.user.created_at,
         updated_at: req.user.updated_at

@@ -94,7 +94,20 @@ const imageryRequestSchema = new mongoose.Schema({
   },
   phone: {
     type: String,
+    required: [true, 'Phone number is required'],
     trim: true
+  },
+  use_case: {
+    type: String,
+    trim: true
+  },
+  data_type: {
+    type: String,
+    trim: true,
+    enum: {
+      values: ['optical', 'radar', 'thermal'],
+      message: '{VALUE} is not a valid data type'
+    }
   },
   
   // AOI Data
@@ -179,6 +192,14 @@ const imageryRequestSchema = new mongoose.Schema({
   additional_requirements: {
     type: String,
     trim: true
+  },
+  estimated_archive_price: {
+    type: Number,
+    min: [0, 'Estimated archive price must be positive']
+  },
+  estimated_tasking_price: {
+    type: Number,
+    min: [0, 'Estimated tasking price must be positive']
   },
   
   // Status Tracking

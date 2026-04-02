@@ -9,6 +9,8 @@ export interface ImageryRequestPayload {
   email: string;
   company?: string;
   phone?: string;
+  use_case?: string;
+  data_type?: 'optical' | 'radar' | 'thermal';
   aoi_type: string;
   aoi_coordinates: {
     type: string;
@@ -32,7 +34,10 @@ export interface ImageryRequestPayload {
   };
   urgency: 'standard' | 'urgent' | 'emergency';
   additional_requirements?: string;
+  estimated_archive_price?: number;
+  estimated_tasking_price?: number;
 }
+
 
 export interface ImageryRequest {
   _id: string;
@@ -62,6 +67,8 @@ export interface ImageryRequest {
     bands?: string[];
     image_types?: string[];
   };
+  use_case?: string;
+  data_type?: string;
   urgency: string;
   additional_requirements?: string;
   status: string;

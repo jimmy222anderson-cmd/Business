@@ -1,4 +1,4 @@
-import { useRef, useState, useCallback, useEffect } from 'react';
+import { useRef, useState, useCallback, useEffect, useMemo } from 'react';
 import { useNavigate, useLocation } from 'react-router-dom';
 import { Helmet } from 'react-helmet-async';
 import L from 'leaflet';
@@ -12,9 +12,10 @@ import { AOIFileUpload } from '@/components/AOIFileUpload';
 import { MobileBottomNav } from '@/components/MobileBottomNav';
 import { Button } from '@/components/ui/button';
 import { Card } from '@/components/ui/card';
-import { Send, MapPin, Layers, Calendar, Search as SearchIcon, ArrowLeft, Filter, Save, BookmarkIcon, Upload } from 'lucide-react';
+import { Send, MapPin, Layers, Calendar, Search as SearchIcon, ArrowLeft, Filter, Save, BookmarkIcon, Upload, DollarSign, Eye, Radio, Thermometer } from 'lucide-react';
 import { useAuth } from '@/contexts/AuthContext';
 import { SavedAOI } from '@/lib/api/savedAOIs';
+import { estimatePrices, PriceEstimate } from '@/lib/utils/pricing';
 import {
   Sheet,
   SheetContent,
@@ -85,6 +86,20 @@ export default function ExplorerPage() {
   
   // State to hold uploaded geometries
   const [uploadedGeometries, setUploadedGeometries] = useState<any[] | null>(null);
+
+  // Data type selection
+  const [selectedDataType, setSelectedDataType] = useState<'optical' | 'radar' | 'thermal' | null>(null);
+
+  // Derived price estimates from AOI + filters
+  const priceEstimate = useMemo<PriceEstimate | null>(() => {
+    if (!currentAOI) return null;
+    return estimatePrices({
+      areaSqKm: currentAOI.area,
+      resolution: filterState?.selectedResolutions?.[0],
+      urgency: undefined,
+      maxCloud: filterState?.cloudCoverage,
+    });
+  }, [currentAOI, filterState]);
 
   // Handle AOI loaded from navigation state (e.g., from dashboard)
   useEffect(() => {
@@ -472,7 +487,7 @@ export default function ExplorerPage() {
                       {currentAOI.center.lat.toFixed(4)}, {currentAOI.center.lng.toFixed(4)}
                     </span>
                   </div>
-                  
+
                   {/* Display vertex coordinates for polygon and rectangle AOIs */}
                   {(currentAOI.type === 'polygon' || currentAOI.type === 'rectangle') && currentAOI.coordinates && currentAOI.coordinates[0] && (
                     <div className="pt-2 border-t border-slate-700">
@@ -490,7 +505,28 @@ export default function ExplorerPage() {
                     </div>
                   )}
                 </div>
-                
+
+                {/* Price Estimate */}
+                {priceEstimate && (
+                  <div className="mt-3 pt-3 border-t border-slate-700">
+                    <div className="flex items-center gap-2 mb-2">
+                      <DollarSign className="h-3.5 w-3.5 text-yellow-400" />
+                      <span className="text-xs font-semibold text-slate-300">PRICE ESTIMATE</span>
+                    </div>
+                    <div className="space-y-1.5">
+                      <div className="flex justify-between items-center">
+                        <span className="text-xs text-slate-400">Archive (existing)</span>
+                        <span className="text-sm font-bold text-yellow-400">${priceEstimate.archive.toFixed(2)}</span>
+                      </div>
+                      <div className="flex justify-between items-center">
+                        <span className="text-xs text-slate-400">Tasking (new collect)</span>
+                        <span className="text-sm font-bold text-yellow-400">${priceEstimate.tasking.toFixed(2)}</span>
+                      </div>
+                    </div>
+                    <p className="text-xs text-slate-500 mt-1.5">Indicative estimate only</p>
+                  </div>
+                )}
+
                 {/* Save AOI Button - Only for authenticated users */}
                 {isAuthenticated && (
                   <Button
@@ -558,40 +594,36 @@ export default function ExplorerPage() {
             />
           </div>
 
-          {/* Data Type Section (Placeholder for future) - Hidden on mobile */}
-          <div className="hidden md:block p-3 md:p-6 border-b border-slate-700">
+          {/* Data Type Section */}
+          <div className="p-3 md:p-6 border-b border-slate-700">
             <div className="flex items-center gap-2 mb-2 md:mb-3">
               <Layers className="h-4 w-4 text-slate-400" />
               <h2 className="text-xs md:text-sm font-semibold text-slate-300">DATA TYPE</h2>
             </div>
-            <div className="grid grid-cols-2 gap-2">
-              <Button 
-                variant="outline" 
-                className="bg-slate-800 border-slate-600 hover:bg-slate-700 text-white text-xs h-14 md:h-16 flex flex-col items-center justify-center"
-              >
-                <Layers className="h-4 w-4 md:h-5 md:w-5 mb-1" />
-                <span>Optical</span>
-              </Button>
-              <Button 
-                variant="outline" 
-                className="bg-slate-800 border-slate-600 hover:bg-slate-700 text-white text-xs h-14 md:h-16 flex flex-col items-center justify-center"
-              >
-                <Layers className="h-4 w-4 md:h-5 md:w-5 mb-1" />
-                <span>SAR</span>
-              </Button>
+            <div className="grid grid-cols-3 gap-2">
+              {([
+                { value: 'optical', label: 'Optical', icon: Eye, desc: 'Visible & NIR' },
+                { value: 'radar', label: 'SAR', icon: Radio, desc: 'All-weather radar' },
+                { value: 'thermal', label: 'Thermal', icon: Thermometer, desc: 'Heat signatures' },
+              ] as const).map(({ value, label, icon: Icon, desc }) => (
+                <button
+                  key={value}
+                  onClick={() => setSelectedDataType(prev => prev === value ? null : value)}
+                  className={`flex flex-col items-center justify-center gap-1 p-2 md:p-3 rounded-lg border text-xs transition-all ${
+                    selectedDataType === value
+                      ? 'bg-yellow-500/10 border-yellow-500 text-yellow-400'
+                      : 'bg-slate-800 border-slate-600 text-slate-300 hover:border-slate-500 hover:text-white'
+                  }`}
+                >
+                  <Icon className="h-4 w-4 md:h-5 md:w-5" />
+                  <span className="font-medium">{label}</span>
+                  <span className="text-slate-500 text-[10px] leading-tight text-center hidden md:block">{desc}</span>
+                </button>
+              ))}
             </div>
           </div>
 
-          {/* Date Range Section (Placeholder for future) - Hidden on mobile */}
-          <div className="hidden md:block p-3 md:p-6 border-b border-slate-700">
-            <div className="flex items-center gap-2 mb-2 md:mb-3">
-              <Calendar className="h-4 w-4 text-slate-400" />
-              <h2 className="text-xs md:text-sm font-semibold text-slate-300">DATE RANGE</h2>
-            </div>
-            <p className="text-xs text-slate-400">
-              Select date range in the request form
-            </p>
-          </div>
+
         </div>
 
         {/* Submit Button - Fixed at bottom - Hidden on mobile (using bottom nav instead) */}
@@ -660,6 +692,8 @@ export default function ExplorerPage() {
         filterState={filterState}
         onSubmitSuccess={handleRequestSubmitSuccess}
         duplicateRequestData={duplicateRequestData}
+        priceEstimate={priceEstimate}
+        selectedDataType={selectedDataType}
       />
 
       {/* Save AOI Dialog */}

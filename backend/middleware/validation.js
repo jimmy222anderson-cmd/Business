@@ -488,10 +488,21 @@ const validateImageryRequest = [
     .isLength({ max: 200 })
     .withMessage('Company name must not exceed 200 characters'),
   body('phone')
-    .optional()
     .trim()
+    .notEmpty()
+    .withMessage('Phone number is required')
     .matches(/^[\d\s\-\+\(\)]+$/)
     .withMessage('Please provide a valid phone number'),
+  body('use_case')
+    .optional()
+    .trim()
+    .isLength({ max: 200 })
+    .withMessage('Use case must not exceed 200 characters'),
+  body('data_type')
+    .optional()
+    .trim()
+    .isIn(['optical', 'radar', 'thermal'])
+    .withMessage('Data type must be one of: optical, radar, thermal'),
   body('aoi_type')
     .trim()
     .notEmpty()
@@ -598,6 +609,14 @@ const validateImageryRequest = [
     .trim()
     .isLength({ max: 5000 })
     .withMessage('Additional requirements must not exceed 5000 characters'),
+  body('estimated_archive_price')
+    .optional()
+    .isFloat({ min: 0 })
+    .withMessage('Estimated archive price must be a positive number'),
+  body('estimated_tasking_price')
+    .optional()
+    .isFloat({ min: 0 })
+    .withMessage('Estimated tasking price must be a positive number'),
   handleValidationErrors
 ];
 

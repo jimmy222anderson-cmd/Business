@@ -14,6 +14,8 @@ router.post('/', optionalAuth, validateImageryRequest, async (req, res) => {
       email,
       company,
       phone,
+      use_case,
+      data_type,
       aoi_type,
       aoi_coordinates,
       aoi_area_km2,
@@ -21,7 +23,9 @@ router.post('/', optionalAuth, validateImageryRequest, async (req, res) => {
       date_range,
       filters,
       urgency,
-      additional_requirements
+      additional_requirements,
+      estimated_archive_price,
+      estimated_tasking_price
     } = req.body;
 
     // Calculate area from coordinates if not provided or validate provided area
@@ -37,11 +41,13 @@ router.post('/', optionalAuth, validateImageryRequest, async (req, res) => {
 
     // Create imagery request
     const imageryRequest = new ImageryRequest({
-      user_id: req.user ? req.user._id : null, // Set user_id if authenticated
+      user_id: req.user ? req.user._id : null,
       full_name,
       email,
       company,
       phone,
+      use_case,
+      data_type,
       aoi_type,
       aoi_coordinates,
       aoi_area_km2: calculatedArea,
@@ -50,6 +56,8 @@ router.post('/', optionalAuth, validateImageryRequest, async (req, res) => {
       filters: filters || {},
       urgency: urgency || 'standard',
       additional_requirements,
+      estimated_archive_price,
+      estimated_tasking_price,
       status: 'pending'
     });
 

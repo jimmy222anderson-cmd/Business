@@ -27,10 +27,11 @@ import {
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Collapsible, CollapsibleContent, CollapsibleTrigger } from "@/components/ui/collapsible";
-import { MapPin, Maximize2, CheckCircle2, Calendar, Filter, ChevronDown } from "lucide-react";
+import { MapPin, Maximize2, CheckCircle2, Calendar, Filter, ChevronDown, DollarSign, Eye, Radio, Thermometer, User, Building2, Briefcase, Layers } from "lucide-react";
 import { submitImageryRequest } from "@/lib/api/imageryRequests";
 import { ApiError } from "@/lib/api/errorHandler";
 import { FilterState } from "@/components/FilterPanel";
+import { PriceEstimate } from "@/lib/utils/pricing";
 
 // Request form schema
 const requestFormSchema = z.object({
@@ -43,8 +44,14 @@ const requestFormSchema = z.object({
     .max(100, "Company name must be less than 100 characters")
     .optional(),
   phone: z.string()
-    .max(20, "Phone number must be less than 20 characters")
+    .min(1, "Phone number is required")
+    .max(20, "Phone number must be less than 20 characters"),
+  use_case: z.string()
+    .max(200, "Use case must be less than 200 characters")
     .optional(),
+  data_type: z.enum(["optical", "radar", "thermal"], {
+    required_error: "Please select a data type",
+  }),
   start_date: z.date({
     required_error: "Start date is required",
   }),
@@ -93,6 +100,8 @@ interface RequestFormProps {
   aoiData?: AOIData | null;
   filterState?: FilterState | null;
   onSubmitSuccess?: () => void;
+  priceEstimate?: PriceEstimate | null;
+  selectedDataType?: 'optical' | 'radar' | 'thermal' | null;
   duplicateRequestData?: {
     urgency?: string;
     additional_requirements?: string;
@@ -104,6 +113,25 @@ interface RequestFormProps {
 }
 
 
+const DATA_TYPES = [
+  { value: 'optical', label: 'Optical', icon: Eye, desc: 'Visible & near-infrared' },
+  { value: 'radar', label: 'SAR / Radar', icon: Radio, desc: 'All-weather, day & night' },
+  { value: 'thermal', label: 'Thermal', icon: Thermometer, desc: 'Heat & temperature' },
+] as const;
+
+const USE_CASE_OPTIONS = [
+  'Agriculture & Crop Monitoring',
+  'Urban Planning & Development',
+  'Disaster Response & Assessment',
+  'Environmental Monitoring',
+  'Infrastructure Inspection',
+  'Maritime & Coastal Monitoring',
+  'Forestry & Land Use',
+  'Defence & Security',
+  'Mining & Resources',
+  'Other',
+];
+
 export const RequestForm = ({
   open,
   onOpenChange,
@@ -111,6 +139,8 @@ export const RequestForm = ({
   filterState,
   onSubmitSuccess,
   duplicateRequestData,
+  priceEstimate,
+  selectedDataType,
 }: RequestFormProps) => {
   const { user, isAuthenticated } = useAuth();
   const { toast } = useToast();
@@ -130,12 +160,14 @@ export const RequestForm = ({
     resolver: zodResolver(requestFormSchema),
     defaultValues: {
       urgency: "standard",
-      start_date: new Date(Date.now() - 30 * 24 * 60 * 60 * 1000), // 30 days ago
-      end_date: new Date(), // Today
+      data_type: selectedDataType ?? "optical",
+      start_date: new Date(Date.now() - 30 * 24 * 60 * 60 * 1000),
+      end_date: new Date(),
     },
   });
 
   const urgency = watch("urgency");
+  const dataType = watch("data_type");
 
   // Calculate bounding box from coordinates
   const calculateBoundingBox = (coordinates: number[][][]) => {
@@ -178,8 +210,18 @@ export const RequestForm = ({
       if (user.company) {
         setValue("company", user.company);
       }
+      if (user.phone) {
+        setValue("phone", user.phone);
+      }
     }
   }, [isAuthenticated, user, setValue]);
+
+  // Sync selectedDataType from explorer sidebar
+  useEffect(() => {
+    if (selectedDataType && open) {
+      setValue("data_type", selectedDataType);
+    }
+  }, [selectedDataType, open, setValue]);
 
   // Pre-fill form with duplicate request data
   useEffect(() => {
@@ -228,7 +270,9 @@ export const RequestForm = ({
         full_name: data.full_name,
         email: data.email,
         company: data.company || undefined,
-        phone: data.phone || undefined,
+        phone: data.phone,
+        use_case: data.use_case || undefined,
+        data_type: data.data_type,
         aoi_type: aoiData.type,
         aoi_coordinates: {
           type: "Polygon",
@@ -236,12 +280,10 @@ export const RequestForm = ({
         },
         aoi_area_km2: aoiData.area,
         aoi_center: aoiData.center,
-        // Use dates from form
         date_range: {
           start_date: data.start_date.toISOString(),
           end_date: data.end_date.toISOString(),
         },
-        // Include filters if available
         filters: filterState ? {
           resolution_category: filterState.selectedResolutions.length > 0 ? filterState.selectedResolutions : undefined,
           max_cloud_coverage: filterState.cloudCoverage < 100 ? filterState.cloudCoverage : undefined,
@@ -251,6 +293,8 @@ export const RequestForm = ({
         } : undefined,
         urgency: data.urgency,
         additional_requirements: data.additional_requirements || undefined,
+        estimated_archive_price: priceEstimate?.archive,
+        estimated_tasking_price: priceEstimate?.tasking,
       };
 
       // Submit to API endpoint
@@ -423,6 +467,35 @@ export const RequestForm = ({
                 </Card>
               )}
 
+              {/* Price Estimate Card */}
+              {priceEstimate && (
+                <Card className="border-yellow-500/50 bg-slate-900 text-white">
+                  <CardHeader className="pb-2 px-3 sm:px-6 pt-3 sm:pt-6">
+                    <CardTitle className="text-xs sm:text-sm md:text-base flex items-center gap-2 text-white">
+                      <DollarSign className="h-3 w-3 sm:h-4 sm:w-4 text-yellow-400" />
+                      Price Estimate
+                    </CardTitle>
+                  </CardHeader>
+                  <CardContent className="px-3 sm:px-6 pb-3 sm:pb-6">
+                    <div className="grid grid-cols-2 gap-3">
+                      <div className="bg-slate-800 rounded-lg p-3 text-center">
+                        <p className="text-xs text-slate-400 mb-1">Archive</p>
+                        <p className="text-lg font-bold text-yellow-400">${priceEstimate.archive.toFixed(2)}</p>
+                        <p className="text-xs text-slate-500">Existing imagery</p>
+                      </div>
+                      <div className="bg-slate-800 rounded-lg p-3 text-center">
+                        <p className="text-xs text-slate-400 mb-1">Tasking</p>
+                        <p className="text-lg font-bold text-yellow-400">${priceEstimate.tasking.toFixed(2)}</p>
+                        <p className="text-xs text-slate-500">New collection</p>
+                      </div>
+                    </div>
+                    <p className="text-xs text-slate-500 mt-2">
+                      <span className="font-medium text-slate-400">Estimate Only.</span> Final pricing subject to provider availability and service agreements.
+                    </p>
+                  </CardContent>
+                </Card>
+              )}
+
               {/* Filter Summary Display */}
               {filterState && (
                 filterState.selectedResolutions.length > 0 ||
@@ -514,90 +587,125 @@ export const RequestForm = ({
                 </Card>
               )}
 
-          {/* Full Name */}
-          <div className="space-y-1.5 sm:space-y-2">
-            <Label htmlFor="full_name" className="text-sm">Full Name *</Label>
-            <Input
-              id="full_name"
-              placeholder="John Doe"
-              {...register("full_name")}
-              aria-invalid={errors.full_name ? "true" : "false"}
-              aria-describedby={errors.full_name ? "full_name-error" : undefined}
-              className="min-h-[44px]"
-            />
-            {errors.full_name && (
-              <p id="full_name-error" className="text-xs sm:text-sm text-destructive">
-                {errors.full_name.message}
-              </p>
-            )}
+          {/* ── Section: Contact Details ── */}
+          <div className="space-y-3 sm:space-y-4">
+            <div className="flex items-center gap-2 pb-1 border-b border-slate-700">
+              <User className="h-4 w-4 text-yellow-400" />
+              <h3 className="text-sm font-semibold text-slate-200">Contact Details</h3>
+            </div>
+
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+              {/* Full Name */}
+              <div className="space-y-1.5">
+                <Label htmlFor="full_name" className="text-xs text-slate-300">Full Name *</Label>
+                <Input
+                  id="full_name"
+                  placeholder="Jane Smith"
+                  {...register("full_name")}
+                  aria-invalid={errors.full_name ? "true" : "false"}
+                  className="min-h-[44px] bg-slate-800 border-slate-600 text-white placeholder:text-slate-500 focus:border-yellow-500"
+                />
+                {errors.full_name && <p className="text-xs text-destructive">{errors.full_name.message}</p>}
+              </div>
+
+              {/* Email */}
+              <div className="space-y-1.5">
+                <Label htmlFor="email" className="text-xs text-slate-300">Email Address *</Label>
+                <Input
+                  id="email"
+                  type="email"
+                  placeholder="jane@company.com"
+                  {...register("email")}
+                  aria-invalid={errors.email ? "true" : "false"}
+                  className="min-h-[44px] bg-slate-800 border-slate-600 text-white placeholder:text-slate-500 focus:border-yellow-500"
+                />
+                {errors.email && <p className="text-xs text-destructive">{errors.email.message}</p>}
+              </div>
+
+              {/* Company */}
+              <div className="space-y-1.5">
+                <Label htmlFor="company" className="text-xs text-slate-300">Company</Label>
+                <div className="relative">
+                  <Building2 className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-slate-500" />
+                  <Input
+                    id="company"
+                    placeholder="Organisation"
+                    {...register("company")}
+                    className="min-h-[44px] pl-9 bg-slate-800 border-slate-600 text-white placeholder:text-slate-500 focus:border-yellow-500"
+                  />
+                </div>
+                {errors.company && <p className="text-xs text-destructive">{errors.company.message}</p>}
+              </div>
+
+              {/* Phone */}
+              <div className="space-y-1.5">
+                <Label htmlFor="phone" className="text-xs text-slate-300">Phone Number</Label>
+                <Input
+                  id="phone"
+                  type="tel"
+                  placeholder="+1 (555) 123-4567"
+                  {...register("phone")}
+                  className="min-h-[44px] bg-slate-800 border-slate-600 text-white placeholder:text-slate-500 focus:border-yellow-500"
+                />
+                {errors.phone && <p className="text-xs text-destructive">{errors.phone.message}</p>}
+              </div>
+            </div>
+
+            {/* Use Case */}
+            <div className="space-y-1.5">
+              <Label htmlFor="use_case" className="text-xs text-slate-300 flex items-center gap-1.5">
+                <Briefcase className="h-3.5 w-3.5" /> Use Case
+              </Label>
+              <Select onValueChange={(v) => setValue("use_case", v)}>
+                <SelectTrigger className="min-h-[44px] bg-slate-800 border-slate-600 text-white">
+                  <SelectValue placeholder="Select your use case..." />
+                </SelectTrigger>
+                <SelectContent>
+                  {USE_CASE_OPTIONS.map((uc) => (
+                    <SelectItem key={uc} value={uc}>{uc}</SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
+            </div>
           </div>
 
-          {/* Email */}
-          <div className="space-y-1.5 sm:space-y-2">
-            <Label htmlFor="email" className="text-sm">Email Address *</Label>
-            <Input
-              id="email"
-              type="email"
-              placeholder="john.doe@company.com"
-              {...register("email")}
-              aria-invalid={errors.email ? "true" : "false"}
-              aria-describedby={errors.email ? "email-error" : undefined}
-              className="min-h-[44px]"
-            />
-            {errors.email && (
-              <p id="email-error" className="text-xs sm:text-sm text-destructive">
-                {errors.email.message}
-              </p>
-            )}
+          {/* ── Section: Data Type ── */}
+          <div className="space-y-3">
+            <div className="flex items-center gap-2 pb-1 border-b border-slate-700">
+              <Layers className="h-4 w-4 text-yellow-400" />
+              <h3 className="text-sm font-semibold text-slate-200">Data Type *</h3>
+            </div>
+            <div className="grid grid-cols-3 gap-2">
+              {DATA_TYPES.map(({ value, label, icon: Icon, desc }) => (
+                <button
+                  key={value}
+                  type="button"
+                  onClick={() => setValue("data_type", value)}
+                  className={`flex flex-col items-center gap-1.5 p-3 rounded-lg border text-xs transition-all ${
+                    dataType === value
+                      ? 'bg-yellow-500/10 border-yellow-500 text-yellow-400'
+                      : 'bg-slate-800 border-slate-600 text-slate-300 hover:border-slate-500 hover:text-white'
+                  }`}
+                >
+                  <Icon className="h-5 w-5" />
+                  <span className="font-semibold">{label}</span>
+                  <span className="text-[10px] text-slate-500 text-center leading-tight">{desc}</span>
+                </button>
+              ))}
+            </div>
+            {errors.data_type && <p className="text-xs text-destructive">{errors.data_type.message}</p>}
           </div>
 
-          {/* Company */}
-          <div className="space-y-1.5 sm:space-y-2">
-            <Label htmlFor="company" className="text-sm">Company</Label>
-            <Input
-              id="company"
-              placeholder="Your Company"
-              {...register("company")}
-              aria-invalid={errors.company ? "true" : "false"}
-              aria-describedby={errors.company ? "company-error" : undefined}
-              className="min-h-[44px]"
-            />
-            {errors.company && (
-              <p id="company-error" className="text-xs sm:text-sm text-destructive">
-                {errors.company.message}
-              </p>
-            )}
-          </div>
+          {/* ── Section: Date Range & Urgency ── */}
+          <div className="space-y-3">
+            <div className="flex items-center gap-2 pb-1 border-b border-slate-700">
+              <Calendar className="h-4 w-4 text-yellow-400" />
+              <h3 className="text-sm font-semibold text-slate-200">Date Range & Urgency</h3>
+            </div>
 
-          {/* Phone */}
-          <div className="space-y-1.5 sm:space-y-2">
-            <Label htmlFor="phone" className="text-sm">Phone Number</Label>
-            <Input
-              id="phone"
-              type="tel"
-              placeholder="+1 (555) 123-4567"
-              {...register("phone")}
-              aria-invalid={errors.phone ? "true" : "false"}
-              aria-describedby={errors.phone ? "phone-error" : undefined}
-              className="min-h-[44px]"
-            />
-            {errors.phone && (
-              <p id="phone-error" className="text-xs sm:text-sm text-destructive">
-                {errors.phone.message}
-              </p>
-            )}
-          </div>
-
-          {/* Date Range */}
-          <div className="space-y-1.5 sm:space-y-2">
-            <Label className="flex items-center gap-2 text-sm">
-              <Calendar className="h-3 w-3 sm:h-4 sm:w-4" />
-              Date Range *
-            </Label>
-            <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 sm:gap-4">
-              {/* Start Date */}
-              <div className="space-y-1.5 sm:space-y-2">
-                <Label htmlFor="start_date" className="text-xs text-muted-foreground">Start Date</Label>
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+              <div className="space-y-1.5">
+                <Label className="text-xs text-slate-300">Start Date *</Label>
                 <Controller
                   name="start_date"
                   control={control}
@@ -607,21 +715,16 @@ export const RequestForm = ({
                       onChange={(date) => field.onChange(date)}
                       maxDate={watch("end_date") || new Date()}
                       dateFormat="MMM d, yyyy"
-                      className="w-full px-3 py-2 text-sm rounded-md border border-input bg-background min-h-[44px]"
+                      className="w-full px-3 py-2 text-sm rounded-md border border-slate-600 bg-slate-800 text-white min-h-[44px] focus:outline-none focus:border-yellow-500"
                       placeholderText="Select start date"
                     />
                   )}
                 />
-                {errors.start_date && (
-                  <p className="text-xs sm:text-sm text-destructive">
-                    {errors.start_date.message}
-                  </p>
-                )}
+                {errors.start_date && <p className="text-xs text-destructive">{errors.start_date.message}</p>}
               </div>
 
-              {/* End Date */}
-              <div className="space-y-1.5 sm:space-y-2">
-                <Label htmlFor="end_date" className="text-xs text-muted-foreground">End Date</Label>
+              <div className="space-y-1.5">
+                <Label className="text-xs text-slate-300">End Date *</Label>
                 <Controller
                   name="end_date"
                   control={control}
@@ -632,80 +735,67 @@ export const RequestForm = ({
                       minDate={watch("start_date")}
                       maxDate={new Date()}
                       dateFormat="MMM d, yyyy"
-                      className="w-full px-3 py-2 text-sm rounded-md border border-input bg-background min-h-[44px]"
+                      className="w-full px-3 py-2 text-sm rounded-md border border-slate-600 bg-slate-800 text-white min-h-[44px] focus:outline-none focus:border-yellow-500"
                       placeholderText="Select end date"
                     />
                   )}
                 />
-                {errors.end_date && (
-                  <p className="text-xs sm:text-sm text-destructive">
-                    {errors.end_date.message}
-                  </p>
-                )}
+                {errors.end_date && <p className="text-xs text-destructive">{errors.end_date.message}</p>}
               </div>
             </div>
-            <p className="text-xs text-muted-foreground">
-              Select the date range for imagery you're interested in
-            </p>
+
+            <div className="space-y-1.5">
+              <Label htmlFor="urgency" className="text-xs text-slate-300">Urgency Level *</Label>
+              <Select
+                value={urgency}
+                onValueChange={(value) => setValue("urgency", value as "standard" | "urgent" | "emergency")}
+              >
+                <SelectTrigger id="urgency" className="min-h-[44px] bg-slate-800 border-slate-600 text-white">
+                  <SelectValue placeholder="Select urgency level" />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="standard">🕐 Standard — 5–7 business days</SelectItem>
+                  <SelectItem value="urgent">⚡ Urgent — 2–3 business days</SelectItem>
+                  <SelectItem value="emergency">🚨 Emergency — 24–48 hours</SelectItem>
+                </SelectContent>
+              </Select>
+              {errors.urgency && <p className="text-xs text-destructive">{errors.urgency.message}</p>}
+            </div>
           </div>
 
-          {/* Urgency */}
-          <div className="space-y-1.5 sm:space-y-2">
-            <Label htmlFor="urgency" className="text-sm">Urgency Level *</Label>
-            <Select
-              value={urgency}
-              onValueChange={(value) => setValue("urgency", value as "standard" | "urgent" | "emergency")}
-            >
-              <SelectTrigger id="urgency" aria-describedby={errors.urgency ? "urgency-error" : undefined} className="min-h-[44px]">
-                <SelectValue placeholder="Select urgency level" />
-              </SelectTrigger>
-              <SelectContent>
-                <SelectItem value="standard">Standard (5-7 business days)</SelectItem>
-                <SelectItem value="urgent">Urgent (2-3 business days)</SelectItem>
-                <SelectItem value="emergency">Emergency (24-48 hours)</SelectItem>
-              </SelectContent>
-            </Select>
-            {errors.urgency && (
-              <p id="urgency-error" className="text-xs sm:text-sm text-destructive">
-                {errors.urgency.message}
-              </p>
-            )}
-          </div>
-
-          {/* Additional Requirements */}
-          <div className="space-y-1.5 sm:space-y-2">
-            <Label htmlFor="additional_requirements" className="text-sm">Additional Requirements</Label>
+          {/* ── Section: Additional Requirements ── */}
+          <div className="space-y-3">
+            <div className="flex items-center gap-2 pb-1 border-b border-slate-700">
+              <Filter className="h-4 w-4 text-yellow-400" />
+              <h3 className="text-sm font-semibold text-slate-200">Additional Requirements</h3>
+            </div>
             <Textarea
               id="additional_requirements"
-              placeholder="Please provide any additional details about your imagery requirements..."
+              placeholder="Describe any specific requirements — e.g. off-nadir angle, stereo pairs, delivery format, processing level..."
               rows={4}
               {...register("additional_requirements")}
-              aria-invalid={errors.additional_requirements ? "true" : "false"}
-              aria-describedby={errors.additional_requirements ? "additional_requirements-error" : undefined}
-              className="min-h-[100px] resize-y"
+              className="min-h-[100px] resize-y bg-slate-800 border-slate-600 text-white placeholder:text-slate-500 focus:border-yellow-500"
             />
             {errors.additional_requirements && (
-              <p id="additional_requirements-error" className="text-xs sm:text-sm text-destructive">
-                {errors.additional_requirements.message}
-              </p>
+              <p className="text-xs text-destructive">{errors.additional_requirements.message}</p>
             )}
           </div>
 
           {/* Submit Button */}
-          <div className="flex flex-col sm:flex-row justify-end gap-2 sm:gap-3 pt-4 border-t">
+          <div className="flex flex-col sm:flex-row justify-end gap-2 sm:gap-3 pt-4 border-t border-slate-700">
             <Button
               type="button"
               variant="outline"
               onClick={() => onOpenChange(false)}
               disabled={isSubmitting}
-              className="w-full sm:w-auto min-h-[44px] order-2 sm:order-1"
+              className="w-full sm:w-auto min-h-[44px] order-2 sm:order-1 border-slate-600 text-slate-300 hover:bg-slate-800"
             >
               Cancel
             </Button>
             <Button
               type="submit"
               disabled={isSubmitting || !aoiData}
-              className="w-full sm:w-auto bg-yellow-500 hover:bg-yellow-600 text-slate-900 min-h-[44px] order-1 sm:order-2"
+              className="w-full sm:w-auto bg-yellow-500 hover:bg-yellow-600 text-slate-900 font-semibold min-h-[44px] order-1 sm:order-2 disabled:opacity-50"
             >
               {isSubmitting ? "Submitting..." : "Submit Request"}
             </Button>

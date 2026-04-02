@@ -34,6 +34,8 @@ interface ImageryRequest {
   email: string;
   company?: string;
   phone?: string;
+  use_case?: string;
+  data_type?: string;
   aoi_type: string;
   aoi_coordinates: {
     type: string;

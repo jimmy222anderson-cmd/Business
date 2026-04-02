@@ -9,6 +9,7 @@ export interface User {
   email: string;
   full_name?: string;
   company?: string;
+  phone?: string;
   role: 'user' | 'admin';
   email_verified?: boolean;
   created_at: string;
